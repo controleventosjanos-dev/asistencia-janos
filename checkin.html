@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asistencia Janos</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+     background:#f1f5f9;min-height:100vh;display:flex;align-items:center;
+     justify-content:center;padding:16px}
+.card{background:#fff;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.12);
+      padding:32px 24px;max-width:360px;width:100%;text-align:center}
+.logo{font-size:12px;font-weight:700;letter-spacing:2px;color:#94a3b8;
+      margin-bottom:20px;text-transform:uppercase}
+video{width:100%;border-radius:12px;background:#000;aspect-ratio:3/4;
+      object-fit:cover;display:block;margin-bottom:12px}
+canvas{display:none}
+.badge-tipo{display:inline-block;color:#fff;font-size:11px;font-weight:700;
+            letter-spacing:1px;padding:5px 14px;border-radius:100px;margin-bottom:16px}
+button{width:100%;padding:14px;border:none;border-radius:12px;
+       color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;transition:.2s}
+button:disabled{opacity:.5;cursor:not-allowed}
+#cam-status{margin-top:16px;font-size:14px;color:#64748b;min-height:20px;line-height:1.5}
+#gps-badge{font-size:12px;margin-bottom:10px;min-height:18px;color:#94a3b8}
+
+/* Pantalla de resultado */
+#result{display:none}
+#result .r-emoji{font-size:72px;margin-bottom:16px}
+#result .r-badge{display:inline-block;color:#fff;font-size:12px;font-weight:800;
+                 letter-spacing:1.5px;padding:6px 18px;border-radius:100px;margin-bottom:24px}
+#result .r-nombre{font-size:28px;font-weight:800;color:#111;margin-bottom:4px}
+#result .r-hora{font-size:56px;font-weight:900;margin:16px 0 4px;letter-spacing:-2px}
+#result .r-fecha{font-size:16px;color:#6b7280;margin-bottom:8px}
+#result .r-conf{font-size:12px;color:#d1d5db}
+#result .r-cierra{font-size:13px;color:#d1d5db;margin-top:16px}
+#result.dup .r-badge{background:#92400e}
+#result.err-card .r-badge{background:#991b1b}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">Eventos Janos</div>
+
+  <!-- Pantalla de check-in -->
+  <div id="checkin-wrap">
+    <div class="badge-tipo" id="badge-tipo"></div>
+    <div id="gps-badge">ð Verificando ubicaciÃ³n...</div>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas"></canvas>
+    <button id="btn" onclick="verificar()">ð¸ <span id="btn-label"></span></button>
+    <div id="cam-status">EnfocÃ¡ tu cara a la cÃ¡mara</div>
+  </div>
+
+  <!-- Pantalla de resultado (inline, sin redirect) -->
+  <div id="result">
+    <div class="r-emoji" id="s-emoji"></div>
+    <div class="r-badge" id="s-badge"></div>
+    <div class="r-nombre" id="r-nombre"></div>
+    <div class="r-hora" id="r-hora"></div>
+    <div class="r-fecha" id="s-fecha"></div>
+    <div class="r-conf" id="r-conf"></div>
+    <div class="s-cierra">PodÃ©s cerrar esta pantalla</div>
+  </div>
+</div>
+
+<script>
+// ââ CONFIG ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const API_URL    = "https://p710uk49qg.execute-api.us-east-2.amazonaws.com/prod";
+const APPS_URL   = "https://script.google.com/macros/s/AKfycbwFatJVhY37Bq41r18U4-e-BbxzkgOl8qpZ6hxilNMbZITNYr8YkRE4RA2y6RBfTFcK8g/exec";
+const LAT_SALON  = -34.56579223324552;
+const LON_SALON  = -58.701169532763934;
+const RADIO_M    = 100;
+const BYPASS_IDS = ["PAB001"];
+const TIPO       = (new URLSearchParams(location.search).get("tipo") || "entrada").toLowerCase();
+
+// ââ UI init ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+const esEntrada = TIPO === "entrada";
+const COLOR     = esEntrada ? "#1e40af" : "#991b1b";
+const LABEL     = esEntrada ? "REGISTRAR ENTRADA" : "REGISTRAR SALIDA";
+document.getElementById("badge-tipo").textContent = LABEL;
+document.getElementById("badge-tipo").style.background = COLOR;
+document.getElementById("btn").style.background = COLOR;
+document.getElementById("btn-label").textContent = LABEL;
+
+// ââ GPS ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat/2)**2 +
+            Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+let gpsLat = null, gpsLon = null, gpsDist = null, gpsOk = false;
+
+navigator.geolocation.getCurrentPosition(
+  pos => {
+    gpsLat  = pos.coords.latitude;
+    gpsLon  = pos.coords.longitude;
+    gpsDist = haversine(gpsLat, gpsLon, LAT_SALON, LON_SALON);
+    gpsOk   = gpsDist <= RADIO_M;
+    const badge = document.getElementById("gps-badge");
+    if (gpsOk) {
+      badge.style.color = "#16a34a";
+      badge.textContent = "â UbicaciÃ³n verificada â " + Math.round(gpsDist) + "m del salÃ³n";
+    } else {
+      badge.style.color = "#dc2626";
+      badge.textContent = "â  EstÃ¡s a " + Math.round(gpsDist) + "m del salÃ³n";
+    }
+  },
+  () => {
+    const badge = document.getElementById("gps-badge");
+    badge.style.color = "#dc2626";
+    badge.textContent = "â  No se pudo obtener ubicaciÃ³n";
+  },
+  { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+);
+
+// ââ CÃ¡mara (arranca de inmediato) ââââââââââââââââââââââââââââââââ
+navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
+  .then(s => { document.getElementById("video").srcObject = s; })
+  .catch(() => { document.getElementById("cam-status").textContent = "No se pudo acceder a la cÃ¡mara."; });
+
+// ââ Mostrar resultado inline âââââââââââââââââââââââââââââââââââââ
+function mostrarResultado(tipo, data) {
+  document.getElementById("checkin-wrap").style.display = "none";
+  const res = document.getElementById("result");
+  res.style.display = "block";
+
+  if (tipo === "ok") {
+    const ent   = TIPO === "entrada";
+    const color = ent ? "#16a34a" : "#2563eb";
+    res.style.background = ent ? "#f0fdf4" : "#eff6ff";
+    document.body.style.background = ent ? "#f0fdf4" : "#eff6ff";
+    document.getElementById("r-emoji").textContent  = ent ? "â" : "ð";
+    document.getElementById("r-badge").textContent  = ent ? "INGRESO REGISTRADO" : "SALIDA REGISTRADA";
+    document.getElementById("r-badge").style.background = color;
+    document.getElementById("r-nombre").textContent = data.nombre;
+    document.getElementById("r-hora").textContent   = data.hora;
+    document.getElementById("r-hora").style.color   = color;
+    document.getElementById("r-fecha").textContent  = data.fecha;
+    document.getElementById("r-conf").textContent   = data.conf ? "Â· " + Math.round(data.conf) + "% confianza" : "";
+  } else if (tipo === "dup") {
+    res.style.background = "#fffbeb";
+    document.body.style.background = "#fffbeb";
+    res.classList.add("dup");
+    document.getElementById("r-emoji").textContent  = "â±ï¸";
+    document.getElementById("r-badge").textContent  = "YA REGISTRADO";
+    document.getElementById("r-nombre").textContent = data.nombre;
+    document.getElementById("r-hora").textContent   = "";
+    document.getElementById("r-fecha").textContent  = "";
+    document.getElementById("r-conf").textContent   = "Tu " + TIPO + " ya fue registrada hace menos de 5 minutos.";
+  } else {
+    res.style.background = "#fef2f2";
+    document.body.style.background = "#fef2f2";
+    res.classList.add("err-card");
+    document.getElementById("r-emoji").textContent  = "â";
+    document.getElementById("r-badge").textContent  = "ERROR";
+    document.getElementById("r-nombre").textContent = "";
+    document.getElementById("r-hora").textContent   = "";
+    document.getElementById("r-fecha").textContent  = data.msg || "Error desconocido";
+    document.getElementById("r-conf").textContent   = "";
+  }
+}
+
+// ââ Check-in âââââââââââââââââââââââââââââââââââââââââââââââââââââ
+async function verificar() {
+  const btn    = document.getElementById("btn");
+  const status = document.getElementById("cam-status");
+  btn.disabled = true;
+  status.textContent = "Verificando identidad...";
+
+  const video  = document.getElementById("video");
+  const canvas = document.getElementById("canvas");
+  canvas.width  = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext("2d").drawImage(video, 0, 0);
+  const b64 = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
+
+  try {
+    // 1. Reconocimiento facial â Lambda
+    const res  = await fetch(API_URL + "/verificar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageBase64: b64, tipo: TIPO })
+    });
+    const data = await res.json();
+
+    if (!data.matched) {
+      status.textContent = data.reason === "no_face"
+        ? "No se detectÃ³ un rostro. IntentÃ¡ de nuevo."
+        : "Rostro no reconocido. ContactÃ¡ al administrador.";
+      btn.disabled = false;
+      return;
+    }
+
+    // 2. GPS check (bypass para IDs especiales)
+    const esBypass = BYPASS_IDS.includes(data.employeeId);
+    if (!esBypass && !gpsOk) {
+      const msg = gpsDist !== null
+        ? "EstÃ¡s a " + Math.round(gpsDist) + "m del salÃ³n. El check-in solo es vÃ¡lido dentro del establecimiento."
+        : "No se pudo verificar tu ubicaciÃ³n. ActivÃ¡ el GPS y volvÃ© a intentar.";
+      status.innerHTML = '<span style="color:#dc2626;font-weight:600">' + msg + '</span>';
+      btn.disabled = false;
+      return;
+    }
+
+    // 3. Registrar en Google Sheets â Apps Script (sin cookies, evita redirecciÃ³n /u/N/)
+    status.textContent = "Registrando asistencia...";
+    const params = new URLSearchParams({
+      action: "registrar",
+      format: "json",
+      id:     data.employeeId,
+      name:   data.name,
+      tipo:   TIPO,
+      conf:   data.confidence,
+      lat:    gpsLat  ? gpsLat.toFixed(6)   : "",
+      lon:    gpsLon  ? gpsLon.toFixed(6)   : "",
+      dist:   gpsDist ? Math.round(gpsDist) : ""
+    });
+
+    const reg = await fetch(APPS_URL + "?" + params.toString(), { credentials: "omit" });
+    const regData = await reg.json();
+
+    if (regData.duplicado) {
+      mostrarResultado("dup", { nombre: data.name });
+    } else if (regData.ok) {
+      mostrarResultado("ok", {
+        nombre: data.name,
+        hora:   regData.hora,
+        fecha:  regData.fecha,
+        conf:   data.confidence
+      });
+    } else {
+      mostrarResultado("err", { msg: regData.error || "Error al registrar" });
+    }
+
+  } catch(e) {
+    status.textContent = "Error de conexiÃ³n. IntentÃ¡ de nuevo.";
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
