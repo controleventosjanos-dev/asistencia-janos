@@ -2,30 +2,47 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin - Registro de empleados</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-     background:#f1f5f9;min-height:100vh;padding:24px}
-.card{background:#fff;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,.08);
-      padding:28px 24px;max-width:400px;margin:0 auto}
-h2{font-size:20px;color:#1e3a8a;margin-bottom:6px}
-.salon-tag{font-size:12px;color:#94a3b8;margin-bottom:20px}
-label{display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:4px}
-input{width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;
-      font-size:15px;margin-bottom:16px;outline:none}
-input:focus{border-color:#1e40af}
-video{width:100%;border-radius:12px;background:#000;aspect-ratio:4/3;
-      object-fit:cover;display:block;margin-bottom:16px}
-canvas{display:none}
-button{width:100%;padding:13px;background:#1e3a8a;color:#fff;border:none;
-       border-radius:10px;font-size:15px;font-weight:700;cursor:pointer}
-button:disabled{opacity:.5}
-#msg{margin-top:14px;font-size:14px;padding:10px 14px;border-radius:8px;display:none}
-.ok{background:#dcfce7;color:#166534}
-.err{background:#fee2e2;color:#991b1b}
-#gps-info{font-size:12px;color:#94a3b8;margin-bottom:16px;min-height:18px}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+       background: #f1f5f9; min-height: 100vh; display: flex;
+       align-items: center; justify-content: center; padding: 16px; }
+.card { background: white; border-radius: 16px; padding: 28px 24px;
+        width: 100%; max-width: 420px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
+h2 { font-size: 1.4rem; color: #1e3a5f; margin-bottom: 4px; }
+.salon-tag { font-size: 0.82rem; color: #64748b; margin-bottom: 14px; }
+#gps-info { font-size: 0.82rem; color: #64748b; margin-bottom: 16px;
+            padding: 8px 12px; background: #f8fafc; border-radius: 8px; }
+label { display: block; font-size: 0.78rem; font-weight: 600;
+        color: #475569; margin-bottom: 4px; margin-top: 12px; }
+input { width: 100%; padding: 10px 14px; border: 1.5px solid #cbd5e1;
+        border-radius: 10px; font-size: 0.95rem; outline: none;
+        transition: border-color 0.2s; }
+input:focus { border-color: #3b82f6; }
+.cam-wrap { position: relative; margin-top: 16px; margin-bottom: 4px;
+            background: #0f172a; border-radius: 12px; overflow: hidden; }
+video { width: 100%; display: block; border-radius: 12px;
+        min-height: 200px; }
+canvas { display: none; }
+#btn-flip { position: absolute; top: 10px; right: 10px; z-index: 10;
+            background: rgba(0,0,0,0.55); border: none; border-radius: 50%;
+            width: 44px; height: 44px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.3rem; transition: background 0.2s; }
+#btn-flip:hover { background: rgba(0,0,0,0.80); }
+#btn { width: 100%; margin-top: 16px; padding: 13px;
+       background: #1e3a5f; color: white; border: none;
+       border-radius: 12px; font-size: 1rem; font-weight: 600;
+       cursor: pointer; transition: background 0.2s; }
+#btn:hover:not(:disabled) { background: #2d5a8e; }
+#btn:disabled { opacity: 0.6; cursor: not-allowed; }
+#msg { margin-top: 14px; padding: 10px 14px; border-radius: 10px;
+       font-size: 0.9rem; display: none; font-weight: 500; }
+#msg.ok { background: #dcfce7; color: #15803d; }
+#msg.err { background: #fee2e2; color: #b91c1c; }
 </style>
 </head>
 <body>
@@ -34,13 +51,19 @@ button:disabled{opacity:.5}
   <div class="salon-tag">Janos Bella Vista 2 &mdash; Panel Admin</div>
   <div id="gps-info">&#128205; Verificando ubicacion...</div>
 
-  <label>ID empleado</label>
-  <input id="empId" type="text" placeholder="EMP001">
-  <label>Nombre completo</label>
-  <input id="empName" type="text" placeholder="Maria Garcia">
+  <label for="empId">ID empleado</label>
+  <input id="empId" type="text" placeholder="EMP001" autocomplete="off">
+
+  <label for="empName">Nombre completo</label>
+  <input id="empName" type="text" placeholder="Maria Garcia" autocomplete="off">
+
   <label>Camara</label>
-  <video id="video" autoplay playsinline></video>
+  <div class="cam-wrap">
+    <video id="video" autoplay playsinline muted></video>
+    <button id="btn-flip" onclick="flipCamera()" title="Voltear camara">&#8635;</button>
+  </div>
   <canvas id="canvas"></canvas>
+
   <button id="btn" onclick="registrar()">&#128248; Tomar foto y registrar</button>
   <div id="msg"></div>
 </div>
@@ -50,10 +73,15 @@ var API_URL = "https://p710uk49qg.execute-api.us-east-2.amazonaws.com/prod";
 var LAT_SALON = -34.56579223324552;
 var LON_SALON = -58.701169532763934;
 var RADIO_M = 100;
-
 var TOKEN_OK = (new URLSearchParams(location.search).get("token") || "") === "janos2026admin";
+var currentFacing = "user";
+var currentStream = null;
+
 if (!TOKEN_OK) {
-  document.body.innerHTML = '<div style="text-align:center;padding:80px;font-family:sans-serif"><div style="font-size:48px">&#128274;</div><p style="margin-top:16px;color:#64748b">Acceso no autorizado</p></div>';
+  document.body.innerHTML = '<div style="text-align:center;padding:80px;font-family:sans-serif">' +
+    '<div style="font-size:3rem">&#128274;</div>' +
+    '<h2 style="color:#b91c1c;margin-top:16px">Acceso restringido</h2>' +
+    '<p style="color:#64748b;margin-top:8px">Token de admin requerido</p></div>';
 }
 
 function haversine(lat1, lon1, lat2, lon2) {
@@ -61,7 +89,8 @@ function haversine(lat1, lon1, lat2, lon2) {
   var dLat = (lat2 - lat1) * Math.PI / 180;
   var dLon = (lon2 - lon1) * Math.PI / 180;
   var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
-          Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)*Math.sin(dLon/2);
+          Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
+          Math.sin(dLon/2)*Math.sin(dLon/2);
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
@@ -83,9 +112,26 @@ navigator.geolocation.getCurrentPosition(
   { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
 );
 
-navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
-  .then(function(s) { document.getElementById("video").srcObject = s; })
-  .catch(function() { mostrarMsg("No se pudo acceder a la camara.", false); });
+function startCamera(facing) {
+  if (currentStream) {
+    currentStream.getTracks().forEach(function(t) { t.stop(); });
+    currentStream = null;
+  }
+  var constraints = { video: { facingMode: facing }, audio: false };
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(function(stream) {
+      currentStream = stream;
+      document.getElementById("video").srcObject = stream;
+    })
+    .catch(function(err) {
+      mostrarMsg("No se pudo acceder a la camara: " + err.message, false);
+    });
+}
+
+function flipCamera() {
+  currentFacing = (currentFacing === "user") ? "environment" : "user";
+  startCamera(currentFacing);
+}
 
 function mostrarMsg(txt, ok) {
   var el = document.getElementById("msg");
@@ -98,18 +144,15 @@ async function registrar() {
   var empId   = document.getElementById("empId").value.trim();
   var empName = document.getElementById("empName").value.trim();
   if (!empId || !empName) { mostrarMsg("Completa ID y nombre.", false); return; }
-
   var btn = document.getElementById("btn");
   btn.disabled = true;
   mostrarMsg("Registrando...", true);
-
   var video  = document.getElementById("video");
   var canvas = document.getElementById("canvas");
-  canvas.width  = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext("2d").drawImage(video, 0, 0);
+  canvas.width  = video.videoWidth  || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
   var b64 = canvas.toDataURL("image/jpeg", 0.9).split(",")[1];
-
   try {
     var res  = await fetch(API_URL + "/registrar", {
       method: "POST",
@@ -129,6 +172,8 @@ async function registrar() {
   }
   btn.disabled = false;
 }
+
+startCamera(currentFacing);
 </script>
 </body>
 </html>
