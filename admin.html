@@ -77,14 +77,14 @@ navigator.geolocation.getCurrentPosition(
       info.style.color = "#16a34a";
       info.textContent = "â UbicaciÃ³n verificada â " + Math.round(dist) + "m del salÃ³n";
     } else {
-      info.style.color: = "#f59e0b";
-      info.textContent = "âª Registrando desde " + Math.round(dist) + "m del salÃ³n";
+      info.style.color = "#f59e0b";
+      info.textContent = "â  Registrando desde " + Math.round(dist) + "m del salÃ³n";
     }
   },
   () => {
     document.getElementById("gps-info").textContent = "ð UbicaciÃ³n no disponible";
   },
-  { enableHighAccuracy:] true, timeout: 10000, maximumAge: 0 }
+  { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
 );
 
 // ââ CÃ¡mara âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
@@ -94,7 +94,7 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: fals
 
 function mostrarMsg(txt, ok) {
   const el = document.getElementById("msg");
-  el.textContent = txt;
+  el.textContent= txt;
   el.className = ok ? "ok" : "err";
   el.style.display = "block";
 }
