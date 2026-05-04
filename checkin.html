@@ -2,246 +2,329 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Asistencia Janos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>JANOS – Control de Asistencia</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-     background:#f1f5f9;min-height:100vh;display:flex;align-items:center;
-     justify-content:center;padding:16px}
-.card{background:#fff;border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,.12);
-      padding:32px 24px;max-width:360px;width:100%;text-align:center}
-.logo{font-size:12px;font-weight:700;letter-spacing:2px;color:#94a3b8;
-      margin-bottom:20px;text-transform:uppercase}
-video{width:100%;border-radius:12px;background:#000;aspect-ratio:3/4;
-      object-fit:cover;display:block;margin-bottom:12px}
-canvas{display:none}
-.badge-tipo{display:inline-block;color:#fff;font-size:11px;font-weight:700;
-            letter-spacing:1px;padding:5px 14px;border-radius:100px;margin-bottom:16px}
-button{width:100%;padding:14px;border:none;border-radius:12px;
-       color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:8px;transition:.2s}
-button:disabled{opacity:.5;cursor:not-allowed}
-#cam-status{margin-top:16px;font-size:14px;color:#64748b;min-height:20px;line-height:1.5}
-#gps-badge{font-size:12px;margin-bottom:10px;min-height:18px;color:#94a3b8}
-
-/* Pantalla de resultado */
-#result{display:none}
-#result .r-emoji{font-size:72px;margin-bottom:16px}
-#result .r-badge{display:inline-block;color:#fff;font-size:12px;font-weight:800;
-                 letter-spacing:1.5px;padding:6px 18px;border-radius:100px;margin-bottom:24px}
-#result .r-nombre{font-size:28px;font-weight:800;color:#111;margin-bottom:4px}
-#result .r-hora{font-size:56px;font-weight:900;margin:16px 0 4px;letter-spacing:-2px}
-#result .r-fecha{font-size:16px;color:#6b7280;margin-bottom:8px}
-#result .r-conf{font-size:12px;color:#d1d5db}
-#result .r-cierra{font-size:13px;color:#d1d5db;margin-top:16px}
-#result.dup .r-badge{background:#92400e}
-#result.err-card .r-badge{background:#991b1b}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:16px}
+  .logo{font-size:3rem;text-align:center;margin-bottom:4px}
+  h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-bottom:4px}
+  .salon-tag{text-align:center;font-size:.95rem;color:#94a3b8;margin-bottom:20px;padding:8px 16px;background:#1e293b;border-radius:20px;display:inline-block}
+  .card{background:#1e293b;border-radius:16px;padding:20px;width:100%;max-width:420px;border:1px solid #334155;margin-bottom:16px}
+  #video{width:100%;border-radius:12px;background:#000;display:block;max-height:320px;object-fit:cover}
+  #canvas{display:none}
+  .btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:10px}
+  .btn-scan{background:#6366f1;color:#fff}
+  .btn-scan:hover{background:#4f46e5}
+  .btn-scan:disabled{background:#334155;color:#64748b;cursor:not-allowed}
+  .btn-flip{background:#475569;color:#fff;font-size:.85rem;padding:9px;margin-top:6px}
+  .result{width:100%;max-width:420px;border-radius:16px;padding:24px;text-align:center;display:none}
+  .result-ok{background:#064e3b;border:2px solid #10b981}
+  .result-err{background:#450a0a;border:2px solid #ef4444}
+  .result-warn{background:#431407;border:2px solid #f97316}
+  .result-icon{font-size:3.5rem;margin-bottom:12px}
+  .result-name{font-size:1.4rem;font-weight:800;margin-bottom:6px}
+  .result-detail{font-size:.9rem;color:#94a3b8;line-height:1.6}
+  .confidence{display:inline-block;background:rgba(255,255,255,.1);border-radius:20px;padding:3px 12px;font-size:.85rem;margin-top:6px}
+  .gps-status{text-align:center;font-size:.8rem;padding:6px 12px;border-radius:20px;margin-bottom:12px;display:inline-block}
+  .gps-ok{background:#064e3b;color:#34d399}
+  .gps-wait{background:#1e3a5f;color:#93c5fd}
+  .gps-err{background:#450a0a;color:#f87171}
+  .spinner{display:inline-block;width:20px;height:20px;border:3px solid #334155;border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .tipo-btns{display:flex;gap:10px;margin-bottom:14px}
+  .tipo-btn{flex:1;padding:10px;border:2px solid #334155;border-radius:10px;background:transparent;color:#94a3b8;font-weight:600;cursor:pointer;transition:all .2s;font-size:.9rem}
+  .tipo-btn.active{border-color:#6366f1;color:#818cf8;background:#1e1b4b}
+  .center{text-align:center}
 </style>
 </head>
 <body>
+
+<div class="logo">🪩</div>
+<h1>Control de Asistencia</h1>
+<div class="center"><span class="salon-tag" id="salonLabel">Cargando...</span></div>
+
+<div id="gpsStatus" class="gps-status gps-wait">📍 Obteniendo ubicación...</div>
+
 <div class="card">
-  <div class="logo">Eventos Janos</div>
-
-  <!-- Pantalla de check-in -->
-  <div id="checkin-wrap">
-    <div class="badge-tipo" id="badge-tipo"></div>
-    <div id="gps-badge">ð Verificando ubicaciÃ³n...</div>
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas"></canvas>
-    <button id="btn" onclick="verificar()">ð¸ <span id="btn-label"></span></button>
-    <div id="cam-status">EnfocÃ¡ tu cara a la cÃ¡mara</div>
+  <div class="tipo-btns">
+    <button class="tipo-btn active" id="btnEntrada" onclick="setTipo('entrada')">🟢 Entrada</button>
+    <button class="tipo-btn" id="btnSalida"  onclick="setTipo('salida')">🔴 Salida</button>
   </div>
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="canvas"></canvas>
+  <button class="btn btn-scan" id="btnScan" onclick="escanear()">📷 Verificar identidad</button>
+  <button class="btn btn-flip" onclick="flipCam()">🔄 Cambiar cámara</button>
+</div>
 
-  <!-- Pantalla de resultado (inline, sin redirect) -->
-  <div id="result">
-    <div class="r-emoji" id="r-emoji"></div>
-    <div class="r-badge" id="r-badge"></div>
-    <div class="r-nombre" id="r-nombre"></div>
-    <div class="r-hora" id="r-hora"></div>
-    <div class="r-fecha" id="r-fecha"></div>
-    <div class="r-conf" id="r-conf"></div>
-    <div class="s-cierra">PodÃ©s cerrar esta pantalla</div>
-  </div>
+<div class="result" id="result">
+  <div class="result-icon" id="resIcon"></div>
+  <div class="result-name" id="resName"></div>
+  <div class="result-detail" id="resDetail"></div>
+  <button class="btn btn-scan" onclick="reiniciar()" style="margin-top:18px">↩ Volver</button>
 </div>
 
 <script>
-// ââ CONFIG ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-const API_URL    = "https://p710uk49qg.execute-api.us-east-2.amazonaws.com/prod";
-const APPS_URL   = "https://script.google.com/macros/s/AKfycbwFatJVhY37Bq41r18U4-e-BbxzkgOl8qpZ6hxilNMbZITNYr8YkRE4RA2y6RBfTFcK8g/exec";
-const LAT_SALON  = -34.56579223324552;
-const LON_SALON  = -58.701169532763934;
-const RADIO_M    = 100;
-const BYPASS_IDS = ["PAB001"];
-const TIPO       = (new URLSearchParams(location.search).get("tipo") || "entrada").toLowerCase();
+// ── Datos embebidos desde el QR ────────────────────────────────────────────
+const SALONES = {
+  "Acceso Oeste":{"lat":-34.630051,"lng":-58.736273},
+  "Acceso Oeste 2":{"lat":-34.6343665,"lng":-58.7541304},
+  "Adrogue":{"lat":-34.79580714896355,"lng":-58.39840871349146},
+  "Avellaneda 1":{"lat":-34.67700663596199,"lng":-58.36926045956796},
+  "Avellaneda 2":{"lat":-34.67700663596199,"lng":-58.36926045956796},
+  "Avellaneda 3":{"lat":-34.67700663596199,"lng":-58.36926045956796},
+  "Avellaneda 4":{"lat":-34.67700663596199,"lng":-58.36926045956796},
+  "Bayres Eventos":{"lat":-34.49386844950456,"lng":-58.59392713305712},
+  "Bella Vista":{"lat":-34.556763,"lng":-58.695852},
+  "Bella Vista 2":{"lat":-34.56558024975642,"lng":-58.70115624468752},
+  "Benavidez 1":{"lat":-34.41328690586904,"lng":-58.70441725767073},
+  "Benavidez 2":{"lat":-34.41283070430927,"lng":-58.71634057565793},
+  "Berazategui":{"lat":-34.78078603561312,"lng":-58.24587579999999},
+  "Berazategui 2":{"lat":-34.77625697288345,"lng":-58.23644127686214},
+  "Berisso":{"lat":-34.88420883790188,"lng":-57.90217764534688},
+  "CABA Boutique":{"lat":-34.60696947952881,"lng":-58.38446560235706},
+  "Caballito 1":{"lat":-34.60976055210654,"lng":-58.4400598},
+  "Cabal
+lito 2":{"lat":-34.60976055210654,"lng":-58.4400598},
+  "Campana":{"lat":-34.1570387,"lng":-59.0185956},
+  "Canning":{"lat":-34.85605521068076,"lng":-58.5175497},
+  "Champagnat Boutique":{"lat":-34.451768,"lng":-58.916404},
+  "Costanera 1":{"lat":-34.54545894333134,"lng":-58.43118643173255},
+  "Costanera 2":{"lat":-34.54545894333134,"lng":-58.43118643173255},
+  "Dardo Rocha":{"lat":-34.4907407206998,"lng":-58.52651305767236},
+  "Darwin 1":{"lat":-34.5886717288581,"lng":-58.43687601534143},
+  "Darwin 2":{"lat":-34.5886717288581,"lng":-58.43687601534143},
+  "Del Viso":{"lat":-34.44740216850433,"lng":-58.79489273317542},
+  "DOT":{"lat":-34.54635161803416,"lng":-58.48787506064081},
+  "Escobar":{"lat":-34.376101,"lng":-58.81715},
+  "General Rodriguez":{"lat":-34.59602602954801,"lng":-58.93372882123573},
+  "Haedo":{"lat":-34.6356497,"lng":-58.5896032},
+  "Haedo 2":{"lat":-34.6356497,"lng":-58.5896032},
+  "Hipodromo La Plata":{"lat":-34.90392222834488,"lng":-57.94801235582321},
+  "Holiday Inn":{"lat":-34.73327940981686,"lng":-58.52004444603416},
+  "Holiday Inn 2":{"lat":-34.73327940981686,"lng":-58.52004444603416},
+  "House":{"lat":-34.519991,"lng":-58.742783},
+  "Hudson":{"lat":-34.80735519557907,"lng":-58.17153655397216},
+  "Hudson 2":{"lat":-34.90252141857428,"lng":-58.17218342883579},
+  "Hurlingham":{"lat":-34.601542,"lng":-58.652154},
+  "Ituzaingo":{"lat":-34.638843,"lng":-58.677128},
+  "Ituzaingo 2":{"lat":-34.66464198571634,"lng":-58.67389078886168},
+  "La Plata":{"lat":-34.94450602665787,"lng":-57.96753527384086},
+  "La Plata 2":{"lat":-34.93372659788916,"lng":-57.92991437116449},
+  "La Plata Boutique":{"lat":-34.93372659788916,"lng":-57.92991437116449},
+  "Liniers":{"lat":-34.64489496032444,"lng":-58.51045795302172},
+  "Lomas":{"lat":-34.75689134308413,"lng":-58.39613517301476},
+  "Lomas Boutique":{"lat":-34.7603301378896,"lng":-58.41099933068637},
+  "Los Naranjos":{"lat":-38.00898592439063,"lng":-57.6333206181579},
+  "Martinez":{"lat":-34.492246,"lng":-58.511093},
+  "Maschwitz":{"lat":-34.378192,"lng":-58.752286},
+  "Merlo":{"lat":-34.66875764104189,"lng":-58.7378104106764},
+  "Merlo 2":{"lat":-34.66091039235508,"lng":-58.7535604711642},
+  "Moreno":{"lat":-34.646143,"lng":-58.8033},
+  "Moron":{"lat":-34.63326397571632,"lng":-58.63119241534143},
+  "Nuñez":{"lat":-34.54218327080488,"lng":-58.45969217301391},
+  "Oficina":{"lat":-34.556763,"lng":-58.695852},
+  "Olivos":{"lat":-34.502327,"lng":-58.479292},
+  "Olivos 2":{"lat":-34.502327,"lng":-58.479292},
+  "Palacio Sans Souci":{"lat":-34.44566535800791,"lng":-58.54268630429397},
+  "Palermo Hollywood":{"lat":-34.57802364353802,"lng":-58.43768630184958},
+  "Palermo Soho":{"lat":-34.5920897560759,"lng":-58.43083028650607},
+  "Paseo Colon":{"lat":-34.61123555454792,"lng":-58.36965475270821},
+  "Pilar":{"lat":-34.44639611355176,"lng":-58.89163322778487},
+  "Pilar boutique":{"lat":-34.4074743905739,"lng":-58.85580878895455},
+  "Pilar Hotel":{"lat":-34.4569304,"lng":-58.8888985},
+  "Playa Grande":{"lat":-38.02523486067417,"lng":-57.53059157670718},
+  "Puerto Madero":{"lat":-34.60964874165761,"lng":-58.36383646002772},
+  "Puerto Madero Boutique":{"lat":-34.61439986030064,"lng":-58.3579035},
+  "Quilmes Boutique":{"lat":-34.76490647775054,"lng":-58.27535245767235},
+  "Quinta":{"lat":-34.468832,"lng":-58.797458},
+  "Ramos Boutique":{"lat":-34.64604401098804,"lng":-58.56895834496699},
+  "Ramos Boutique 2":{"lat":-34.64838835018546,"lng":-58.5695002888542},
+  "Ramos Mejia":{"lat":-34.65964903594481,"lng":-58.56208005466929},
+  "Ramos Mejia 2":{"lat":-34.65964903594481,"lng":-58.56208005466929},
+  "Recoleta":{"lat":-34.58606615760529,"lng":-58.39348064232763},
+  "San Isidro":{"lat":-34.48035092232818,"lng":-58.52074157116463},
+  "San Justo":{"lat":-34.67591894028484,"lng":-58.5875203558232},
+  "San Justo 2":{"lat":-34.67875610644857,"lng":-58.59102243181726},
+  "San Martin 1":{"lat":-34.56777583638708,"lng":-58.59138328650755},
+  "San Martin 2":{"lat":-34.56816739887635,"lng":-58.59061621404123},
+  "San Martin 3":{"lat":-34.56784016632005,"lng":-58.59070850702175},
+  "San Miguel":{"lat":-34.55440169283807,"lng":-58.71736887116464},
+  "San Telmo":{"lat":-34.61183,"lng":-58.37469},
+  "San Telmo 2":{"lat":-34.61135331347032,"lng":-58.37388707116464},
+  "San Telmo Boutique":{"lat":-34.61492395543934,"lng":-58.37116922883535},
+  "Temperley":{"lat":-34.78514977472399,"lng":-58.40608038465528},
+  "Vicente Lopez":{"lat":-34.51771,"lng":-58.47866},
+  "Villa de Mayo":{"lat":-34.5141151,"lng":-58.6815573},
+  "Villa de Mayo Boutique":{"lat":-34.5141151,"lng":-58.6815573}
+};
 
-// ââ UI init ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-const esEntrada = TIPO === "entrada";
-const COLOR     = esEntrada ? "#1e40af" : "#991b1b";
-const LABEL     = esEntrada ? "REGISTRAR ENTRADA" : "REGISTRAR SALIDA";
-document.getElementById("badge-tipo").textContent = LABEL;
-document.getElementById("badge-tipo").style.background = COLOR;
-document.getElementById("btn").style.background = COLOR;
-document.getElementById("btn-label").textContent = LABEL;
+const API_URL  = 'https://nha46wbuoo7ajwqqrsgzycavfi0rbcqh.lambda-url.us-east-2.on.aws';
+const MAX_DIST = 100; // metros
 
-// ââ GPS ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-function haversine(lat1, lon1, lat2, lon2) {
-  const R = 6371000;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat/2)**2 +
-            Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+var params    = new URLSearchParams(window.location.search);
+var salonNom  = decodeURIComponent(params.get('salon') || '');
+var salonData = SALONES[salonNom] || null;
+var userLat   = null, userLng = null;
+var gpsOk     = false;
+var tipo      = 'entrada';
+var stream    = null, facing = 'environment';
+
+// Init
+document.getElementById('salonLabel').textContent = salonNom || '⚠ Salón no especificado';
+
+if (!salonNom || !salonData) {
+  document.getElementById('gpsStatus').className = 'gps-status gps-err';
+  document.getElementById('gpsStatus').textContent = '⚠ QR sin salón válido';
 }
 
-let gpsLat = null, gpsLon = null, gpsDist = null, gpsOk = false;
+function setTipo(t) {
+  tipo = t;
+  document.getElementById('btnEntrada').className = 'tipo-btn' + (t==='entrada'?' active':'');
+  document.getElementById('btnSalida').className  = 'tipo-btn' + (t==='salida' ?' active':'');
+}
 
-navigator.geolocation.getCurrentPosition(
-  pos => {
-    gpsLat  = pos.coords.latitude;
-    gpsLon  = pos.coords.longitude;
-    gpsDist = haversine(gpsLat, gpsLon, LAT_SALON, LON_SALON);
-    gpsOk   = gpsDist <= RADIO_M;
-    const badge = document.getElementById("gps-badge");
-    if (gpsOk) {
-      badge.style.color = "#16a34a";
-      badge.textContent = "â UbicaciÃ³n verificada â " + Math.round(gpsDist) + "m del salÃ³n";
-    } else {
-      badge.style.color = "#dc2626";
-      badge.textContent = "â  EstÃ¡s a " + Math.round(gpsDist) + "m del salÃ³n";
-    }
-  },
-  () => {
-    const badge = document.getElementById("gps-badge");
-    badge.style.color = "#dc2626";
-    badge.textContent = "â  No se pudo obtener ubicaciÃ³n";
-  },
-  { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-);
+// GPS
+function obtenerGPS() {
+  if (!navigator.geolocation) {
+    setGPSStatus('err', '📍 GPS no disponible en este dispositivo');
+    gpsOk = true; // allow without GPS
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      userLat = pos.coords.latitude;
+      userLng = pos.coords.longitude;
+      if (salonData) {
+        var dist = haversine(userLat, userLng, salonData.lat, salonData.lng);
+        if (dist <= MAX_DIST) {
+          setGPSStatus('ok', '✅ Ubicación verificada — ' + Math.round(dist) + 'm del salón');
+          gpsOk = true;
+        } else {
+          setGPSStatus('err', '⛔ Estás a ' + Math.round(dist) + 'm del salón (máx ' + MAX_DIST + 'm)');
+          gpsOk = false;
+        }
+      } else {
+        setGPSStatus('ok', '📍 GPS: ' + userLat.toFixed(5) + ', ' + userLng.toFixed(5));
+        gpsOk = true;
+      }
+    },
+    function(err) {
+      setGPSStatus('warn', '⚠ No se pudo obtener ubicación — se permitirá igualmente');
+      gpsOk = true;
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+}
 
-// ââ CÃ¡mara (arranca de inmediato) ââââââââââââââââââââââââââââââââ
-navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
-  .then(s => { document.getElementById("video").srcObject = s; })
-  .catch(() => { document.getElementById("cam-status").textContent = "No se pudo acceder a la cÃ¡mara."; });
+function setGPSStatus(tipo, txt) {
+  var el = document.getElementById('gpsStatus');
+  el.className = 'gps-status gps-' + tipo;
+  el.textContent = txt;
+}
 
-// ââ Mostrar resultado inline âââââââââââââââââââââââââââââââââââââ
-function mostrarResultado(tipo, data) {
-  document.getElementById("checkin-wrap").style.display = "none";
-  const res = document.getElementById("result");
-  res.style.display = "block";
+function haversine(lat1, lng1, lat2, lng2) {
+  var R = 6371000;
+  var dLat = (lat2-lat1)*Math.PI/180;
+  var dLng = (lng2-lng1)*Math.PI/180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+          Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+          Math.sin(dLng/2)*Math.sin(dLng/2);
+  return 2*R*Math.asin(Math.sqrt(a));
+}
 
-  if (tipo === "ok") {
-    const ent   = TIPO === "entrada";
-    const color = ent ? "#16a34a" : "#2563eb";
-    res.style.background = ent ? "#f0fdf4" : "#eff6ff";
-    document.body.style.background = ent ? "#f0fdf4" : "#eff6ff";
-    document.getElementById("r-emoji").textContent  = ent ? "â" : "ð";
-    document.getElementById("r-badge").textContent  = ent ? "INGRESO REGISTRADO" : "SALIDA REGISTRADA";
-    document.getElementById("r-badge").style.background = color;
-    document.getElementById("r-nombre").textContent = data.nombre;
-    document.getElementById("r-hora").textContent   = data.hora;
-    document.getElementById("r-hora").style.color   = color;
-    document.getElementById("r-fecha").textContent  = data.fecha;
-    document.getElementById("r-conf").textContent   = data.conf ? "Â· " + Math.round(data.conf) + "% confianza" : "";
-  } else if (tipo === "dup") {
-    res.style.background = "#fffbeb";
-    document.body.style.background = "#fffbeb";
-    res.classList.add("dup");
-    document.getElementById("r-emoji").textContent  = "â±ï¸";
-    document.getElementById("r-badge").textContent  = "YA REGISTRADO";
-    document.getElementById("r-nombre").textContent = data.nombre;
-    document.getElementById("r-hora").textContent   = "";
-    document.getElementById("r-fecha").textContent  = "";
-    document.getElementById("r-conf").textContent   = "Tu " + TIPO + " ya fue registrada hace menos de 5 minutos.";
-  } else {
-    res.style.background = "#fef2f2";
-    document.body.style.background = "#fef2f2";
-    res.classList.add("err-card");
-    document.getElementById("r-emoji").textContent  = "â";
-    document.getElementById("r-badge").textContent  = "ERROR";
-    document.getElementById("r-nombre").textContent = "";
-    document.getElementById("r-hora").textContent   = "";
-    document.getElementById("r-fecha").textContent  = data.msg || "Error desconocido";
-    document.getElementById("r-conf").textContent   = "";
+async function iniciarCam(f) {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: f, width:{ideal:640}, height:{ideal:480} },
+      audio: false
+    });
+    document.getElementById('video').srcObject = stream;
+  } catch(e) {
+    mostrarResult('err','❌','Sin cámara','No se pudo acceder: '+e.message);
   }
 }
 
-// ââ Check-in âââââââââââââââââââââââââââââââââââââââââââââââââââââ
-async function verificar() {
-  const btn    = document.getElementById("btn");
-  const status = document.getElementById("cam-status");
-  btn.disabled = true;
-  status.textContent = "Verificando identidad...";
+function flipCam() {
+  facing = facing==='user'?'environment':'user';
+  iniciarCam(facing);
+}
 
-  const video  = document.getElementById("video");
-  const canvas = document.getElementById("canvas");
-  canvas.width  = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext("2d").drawImage(video, 0, 0);
-  const b64 = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
+async function escanear() {
+  if (!gpsOk) {
+    mostrarResult('err','⛔','Fuera de rango','Debés estar dentro de los ' + MAX_DIST + 'm del salón para marcar asistencia.');
+    return;
+  }
+
+  var btn = document.getElementById('btnScan');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Verificando...';
+
+  var video  = document.getElementById('video');
+  var canvas = document.getElementById('canvas');
+  canvas.width  = video.videoWidth  || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  var b64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+
+  var payload = {
+    imageBase64: b64,
+    salon:       salonNom,
+    tipo:        tipo,
+    userLat:     userLat,
+    userLng:     userLng,
+    salonLat:    salonData ? salonData.lat : null,
+    salonLng:    salonData ? salonData.lng : null
+  };
 
   try {
-    // 1. Reconocimiento facial â Lambda
-    const res  = await fetch(API_URL + "/verificar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imageBase64: b64, tipo: TIPO })
+    var res  = await fetch(API_URL + '/verificar', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
     });
-    const data = await res.json();
+    var data = await res.json();
 
-    if (!data.matched) {
-      status.textContent = data.reason === "no_face"
-        ? "No se detectÃ³ un rostro. IntentÃ¡ de nuevo."
-        : "Rostro no reconocido. ContactÃ¡ al administrador.";
-      btn.disabled = false;
-      return;
-    }
-
-    // 2. GPS check (bypass para IDs especiales)
-    const esBypass = BYPASS_IDS.includes(data.employeeId);
-    if (!esBypass && !gpsOk) {
-      const msg = gpsDist !== null
-        ? "EstÃ¡s a " + Math.round(gpsDist) + "m del salÃ³n. El check-in solo es vÃ¡lido dentro del establecimiento."
-        : "No se pudo verificar tu ubicaciÃ³n. ActivÃ¡ el GPS y volvÃ© a intentar.";
-      status.innerHTML = '<span style="color:#dc2626;font-weight:600">' + msg + '</span>';
-      btn.disabled = false;
-      return;
-    }
-
-    // 3. Registrar en Google Sheets â Apps Script (sin cookies, evita redirecciÃ³n /u/N/)
-    status.textContent = "Registrando asistencia...";
-    const params = new URLSearchParams({
-      action: "registrar",
-      format: "json",
-      id:     data.employeeId,
-      name:   data.name,
-      tipo:   TIPO,
-      conf:   data.confidence,
-      lat:    gpsLat  ? gpsLat.toFixed(6)   : "",
-      lon:    gpsLon  ? gpsLon.toFixed(6)   : "",
-      dist:   gpsDist ? Math.round(gpsDist) : ""
-    });
-
-    const reg = await fetch(APPS_URL + "?" + params.toString(), { credentials: "omit" });
-    const regData = await reg.json();
-
-    if (regData.duplicado) {
-      mostrarResultado("dup", { nombre: data.name });
-    } else if (regData.ok) {
-      mostrarResultado("ok", {
-        nombre: data.name,
-        hora:   regData.hora,
-        fecha:  regData.fecha,
-        conf:   data.confidence
-      });
+    if (data.matched) {
+      var tipoTxt = tipo === 'entrada' ? '🟢 ENTRADA' : '🔴 SALIDA';
+      mostrarResult('ok','✅', data.name,
+        tipoTxt + ' registrada\n' + salonNom + '\n' +
+        '<span class="confidence">Confianza: ' + data.confidence + '%</span>');
+    } else if (data.reason === 'fuera_de_rango') {
+      mostrarResult('warn','⛔','Fuera de rango',
+        'Estás a ' + data.distancia + 'm del salón.\nMáximo permitido: ' + data.maximo + 'm.');
+    } else if (data.reason === 'no_face') {
+      mostrarResult('err','😶','Sin rostro detectado','Posicioná tu cara frente a la cámara con buena iluminación.');
     } else {
-      mostrarResultado("err", { msg: regData.error || "Error al registrar" });
+      mostrarResult('err','❌','No reconocido','Rostro no encontrado en la base de datos.\nContactá al administrador.');
     }
-
   } catch(e) {
-    status.textContent = "Error de conexiÃ³n. IntentÃ¡ de nuevo.";
-    btn.disabled = false;
+    mostrarResult('err','❌','Error de conexión', e.message);
   }
+
+  btn.disabled = false;
+  btn.innerHTML = '📷 Verificar identidad';
 }
+
+function mostrarResult(tipo, icon, name, detail) {
+  document.getElementById('result').className    = 'result result-' + tipo;
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('resIcon').textContent  = icon;
+  document.getElementById('resName').textContent  = name;
+  document.getElementById('resDetail').innerHTML  = detail.replace(/\n/g,'<br>');
+  document.querySelector('.card').style.display   = 'none';
+}
+
+function reiniciar() {
+  document.getElementById('result').style.display = 'none';
+  document.querySelector('.card').style.display   = 'block';
+  obtenerGPS();
+}
+
+// Start
+obtenerGPS();
+iniciarCam(facing);
 </script>
 </body>
 </html>
