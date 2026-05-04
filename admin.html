@@ -2,178 +2,401 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin - Registro de empleados</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>JANOS – Registrar Empleado</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-       background: #f1f5f9; min-height: 100vh; display: flex;
-       align-items: center; justify-content: center; padding: 16px; }
-.card { background: white; border-radius: 16px; padding: 28px 24px;
-        width: 100%; max-width: 420px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
-h2 { font-size: 1.4rem; color: #1e3a5f; margin-bottom: 4px; }
-.salon-tag { font-size: 0.82rem; color: #64748b; margin-bottom: 14px; }
-#gps-info { font-size: 0.82rem; color: #64748b; margin-bottom: 16px;
-            padding: 8px 12px; background: #f8fafc; border-radius: 8px; }
-label { display: block; font-size: 0.78rem; font-weight: 600;
-        color: #475569; margin-bottom: 4px; margin-top: 12px; }
-input { width: 100%; padding: 10px 14px; border: 1.5px solid #cbd5e1;
-        border-radius: 10px; font-size: 0.95rem; outline: none;
-        transition: border-color 0.2s; }
-input:focus { border-color: #3b82f6; }
-.cam-wrap { position: relative; margin-top: 16px; margin-bottom: 4px;
-            background: #0f172a; border-radius: 12px; overflow: hidden; }
-video { width: 100%; display: block; border-radius: 12px;
-        min-height: 200px; }
-canvas { display: none; }
-#btn-flip { position: absolute; top: 10px; right: 10px; z-index: 10;
-            background: rgba(0,0,0,0.55); border: none; border-radius: 50%;
-            width: 44px; height: 44px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.3rem; transition: background 0.2s; }
-#btn-flip:hover { background: rgba(0,0,0,0.80); }
-#btn { width: 100%; margin-top: 16px; padding: 13px;
-       background: #1e3a5f; color: white; border: none;
-       border-radius: 12px; font-size: 1rem; font-weight: 600;
-       cursor: pointer; transition: background 0.2s; }
-#btn:hover:not(:disabled) { background: #2d5a8e; }
-#btn:disabled { opacity: 0.6; cursor: not-allowed; }
-#msg { margin-top: 14px; padding: 10px 14px; border-radius: 10px;
-       font-size: 0.9rem; display: none; font-weight: 500; }
-#msg.ok { background: #dcfce7; color: #15803d; }
-#msg.err { background: #fee2e2; color: #b91c1c; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9;min-height:100vh;padding:16px}
+  h1{text-align:center;font-size:1.4rem;font-weight:700;margin-bottom:18px;color:#38bdf8}
+  .logo{text-align:center;font-size:2.5rem;margin-bottom:6px}
+  .card{background:#1e293b;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #334155}
+  label{display:block;font-size:.85rem;color:#94a3b8;margin-bottom:6px;font-weight:500}
+  input,select{width:100%;padding:12px 14px;background:#0f172a;border:1.5px solid #334155;border-radius:10px;color:#f1f5f9;font-size:1rem;outline:none;transition:border-color .2s}
+  input:focus,select:focus{border-color:#38bdf8}
+  select option{background:#1e293b}
+  .field{margin-bottom:14px}
+  #video{width:100%;border-radius:12px;background:#000;display:block;max-height:280px;object-fit:cover}
+  #canvas{display:none}
+  .btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:8px}
+  .btn-cam{background:#0ea5e9;color:#fff}
+  .btn-cam:hover{background:#0284c7}
+  .btn-flip{background:#475569;color:#fff;margin-top:6px;font-size:.9rem;padding:10px}
+  .btn-reg{background:#10b981;color:#fff}
+  .btn-reg:hover{background:#059669}
+  .btn-reg:disabled{background:#334155;color:#64748b;cursor:not-allowed}
+  #preview{width:100%;border-radius:12px;display:none;margin-top:10px}
+  #msg{margin-top:14px;padding:14px;border-radius:10px;font-size:.95rem;font-weight:600;display:none;text-align:center}
+  .ok{background:#064e3b;color:#34d399;border:1px solid #10b981}
+  .err{background:#450a0a;color:#f87171;border:1px solid #ef4444}
+  .warn{background:#431407;color:#fdba74;border:1px solid #f97316}
+  .gps-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-size:.8rem;font-weight:600;margin-top:8px}
+  .gps-ok{background:#064e3b;color:#34d399}
+  .gps-err{background:#450a0a;color:#f87171}
+  .gps-wait{background:#1e3a5f;color:#93c5fd}
+  .spinner{display:inline-block;width:18px;height:18px;border:3px solid #334155;border-top-color:#38bdf8;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .zone-tag{font-size:.75rem;color:#64748b;margin-left:4px}
 </style>
 </head>
 <body>
+
+<div class="logo">🪩</div>
+<h1>JANOS – Registro de Empleado</h1>
+
 <div class="card">
-  <h2>&#128203; Registrar empleado</h2>
-  <div class="salon-tag">Janos Bella Vista 2 &mdash; Panel Admin</div>
-  <div id="gps-info">&#128205; Verificando ubicacion...</div>
-
-  <label for="empId">ID empleado</label>
-  <input id="empId" type="text" placeholder="EMP001" autocomplete="off">
-
-  <label for="empName">Nombre completo</label>
-  <input id="empName" type="text" placeholder="Maria Garcia" autocomplete="off">
-
-  <label>Camara</label>
-  <div class="cam-wrap">
-    <video id="video" autoplay playsinline muted></video>
-    <button id="btn-flip" onclick="flipCamera()" title="Voltear camara">&#8635;</button>
+  <div class="field">
+    <label>DNI del empleado *</label>
+    <input type="text" id="dni" placeholder="Ej: 38521744" inputmode="numeric" maxlength="10">
   </div>
-  <canvas id="canvas"></canvas>
+  <div class="field">
+    <label>Nombre completo *</label>
+    <input type="text" id="nombre" placeholder="Ej: María López" autocomplete="off">
+  </div>
+  <div class="field">
+    <label>Salón *</label>
+    <select id="salon">
+      <option value="">— Seleccioná un salón —</option>
+      <optgroup label="CABA">
+        <option value="CABA Boutique" data-lat="-34.60696947952881" data-lng="-58.38446560235706">CABA Boutique</option>
+        <option value="Caballito 1" data-lat="-34.60976055210654" data-lng="-58.4400598">Caballito 1</option>
+        <option value="Caballito 2" data-lat="-34.60976055210654" data-lng="-58.4400598">Caballito 2</option>
+        <option value="Costanera 1" data-lat="-34.54545894333134" data-lng="-58.43118643173255">Costanera 1</option>
+        <option value="Costanera 2" data-lat="-34.54545894333134" data-lng="-58.43118643173255">Costanera 2</option>
+        <option value="Dardo Rocha" data-lat="-34.4907407206998" data-lng="-58.52651305767236">Dardo Rocha</option>
+        <option value="Darwin 1" data-lat="-34.5886717288581" data-lng="-58.43687601534143">Darwin 1</option>
+        <option value="Darwin 2" data-lat="-34.5886717288581" data-lng="-58.43687601534143">Darwin 2</option>
+        <option value="DOT" data-lat="-34.54635161803416" data-lng="-58.48787506064081">DOT</option>
+        <option value="Nuñez" data-lat="-34.54218327080488" data-lng="-58.45969217301391">Nuñez</option>
+        <option value="Palermo Hollywood" data-lat="-34.57802364353802" data-lng="-58.43768630184958">Palermo Hollywood</option>
+        <option value="Palermo Soho" data-lat="-34.5920897560759" data-lng="-58.43083028650607">Palermo Soho</option>
+        <option value="Paseo Colon" data-lat="-34.61123555454792" data-lng="-58.36965475270821">Paseo Colon</option>
+        <option value="Puerto Madero" data-lat="-34.60964874165761" data-lng="-58.36383646002772">Puerto Madero</option>
+        <option value="Puerto Madero Boutique" data-lat="-34.61439986030064" data-lng="-58.3579035">Puerto Madero Boutique</option>
+        <option value="Recoleta" data-lat="-34.58606615760529" data-lng="-58.39348064232763">Recoleta</option>
+        <option value="San Isidro" data-lat="-34.48035092232818" data-lng="-58.52074157116463">San Isidro</option>
+        <option value="San Telmo" data-lat="-34.61183" data-lng="-58.37469">San Telmo</option>
+        <option value="San Telmo 2" data-lat="-34.61135331347032" data-lng="-58.37388707116464">San Telmo 2</option>
+        <option value="San Telmo Boutique" data-lat="-34.61492395543934" data-lng="-58.37116922883535">San Telmo Boutique</option>
+        <option value="Vicente Lopez" data-lat="-34.51771" data-lng="-58.47866">Vicente Lopez</option>
+      </optgroup>
+      <optgroup label="NORTE">
+        <option value="Bayres Eventos" data-lat="-34.49386844950456" data-lng="-58.59392713305712">Bayres Eventos</option>
+        <option value="Bella Vista" data-lat="-34.556763<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>JANOS â Registrar Empleado</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9;min-height:100vh;padding:16px}
+  h1{text-align:center;font-size:1.4rem;font-weight:700;margin-bottom:18px;color:#38bdf8}
+  .logo{text-align:center;font-size:2.5rem;margin-bottom:6px}
+  .card{background:#1e293b;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #334155}
+  label{display:block;font-size:.85rem;color:#94a3b8;margin-bottom:6px;font-weight:500}
+  input,select{width:100%;padding:12px 14px;background:#0f172a;border:1.5px solid #334155;border-radius:10px;color:#f1f5f9;font-size:1rem;outline:none;transition:border-color .2s}
+  input:focus,select:focus{border-color:#38bdf8}
+  select option{background:#1e293b}
+  .field{margin-bottom:14px}
+  #video{width:100%;border-radius:12px;background:#000;display:block;max-height:280px;object-fit:cover}
+  #canvas{display:none}
+  .btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:8px}
+  .btn-cam{background:#0ea5e9;color:#fff}
+  .btn-cam:hover{background:#0284c7}
+  .btn-flip{background:#475569;color:#fff;margin-top:6px;font-size:.9rem;padding:10px}
+  .btn-reg{background:#10b981;color:#fff}
+  .btn-reg:hover{background:#059669}
+  .btn-reg:disabled{background:#334155;color:#64748b;cursor:not-allowed}
+  #preview{width:100%;border-radius:12px;display:none;margin-top:10px}
+  #msg{margin-top:14px;padding:14px;border-radius:10px;font-size:.95rem;font-weight:600;display:none;text-align:center}
+  .ok{background:#064e3b;color:#34d399;border:1px solid #10b981}
+  .err{background:#450a0a;color:#f87171;border:1px solid #ef4444}
+  .warn{background:#431407;color:#fdba74;border:1px solid #f97316}
+  .gps-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;font-size:.8rem;font-weight:600;margin-top:8px}
+  .gps-ok{background:#064e3b;color:#34d399}
+  .gps-err{background:#450a0a;color:#f87171}
+  .gps-wait{background:#1e3a5f;color:#93c5fd}
+  .spinner{display:inline-block;width:18px;height:18px;border:3px solid #334155;border-top-color:#38bdf8;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .zone-tag{font-size:.75rem;color:#64748b;margin-left:4px}
+</style>
+</head>
+<body>
 
-  <button id="btn" onclick="registrar()">&#128248; Tomar foto y registrar</button>
-  <div id="msg"></div>
+<div class="logo">ðª©</div>
+<h1>JANOS â Registro de Empleado</h1>
+
+<div class="card">
+  <div class="field">
+    <label>DNI del empleado *</label>
+    <input type="text" id="dni" placeholder="Ej: 38521744" inputmode="numeric" maxlength="10">
+  </div>
+  <div class="field">
+    <label>Nombre completo *</label>
+    <input type="text" id="nombre" placeholder="Ej: MarÃ­a LÃ³pez" autocomplete="off">
+  </div>
+  <div class="field">
+    <label>SalÃ³n *</label>
+    <select id="salon">
+      <option value="">â SeleccionÃ¡ un salÃ³n â</option>
+      <optgroup label="CABA">
+        <option value="CABA Boutique" data-lat="-34.60696947952881" data-lng="-58.38446560235706">CABA Boutique</option>
+        <option value="Caballito 1" data-lat="-34.60976055210654" data-lng="-58.4400598">Caballito 1</option>
+        <option value="Caballito 2" data-lat="-34.60976055210654" data-lng="-58.4400598">Caballito 2</option>
+        <option value="Costanera 1" data-lat="-34.54545894333134" data-lng="-58.43118643173255">Costanera 1</option>
+        <option value="Costanera 2" data-lat="-34.54545894333134" data-lng="-58.43118643173255">Costanera 2</option>
+        <option value="Dardo Rocha" data-lat="-34.4907407206998" data-lng="-58.52651305767236">Dardo Rocha</option>
+        <option value="Darwin 1" data-lat="-34.5886717288581" data-lng="-58.43687601534143">Darwin 1</option>
+        <option value="Darwin 2" data-lat="-34.5886717288581" data-lng="-58.43687601534143">Darwin 2</option>
+        <option value="DOT" data-lat="-34.54635161803416" data-lng="-58.48787506064081">DOT</option>
+        <option value="NuÃ±ez" data-lat="-34.54218327080488" data-lng="-58.45969217301391">NuÃ±ez</option>
+        <option value="Palermo Hollywood" data-lat="-34.57802364353802" data-lng="-58.43768630184958">Palermo Hollywood</option>
+        <option value="Palermo Soho" data-lat="-34.5920897560759" data-lng="-58.43083028650607">Palermo Soho</option>
+        <option value="Paseo Colon" data-lat="-34.61123555454792" data-lng="-58.36965475270821">Paseo Colon</option>
+        <option value="Puerto Madero" data-lat="-34.60964874165761" data-lng="-58.36383646002772">Puerto Madero</option>
+        <option value="Puerto Madero Boutique" data-lat="-34.61439986030064" data-lng="-58.3579035">Puerto Madero Boutique</option>
+        <option value="Recoleta" data-lat="-34.58606615760529" data-lng="-58.39348064232763">Recoleta</option>
+        <option value="San Isidro" data-lat="-34.48035092232818" data-lng="-58.52074157116463">San Isidro</option>
+        <option value="San Telmo" data-lat="-34.61183" data-lng="-58.37469">San Telmo</option>
+        <option value="San Telmo 2" data-lat="-34.61135331347032" data-lng="-58.37388707116464">San Telmo 2</option>
+        <option value="San Telmo Boutique" data-lat="-34.61492395543934" data-lng="-58.37116922883535">San Telmo Boutique</option>
+        <option value="Vicente Lopez" data-lat="-34.51771" data-lng="-58.47866">Vicente Lopez</option>
+      </optgroup>
+      <optgroup label="NORTE">
+        <option value="Bayres Eventos" data-lat="-34.49386844950456" data-lng="-58.59392713305712">Bayres Eventos</option>
+        <option value="Bella Vista" data-lat="-34.556763" data-lng="-58.695852">Bella Vista</option>
+        <option value="Bella Vista 2" data-lat="-34.56558024975642" data-lng="-58.70115624468752">Bella Vista 2</option>
+        <option value="Benavidez 1" data-lat="-34.41328690586904" data-lng="-58.70441725767073">Benavidez 1</option>
+        <option value="Benavidez 2" data-lat="-34.41283070430927" data-lng="-58.71634057565793">Benavidez 2</option>
+        <option value="Campana" data-lat="-34.1570387" data-lng="-59.0185956">Campana</option>
+        <option value="Champagnat Boutique" data-lat="-34.451768" data-lng="-58.916404">Champagnat Boutique</option>
+        <option value="Del Viso" data-lat="-34.44740216850433" data-lng="-58.79489273317542">Del Viso</option>
+        <option value="Escobar" data-lat="-34.376101" data-lng="-58.81715">Escobar</option>
+        <option value="House" data-lat="-34.519991" data-lng="-58.742783">House</option>
+        <option value="Hurlingham" data-lat="-34.601542" data-lng="-58.652154">Hurlingham</option>
+        <option value="Martinez" data-lat="-34.492246" data-lng="-58.511093">Martinez</option>
+        <option value="Maschwitz" data-lat="-34.378192" data-lng="-58.752286">Maschwitz</option>
+        <option value="Oficina" data-lat="-34.556763" data-lng="-58.695852">Oficina</option>
+        <option value="Olivos" data-lat="-34.502327" data-lng="-58.479292">Olivos</option>
+        <option value="Olivos 2" data-lat="-34.502327" data-lng="-58.479292">Olivos 2</option>
+        <option value="Palacio Sans Souci" data-lat="-34.44566535800791" data-lng="-58.54268630429397">Palacio Sans Souci</option>
+        <option value="Pilar" data-lat="-34.44639611355176" data-lng="-58.89163322778487">Pilar</option>
+        <option value="Pilar boutique" data-lat="-34.4074743905739" data-lng="-58.85580878895455">Pilar Boutique</option>
+        <option value="Pilar Hotel" data-lat="-34.4569304" data-lng="-58.8888985">Pilar Hotel</option>
+        <option value="Quinta" data-lat="-34.468832" data-lng="-58.797458">Quinta</option>
+        <option value="San Miguel" data-lat="-34.55440169283807" data-lng="-58.71736887116464">San Miguel</option>
+        <option value="Villa de Mayo" data-lat="-34.5141151" data-lng="-58.6815573">Villa de Mayo</option>
+        <option value="Villa de Mayo Boutique" data-lat="-34.5141151" data-lng="-58.6815573">Villa de Mayo Boutique</option>
+      </optgroup>
+      <optgroup label="OESTE">
+        <option value="Acceso Oeste" data-lat="-34.630051" data-lng="-58.736273">Acceso Oeste</option>
+        <option value="Acceso Oeste 2" data-lat="-34.6343665" data-lng="-58.7541304">Acceso Oeste 2</option>
+        <option value="General Rodriguez" data-lat="-34.59602602954801" data-lng="-58.93372882123573">General Rodriguez</option>
+        <option value="Haedo" data-lat="-34.6356497" data-lng="-58.5896032">Haedo</option>
+        <option value="Haedo 2" data-lat="-34.6356497" data-lng="-58.5896032">Haedo 2</option>
+        <option value="Ituzaingo" data-lat="-34.638843" data-lng="-58.677128">Ituzaingo</option>
+        <option value="Ituzaingo 2" data-lat="-34.66464198571634" data-lng="-58.67389078886168">Ituzaingo 2</option>
+        <option value="Liniers" data-lat="-34.64489496032444" data-lng="-58.51045795302172">Liniers</option>
+        <option value="Merlo" data-lat="-34.66875764104189" data-lng="-58.7378104106764">Merlo</option>
+        <option value="Merlo 2" data-lat="-34.66091039235508" data-lng="-58.7535604711642">Merlo 2</option>
+        <option value="Moreno" data-lat="-34.646143" data-lng="-58.8033">Moreno</option>
+        <option value="Moron" data-lat="-34.63326397571632" data-lng="-58.63119241534143">Moron</option>
+        <option value="Ramos Boutique" data-lat="-34.64604401098804" data-lng="-58.56895834496699">Ramos Boutique</option>
+        <option value="Ramos Boutique 2" data-lat="-34.64838835018546" data-lng="-58.5695002888542">Ramos Boutique 2</option>
+        <option value="Ramos Mejia" data-lat="-34.65964903594481" data-lng="-58.56208005466929">Ramos Mejia</option>
+        <option value="Ramos Mejia 2" data-lat="-34.65964903594481" data-lng="-58.56208005466929">Ramos Mejia 2</option>
+        <option value="Bella Vista 2" data-lat="-34.56558024975642" data-lng="-58.70115624468752">Bella Vista 2</option>
+        <option value="Benavidez 1" data-lat="-34.41328690586904" data-lng="-58.70441725767073">Benavidez 1</option>
+        <option value="Benavidez 2" data-lat="-34.41283070430927" data-lng="-58.71634057565793">Benavidez 2</option>
+        <option value="Campana" data-lat="-34.1570387" data-lng="-59.0185956">Campana</option>
+        <option value="Champagnat Boutique" data-lat="-34.451768" data-lng="-58.916404">Champagnat Boutique</option>
+        <option value="Del Viso" data-lat="-34.44740216850433" data-lng="-58.79489273317542">Del Viso</option>
+        <option value="Escobar" data-lat="-34.376101" data-lng="-58.81715">Escobar</option>
+        <option value="House" data-lat="-34.519991" data-lng="-58.742783">House</option>
+        <option value="Hurlingham" data-lat="-34.601542" data-lng="-58.652154">Hurlingham</option>
+        <option value="Martinez" data-lat="-34.492246" data-lng="-58.511093">Martinez</option>
+        <option value="Maschwitz" data-lat="-34.378192" data-lng="-58.752286">Maschwitz</option>
+        <option value="Oficina" data-lat="-34.556763" data-lng="-58.695852">Oficina</option>
+        <option value="Olivos" data-lat="-34.502327" data-lng="-58.479292">Olivos</option>
+        <option value="Olivos 2" data-lat="-34.502327" data-lng="-58.479292">Olivos 2</option>
+        <option value="Palacio Sans Souci" data-lat="-34.44566535800791" data-lng="-58.54268630429397">Palacio Sans Souci</option>
+        <option value="Pilar" data-lat="-34.44639611355176" data-lng="-58.89163322778487">Pilar</option>
+        <option value="Pilar boutique" data-lat="-34.4074743905739" data-lng="-58.85580878895455">Pilar Boutique</option>
+        <option value="Pilar Hotel" data-lat="-34.4569304" data-lng="-58.8888985">Pilar Hotel</option>
+        <option value="Quinta" data-lat="-34.468832" data-lng="-58.797458">Quinta</option>
+        <option value="San Miguel" data-lat="-34.55440169283807" data-lng="-58.71736887116464">San Miguel</option>
+        <option value="Villa de Mayo" data-lat="-34.5141151" data-lng="-58.6815573">Villa de Mayo</option>
+        <option value="Villa de Mayo Boutique" data-lat="-34.5141151" data-lng="-58.6815573">Villa de Mayo Boutique</option>
+      </optgroup>
+      <optgroup label="OESTE">
+        <option value="Acceso Oeste" data-lat="-34.630051" data-lng="-58.736273">Acceso Oeste</option>
+        <option value="Acceso Oeste 2" data-lat="-34.6343665" data-lng="-58.7541304">Acceso Oeste 2</option>
+        <option value="General Rodriguez" data-lat="-34.59602602954801" data-lng="-58.93372882123573">General Rodriguez</option>
+        <option value="Haedo" data-lat="-34.6356497" data-lng="-58.5896032">Haedo</option>
+        <option value="Haedo 2" data-lat="-34.6356497" data-lng="-58.5896032">Haedo 2</option>
+        <option value="Ituzaingo" data-lat="-34.638843" data-lng="-58.677128">Ituzaingo</option>
+        <option value="Ituzaingo 2" data-lat="-34.66464198571634" data-lng="-58.67389078886168">Ituzaingo 2</option>
+        <option value="Liniers" data-lat="-34.64489496032444" data-lng="-58.51045795302172">Liniers</option>
+        <option value="Merlo" data-lat="-34.66875764104189" data-lng="-58.7378104106764">Merlo</option>
+        <option value="Merlo 2" data-lat="-34.66091039235508" data-lng="-58.7535604711642">Merlo 2</option>
+        <option value="Moreno" data-lat="-34.646143" data-lng="-58.8033">Moreno</option>
+        <option value="Moron" data-lat="-34.63326397571632" data-lng="-58.63119241534143">Moron</option>
+        <option value="Ramos Boutique" data-lat="-34.64604401098804" data-lng="-58.56895834496699">Ramos Boutique</option>
+        <option value="Ramos Boutique 2" data-lat="-34.64838835018546" data-lng="-58.5695002888542">Ramos Boutique 2</option>
+        <option value="Ramos Mejia" data-lat="-34.65964903594481" data-lng="-58.56208005466929">Ramos Mejia</option>
+        <option value="Ramos Mejia 2" data-lat="-34.65964903594481" data-lng="-58.56208005466929">Ramos Mejia 2</option>
+        <option value="San Justo" data-lat="-34.67591894028484" data-lng="-58.5875203558232">San Justo</option>
+        <option value="San Justo 2" data-lat="-34.67875610644857" data-lng="-58.59102243181726">San Justo 2</option>
+        <option value="San Martin 1" data-lat="-34.56777583638708" data-lng="-58.59138328650755">San Martin 1</option>
+        <option value="San Martin 2" data-lat="-34.56816739887635" data-lng="-58.59061621404123">San Martin 2</option>
+        <option value="San Martin 3" data-lat="-34.56784016632005" data-lng="-58.59070850702175">San Martin 3</option>
+      </optgroup>
+      <optgroup label="SUR">
+        <option value="Adrogue" data-lat="-34.79580714896355" data-lng="-58.39840871349146">Adrogue</option>
+        <option value="Avellaneda 1" data-lat="-34.67700663596199" data-lng="-58.36926045956796">Avellaneda 1</option>
+        <option value="Avellaneda 2" data-lat="-34.67700663596199" data-lng="-58.36926045956796">Avellaneda 2</option>
+        <option value="Avellaneda 3" data-lat="-34.67700663596199" data-lng="-58.36926045956796">Avellaneda 3</option>
+        <option value="Avellaneda 4" data-lat="-34.67700663596199" data-lng="-58.36926045956796">Avellaneda 4</option>
+        <option value="Berazategui" data-lat="-34.78078603561312" data-lng="-58.24587579999999">Berazategui</option>
+        <option value="Berazategui 2" data-lat="-34.77625697288345" data-lng="-58.23644127686214">Berazategui 2</option>
+        <option value="Berisso" data-lat="-34.88420883790188" data-lng="-57.90217764534688">Berisso</option>
+        <option value="Canning" data-lat="-34.85605521068076" data-lng="-58.5175497">Canning</option>
+        <option value="Hipodromo La Plata" data-lat="-34.90392222834488" data-lng="-57.94801235582321">Hipodromo La Plata</option>
+        <option value="Holiday Inn" data-lat="-34.73327940981686" data-lng="-58.52004444603416">Holiday Inn</option>
+        <option value="Holiday Inn 2" data-lat="-34.73327940981686" data-lng="-58.52004444603416">Holiday Inn 2</option>
+        <option value="Hudson" data-lat="-34.80735519557907" data-lng="-58.17153655397216">Hudson</option>
+        <option value="Hudson 2" data-lat="-34.90252141857428" data-lng="-58.17218342883579">Hudson 2</option>
+        <option value="La Plata" data-lat="-34.94450602665787" data-lng="-57.96753527384086">La Plata</option>
+        <option value="La Plata 2" data-lat="-34.93372659788916" data-lng="-57.92991437116449">La Plata 2</option>
+        <option value="La Plata Boutique" data-lat="-34.93372659788916" data-lng="-57.92991437116449">La Plata Boutique</option>
+        <option value="Lomas" data-lat="-34.75689134308413" data-lng="-58.39613517301476">Lomas</option>
+        <option value="Lomas Boutique" data-lat="-34.7603301378896" data-lng="-58.41099933068637">Lomas Boutique</option>
+        <option value="Los Naranjos" data-lat="-38.00898592439063" data-lng="-57.6333206181579">Los Naranjos</option>
+        <option value="Playa Grande" data-lat="-38.02523486067417" data-lng="-57.53059157670718">Playa Grande</option>
+        <option value="Quilmes Boutique" data-lat="-34.76490647775054" data-lng="-58.27535245767235">Quilmes Boutique</option>
+        <option value="Temperley" data-lat="-34.78514977472399" data-lng="-58.40608038465528">Temperley</option>
+      </optgroup>
+    </select>
+  </div>
 </div>
 
+<div class="card">
+  <label>Foto del empleado *</label>
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="canvas"></canvas>
+  <img id="preview" alt="Foto capturada">
+  <button class="btn btn-cam" onclick="tomarFoto()">📷 Tomar foto</button>
+  <button class="btn btn-flip" onclick="flipCam()">🔄 Cambiar cámara</button>
+</div>
+
+<button class="btn btn-reg" id="btnReg" onclick="registrar()" disabled>✅ Registrar empleado</button>
+<div id="msg"></div>
+
 <script>
-var API_URL = "https://p710uk49qg.execute-api.us-east-2.amazonaws.com/prod";
-var LAT_SALON = -34.56579223324552;
-var LON_SALON = -58.701169532763934;
-var RADIO_M = 100;
-var TOKEN_OK = (new URLSearchParams(location.search).get("token") || "") === "janos2026admin";
-var currentFacing = "user";
-var currentStream = null;
+const API_URL = 'https://nha46wbuoo7ajwqqrsgzycavfi0rbcqh.lambda-url.us-east-2.on.aws';
 
-if (!TOKEN_OK) {
-  document.body.innerHTML = '<div style="text-align:center;padding:80px;font-family:sans-serif">' +
-    '<div style="font-size:3rem">&#128274;</div>' +
-    '<h2 style="color:#b91c1c;margin-top:16px">Acceso restringido</h2>' +
-    '<p style="color:#64748b;margin-top:8px">Token de admin requerido</p></div>';
-}
+var stream = null, facing = 'user', fotoB64 = null;
 
-function haversine(lat1, lon1, lat2, lon2) {
-  var R = 6371000;
-  var dLat = (lat2 - lat1) * Math.PI / 180;
-  var dLon = (lon2 - lon1) * Math.PI / 180;
-  var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
-          Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
-          Math.sin(dLon/2)*Math.sin(dLon/2);
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-navigator.geolocation.getCurrentPosition(
-  function(pos) {
-    var dist = haversine(pos.coords.latitude, pos.coords.longitude, LAT_SALON, LON_SALON);
-    var info = document.getElementById("gps-info");
-    if (dist <= RADIO_M) {
-      info.style.color = "#16a34a";
-      info.textContent = "OK Ubicacion verificada - " + Math.round(dist) + "m del salon";
-    } else {
-      info.style.color = "#f59e0b";
-      info.textContent = "Aviso: Registrando desde " + Math.round(dist) + "m del salon";
-    }
-  },
-  function() {
-    document.getElementById("gps-info").textContent = "Ubicacion no disponible";
-  },
-  { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-);
-
-function startCamera(facing) {
-  if (currentStream) {
-    currentStream.getTracks().forEach(function(t) { t.stop(); });
-    currentStream = null;
-  }
-  var constraints = { video: { facingMode: facing }, audio: false };
-  navigator.mediaDevices.getUserMedia(constraints)
-    .then(function(stream) {
-      currentStream = stream;
-      document.getElementById("video").srcObject = stream;
-    })
-    .catch(function(err) {
-      mostrarMsg("No se pudo acceder a la camara: " + err.message, false);
+async function iniciarCam(f) {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: f, width: { ideal: 640 }, height: { ideal: 480 } },
+      audio: false
     });
+    document.getElementById('video').srcObject = stream;
+    document.getElementById('video').style.display = 'block';
+    document.getElementById('preview').style.display = 'none';
+    fotoB64 = null;
+    actualizarBoton();
+  } catch(e) {
+    mostrar('No se pudo acceder a la cámara: ' + e.message, 'err');
+  }
 }
 
-function flipCamera() {
-  currentFacing = (currentFacing === "user") ? "environment" : "user";
-  startCamera(currentFacing);
+function flipCam() {
+  facing = facing === 'user' ? 'environment' : 'user';
+  iniciarCam(facing);
 }
 
-function mostrarMsg(txt, ok) {
-  var el = document.getElementById("msg");
-  el.textContent = txt;
-  el.className = ok ? "ok" : "err";
-  el.style.display = "block";
-}
-
-async function registrar() {
-  var empId   = document.getElementById("empId").value.trim();
-  var empName = document.getElementById("empName").value.trim();
-  if (!empId || !empName) { mostrarMsg("Completa ID y nombre.", false); return; }
-  var btn = document.getElementById("btn");
-  btn.disabled = true;
-  mostrarMsg("Registrando...", true);
-  var video  = document.getElementById("video");
-  var canvas = document.getElementById("canvas");
+function tomarFoto() {
+  var video = document.getElementById('video');
+  var canvas = document.getElementById('canvas');
   canvas.width  = video.videoWidth  || 640;
   canvas.height = video.videoHeight || 480;
-  canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-  var b64 = canvas.toDataURL("image/jpeg", 0.9).split(",")[1];
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  var dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  fotoB64 = dataUrl.split(',')[1];
+  var preview = document.getElementById('preview');
+  preview.src = dataUrl;
+  preview.style.display = 'block';
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  document.getElementById('video').style.display = 'none';
+  actualizarBoton();
+}
+
+function actualizarBoton() {
+  var dni    = document.getElementById('dni').value.trim();
+  var nombre = document.getElementById('nombre').value.trim();
+  var salon  = document.getElementById('salon').value;
+  document.getElementById('btnReg').disabled = !(dni && nombre && salon && fotoB64);
+}
+
+['dni','nombre','salon'].forEach(id => {
+  document.getElementById(id).addEventListener('input', actualizarBoton);
+});
+
+async function registrar() {
+  var dni    = document.getElementById('dni').value.trim();
+  var nombre = document.getElementById('nombre').value.trim();
+  var salon  = document.getElementById('salon').value;
+  var btn    = document.getElementById('btnReg');
+
+  if (!dni || !nombre || !salon || !fotoB64) {
+    mostrar('Completá todos los campos y tomá una foto', 'warn');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Registrando...';
+  mostrar('', '');
+
   try {
-    var res  = await fetch(API_URL + "/registrar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ employeeId: empId, name: empName, imageBase64: b64 })
+    var res = await fetch(API_URL + '/registrar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ employeeId: dni, name: nombre, salon: salon, imageBase64: fotoB64 })
     });
     var data = await res.json();
     if (data.success) {
-      mostrarMsg("OK " + empName + " registrado (FaceId: " + data.faceId.substring(0,8) + "...)", true);
-      document.getElementById("empId").value   = "";
-      document.getElementById("empName").value = "";
+      mostrar('✅ ' + nombre + ' registrado correctamente en ' + salon + '\nDNI: ' + dni + '\nFaceId: ' + data.faceId.substring(0,8) + '...', 'ok');
+      document.getElementById('dni').value   = '';
+      document.getElementById('nombre').value = '';
+      document.getElementById('salon').value  = '';
+      fotoB64 = null;
+      document.getElementById('preview').style.display = 'none';
+      iniciarCam(facing);
     } else {
-      mostrarMsg("Error: " + (data.error || "desconocido"), false);
+      mostrar('❌ ' + (data.error || 'Error desconocido'), 'err');
     }
   } catch(e) {
-    mostrarMsg("Error de conexion: " + e.message, false);
+    mostrar('❌ Error de conexión: ' + e.message, 'err');
   }
+
   btn.disabled = false;
+  btn.innerHTML = '✅ Registrar empleado';
+  actualizarBoton();
 }
 
-startCamera(currentFacing);
+function mostrar(txt, tipo) {
+  var el = document.getElementById('msg');
+  if (!txt) { el.style.display = 'none'; return; }
+  el.textContent = txt;
+  el.className = tipo;
+  el.style.display = 'block';
+}
+
+iniciarCam(facing);
 </script>
 </body>
 </html>
