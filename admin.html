@@ -140,8 +140,8 @@
         <option value="Berisso" data-lat="-34.88420883790188" data-lng="-57.90217764534688">Berisso</option>
         <option value="Canning" data-lat="-34.85605521068076" data-lng="-58.5175497">Canning</option>
         <option value="Hipodromo La Plata" data-lat="-34.90392222834488" data-lng="-57.94801235582321">Hipodromo La Plata</option>
-        <option value="Holiday Inn" data-lat="-34.73327940981686" data-lng="-58.52004444603416">Holiday Inn</option>
-        <option value="Holiday Inn 2" data-lat="-34.73327940981686" data-lng="-58.52004444603416">Holiday Inn 2</option>
+        <option value="Holiday Inn" data-lat="-34.73327940981686h" data-lng="-58.52004444603416">Holiday Inn</option>
+        <option value="Holiday Inn 2" data-lat="-34.73327940981686" dahta-lng="-58.52004444603416">Holiday Inn 2</option>
         <option value="Hudson" data-lat="-34.80735519557907" data-lng="-58.17153655397216">Hudson</option>
         <option value="Hudson 2" data-lat="-34.90252141857428" data-lng="-58.17218342883579">Hudson 2</option>
         <option value="La Plata" data-lat="-34.94450602665787" data-lng="-57.96753527384086">La Plata</option>
@@ -246,8 +246,8 @@ async function registrar() {
       body: JSON.stringify({ employeeId: dni, name: nombre, salon: salon, imageBase64: fotoB64 })
     });
     var data = await res.json();
-    if (data.success) {
-      mostrar('✅ ' + nombre + ' registrado correctamente en ' + salon + '\nDNI: ' + dni + '\nFaceId: ' + data.faceId.substring(0,8) + '...', 'ok');
+    if (!res.ok) { mostrar('❌ ' + (data.Message || data.error || 'Error ' + res.status), 'err'); } else if (data.ok) {
+      mostrar('✅ ' + nombre + ' registrado correctamente en ' + salon + '\nDNI: ' + dni + '\nFaceId: ' + data.employeeId, 'ok');
       document.getElementById('dni').value   = '';
       document.getElementById('nombre').value = '';
       document.getElementById('salon').value  = '';
