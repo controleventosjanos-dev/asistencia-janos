@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>JANOS – Control de Asistencia</title>
+<title>JANOS - Control de Asistencia</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px}
@@ -12,11 +12,12 @@ h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-botto
 .salon-tag{text-align:center;font-size:1rem;color:#f1f5f9;margin-bottom:12px;padding:8px 20px;background:#1e3a5f;border-radius:20px;display:inline-block;font-weight:600}
 .center{text-align:center;width:100%}
 .card{background:#1e293b;border-radius:16px;padding:20px;width:100%;max-width:420px;border:1px solid #334155;margin-bottom:14px}
-#video{width:100%;border-radius:12px;background:#000;display:block;max-height:300px;object-fit:cover}
+.cam-placeholder{width:100%;border-radius:12px;background:#0f172a;min-height:220px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px dashed #334155;margin-bottom:8px;-webkit-tap-highlight-color:transparent}
+.cam-placeholder:active{border-color:#6366f1}
+#video{width:100%;border-radius:12px;background:#000;display:none;max-height:300px;object-fit:cover;margin-bottom:8px}
 #canvas{display:none}
-.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:10px}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:8px}
 .btn-scan{background:#6366f1;color:#fff}
-.btn-scan:hover{background:#4f46e5}
 .btn-scan:disabled{background:#334155;color:#64748b;cursor:not-allowed}
 .btn-flip{background:#475569;color:#fff;font-size:.85rem;padding:9px;margin-top:6px}
 .tipo-btns{display:flex;gap:10px;margin-bottom:14px}
@@ -34,7 +35,6 @@ h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-botto
 .result-warn{background:#431407;border:2px solid #f97316}
 .result-icon{font-size:4rem;margin-bottom:12px}
 .result-name{font-size:1.5rem;font-weight:800;margin-bottom:6px;color:#f1f5f9}
-.result-tipo{font-size:1rem;font-weight:700;margin-bottom:8px}
 .result-detail{font-size:.88rem;color:#94a3b8;line-height:1.7}
 .chip{display:inline-block;background:rgba(255,255,255,.1);border-radius:20px;padding:3px 12px;font-size:.82rem;margin-top:6px}
 .spinner{display:inline-block;width:22px;height:22px;border:3px solid #334155;border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
@@ -55,26 +55,34 @@ h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-botto
     <button class="tipo-btn active-entrada" id="btnE" onclick="setTipo('entrada')">🟢 Entrada</button>
     <button class="tipo-btn" id="btnS" onclick="setTipo('salida')">🔴 Salida</button>
   </div>
+
+  <div class="cam-placeholder" id="camPlaceholder" onclick="activarCam()">
+    <div style="text-align:center;color:#94a3b8">
+      <div style="font-size:2.5rem;margin-bottom:8px">📷</div>
+      <div style="font-size:.95rem;font-weight:600">Tocá aquí para activar la cámara</div>
+    </div>
+  </div>
+
   <video id="video" autoplay playsinline muted></video>
   <canvas id="canvas"></canvas>
+
   <button class="btn btn-scan" id="btnScan" onclick="escanear()">📷 Verificar identidad</button>
-  <button class="btn btn-flip" onclick="flipCam()">🔄 Cambiar cámara</button>
+  <button class="btn btn-flip" id="btnFlip" onclick="flipCam()" style="display:none">🔄 Cambiar cámara</button>
 </div>
 
 <div class="result" id="resultBox">
   <div class="result-icon" id="resIcon"></div>
   <div class="result-name" id="resName"></div>
-  <div class="result-tipo" id="resTipo"></div>
   <div class="result-detail" id="resDetail"></div>
   <button class="btn btn-scan" onclick="reiniciar()" style="margin-top:20px">↩ Siguiente</button>
 </div>
 
 <script>
-const API_URL    = 'https://nha46wbuoo7ajwqqrsgzycavfi0rbcqh.lambda-url.us-east-2.on.aws';
-const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwFatJVhY37Bq41r18U4-e-BbxzkgOl8qpZ6hxilNMbZITNYr8YkRE4RA2y6RBfTFcK8g/exec';
-const MAX_DIST   = 150;
+var API_URL    = 'https://nha46wbuoo7ajwqqrsgzycavfi0rbcqh.lambda-url.us-east-2.on.aws';
+var SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwFatJVhY37Bq41r18U4-e-BbxzkgOl8qpZ6hxilNMbZITNYr8YkRE4RA2y6RBfTFcK8g/exec';
+var MAX_DIST   = 150;
 
-const SALONES = {
+var SALONES = {
   "Acceso Oeste":{"lat":-34.630051,"lng":-58.736273},
   "Acceso Oeste 2":{"lat":-34.6343665,"lng":-58.7541304},
   "Adrogue":{"lat":-34.79580714896355,"lng":-58.39840871349146},
@@ -166,19 +174,17 @@ const SALONES = {
   "Villa de Mayo Boutique":{"lat":-34.5141151,"lng":-58.6815573}
 };
 
-var params   = new URLSearchParams(window.location.search);
-var salonNom = decodeURIComponent(params.get('salon') || '');
+var params    = new URLSearchParams(window.location.search);
+var salonNom  = decodeURIComponent(params.get('salon') || '');
 var salonData = SALONES[salonNom] || null;
 var userLat = null, userLng = null, gpsOk = false;
 var tipo = 'entrada';
-var stream = null, facing = 'environment';
+var stream = null, facing = 'environment', camActive = false;
 
-document.getElementById('salonLabel').textContent = salonNom || '⚠ Sin salón';
-if (!salonNom) {
-  setGPS('err', '⚠ QR sin salón — contactá al administrador');
-}
+document.getElementById('salonLabel').textContent = salonNom || 'Sin salon';
+if (!salonNom) setGPS('err', 'QR sin salon - contacta al administrador');
+
 obtenerGPS();
-iniciarCam(facing);
 
 function setTipo(t) {
   tipo = t;
@@ -187,32 +193,17 @@ function setTipo(t) {
 }
 
 function obtenerGPS() {
-  if (!navigator.geolocation) {
-    setGPS('warn', '⚠ GPS no disponible — se permite igualmente');
-    gpsOk = true; return;
-  }
+  if (!navigator.geolocation) { setGPS('warn', 'GPS no disponible'); gpsOk = true; return; }
   navigator.geolocation.getCurrentPosition(
     function(pos) {
-      userLat = pos.coords.latitude;
-      userLng = pos.coords.longitude;
+      userLat = pos.coords.latitude; userLng = pos.coords.longitude;
       if (salonData) {
         var d = haversine(userLat, userLng, salonData.lat, salonData.lng);
-        if (d <= MAX_DIST) {
-          setGPS('ok', '✅ Ubicación OK — ' + Math.round(d) + 'm del salón');
-          gpsOk = true;
-        } else {
-          setGPS('err', '⛔ A ' + Math.round(d) + 'm del salón (máx ' + MAX_DIST + 'm)');
-          gpsOk = false;
-        }
-      } else {
-        setGPS('ok', '📍 GPS activo');
-        gpsOk = true;
-      }
+        if (d <= MAX_DIST) { setGPS('ok', 'Ubicacion OK - ' + Math.round(d) + 'm del salon'); gpsOk = true; }
+        else               { setGPS('err', 'A ' + Math.round(d) + 'm del salon (max ' + MAX_DIST + 'm)'); gpsOk = false; }
+      } else { setGPS('ok', 'GPS activo'); gpsOk = true; }
     },
-    function() {
-      setGPS('warn', '⚠ No se pudo obtener ubicación — se permite');
-      gpsOk = true;
-    },
+    function() { setGPS('warn', 'Sin ubicacion - se permite igualmente'); gpsOk = true; },
     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
   );
 }
@@ -224,51 +215,72 @@ function setGPS(tipo, txt) {
 }
 
 function haversine(lat1, lng1, lat2, lng2) {
-  var R = 6371000;
-  var dLat = (lat2-lat1)*Math.PI/180;
-  var dLng = (lng2-lng1)*Math.PI/180;
-  var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
-    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  var R = 6371000, dLat = (lat2-lat1)*Math.PI/180, dLng = (lng2-lng1)*Math.PI/180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
   return 2*R*Math.asin(Math.sqrt(a));
 }
 
-async function iniciarCam(f) {
-  if (stream) stream.getTracks().forEach(t => t.stop());
+function activarCam() {
+  document.getElementById('camPlaceholder').style.display = 'none';
+  document.getElementById('video').style.display = 'block';
+  document.getElementById('btnFlip').style.display = 'block';
+  iniciarCam(facing);
+}
+
+function iniciarCam(f) {
+  if (stream) { stream.getTracks().forEach(function(t){ t.stop(); }); stream = null; }
   var vid = document.getElementById('video');
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: f }, width: { ideal: 640 }, height: { ideal: 480 } }
-    });
-    vid.srcObject = stream;
-    vid.play().catch(function(){});
-  } catch(e) {
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      vid.srcObject = stream;
-      vid.play().catch(function(){});
-    } catch(e2) {
-      mostrarResult('err','❌','Sin cámara','No se pudo acceder a la cámara.<br>Verificá que diste permiso al sitio.<br><small>' + e2.message + '</small>');
-    }
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    mostrarCamError('El navegador no soporta camara. Usa Chrome o Safari actualizado.');
+    return;
   }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: f } } })
+    .then(function(s) {
+      stream = s;
+      vid.srcObject = s;
+      camActive = true;
+      var playPromise = vid.play();
+      if (playPromise !== undefined) playPromise.catch(function(){});
+    })
+    .catch(function(err) {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function(s) {
+          stream = s; vid.srcObject = s; camActive = true;
+          var p = vid.play(); if (p !== undefined) p.catch(function(){});
+        })
+        .catch(function(err2) {
+          mostrarCamError('No se pudo acceder a la camara: ' + err2.message + '. Verifica permisos en tu navegador.');
+        });
+    });
+}
+
+function mostrarCamError(msg) {
+  var ph = document.getElementById('camPlaceholder');
+  ph.style.display = 'flex';
+  ph.innerHTML = '<div style="text-align:center;color:#f87171;padding:16px"><div style="font-size:2rem">❌</div><div style="font-size:.85rem;margin-top:8px">' + msg + '</div><div style="font-size:.8rem;margin-top:8px;color:#94a3b8">Toca para reintentar</div></div>';
+  document.getElementById('video').style.display = 'none';
 }
 
 function flipCam() {
-  facing = facing==='user' ? 'environment' : 'user';
+  facing = facing === 'user' ? 'environment' : 'user';
   iniciarCam(facing);
 }
 
 async function escanear() {
   if (!gpsOk) {
-    mostrarResult('warn','⛔','Fuera de rango',
-      'Debés estar a menos de '+MAX_DIST+'m del salón para marcar asistencia.<br>Acercáte al lugar de trabajo.');
+    mostrarResult('warn', 'Fuera de rango', 'Debes estar a menos de ' + MAX_DIST + 'm del salon para marcar asistencia.');
     return;
   }
-
   var btn = document.getElementById('btnScan');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Verificando...';
 
-  var video  = document.getElementById('video');
+  if (!camActive) {
+    activarCam();
+    await new Promise(function(r){ setTimeout(r, 2000); });
+  }
+
+  var video = document.getElementById('video');
   var canvas = document.getElementById('canvas');
   canvas.width  = video.videoWidth  || 640;
   canvas.height = video.videoHeight || 480;
@@ -277,52 +289,34 @@ async function escanear() {
 
   try {
     var res  = await fetch(API_URL + '/verificar', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
+      method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ imageBase64: b64 })
     });
     var data = await res.json();
-
     if (data.ok) {
-      var sim  = Math.round(data.similarity || 0);
-      var tipoTxt = tipo === 'entrada' ? '🟢 ENTRADA registrada' : '🔴 SALIDA registrada';
-      mostrarResult('ok','✅', data.nombre,
-        tipoTxt + '<br>' + salonNom +
-        '<br><span class="chip">Confianza: ' + sim + '%</span>' +
-        '<br><span class="chip">DNI: ' + data.dni + '</span>');
-
-      var sheetsParams = new URLSearchParams({
-        action:     'registrar_asistencia',
-        employeeId: data.dni,
-        nombre:     data.nombre,
-        salon:      salonNom,
-        tipo:       tipo,
-        confianza:  sim
-      });
-      fetch(SHEETS_URL + '?' + sheetsParams.toString(), { mode: 'no-cors' })
-        .catch(function(){});
-
+      var sim = Math.round(data.similarity || 0);
+      mostrarResult('ok', data.nombre,
+        (tipo === 'entrada' ? 'ENTRADA registrada' : 'SALIDA registrada') + '<br>' + salonNom +
+        '<br><span class="chip">Confianza: ' + sim + '%</span><span class="chip" style="margin-left:6px">DNI: ' + data.dni + '</span>');
+      var sp = new URLSearchParams({ action:'registrar_asistencia', employeeId:data.dni, nombre:data.nombre, salon:salonNom, tipo:tipo, confianza:sim });
+      fetch(SHEETS_URL + '?' + sp.toString(), { mode:'no-cors' }).catch(function(){});
     } else {
-      mostrarResult('err','❌','No reconocido',
-        (data.error || 'Rostro no encontrado en la base de datos.') +
-        '<br><br>Si sos empleado, pedí al administrador que te registre primero.');
+      mostrarResult('err', 'No reconocido', data.error || 'Rostro no encontrado. Si sos empleado, pide al administrador que te registre primero.');
     }
-
   } catch(e) {
-    mostrarResult('err','❌','Error de conexión', e.message);
+    mostrarResult('err', 'Error de conexion', e.message);
   }
-
   btn.disabled = false;
-  btn.innerHTML = '📷 Verificar identidad';
+  btn.innerHTML = 'Verificar identidad';
 }
 
-function mostrarResult(tipo, icon, name, detail) {
+function mostrarResult(tipo, name, detail) {
+  var icons = { ok:'✅', err:'❌', warn:'⛔' };
   var box = document.getElementById('resultBox');
   box.className = 'result result-' + tipo;
   box.style.display = 'block';
-  document.getElementById('resIcon').textContent = icon;
+  document.getElementById('resIcon').textContent = icons[tipo] || '';
   document.getElementById('resName').textContent = name;
-  document.getElementById('resTipo').textContent = '';
   document.getElementById('resDetail').innerHTML = detail;
   document.getElementById('mainCard').style.display = 'none';
   document.getElementById('gpsBar').style.display = 'none';
@@ -332,9 +326,8 @@ function reiniciar() {
   document.getElementById('resultBox').style.display = 'none';
   document.getElementById('mainCard').style.display = 'block';
   document.getElementById('gpsBar').style.display = '';
-  iniciarCam(facing);
-  obtenerGPS();
+  document.getElementById('btnScan').innerHTML = 'Verificar identidad';
 }
 </script>
 </body>
-</html>
+                      </html>
