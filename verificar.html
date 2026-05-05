@@ -62,7 +62,6 @@ h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-botto
   <video id="video" autoplay playsinline muted></video>
   <canvas id="canvas"></canvas>
   <button class="btn btn-scan" id="btnScan" onclick="escanear()">📷 Verificar identidad</button>
-  <button class="btn btn-flip" id="btnFlip" onclick="flipCam()" style="display:none">🔄 Cambiar cámara</button>
 </div>
 <div class="result" id="resultBox">
   <div class="result-icon" id="resIcon"></div>
@@ -170,7 +169,7 @@ var salonForzado = decodeURIComponent(params.get('salon') || '');
 var salonNom = salonForzado;
 var userLat = null, userLng = null, gpsOk = false;
 var tipo = 'entrada';
-var stream = null, facing = 'environment', camActive = false;
+var stream = null, facing = 'user', camActive = false;
 if (salonForzado) document.getElementById('salonLabel').textContent = salonForzado;
 obtenerGPS();
 function setTipo(t) {
@@ -231,7 +230,6 @@ function haversine(lat1,lng1,lat2,lng2) {
 function activarCam() {
   document.getElementById('camPlaceholder').style.display='none';
   document.getElementById('video').style.display='block';
-  document.getElementById('btnFlip').style.display='block';
   iniciarCam(facing);
 }
 function iniciarCam(f) {
