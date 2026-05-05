@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>JANOS – Control de Asistencia</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px}
+.logo{font-size:3rem;text-align:center;margin-bottom:4px}
+h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-bottom:8px}
+.salon-tag{text-align:center;font-size:1rem;color:#f1f5f9;margin-bottom:12px;padding:8px 20px;background:#1e3a5f;border-radius:20px;display:inline-block;font-weight:600}
+.center{text-align:center;width:100%}
+.card{background:#1e293b;border-radius:16px;padding:20px;width:100%;max-width:420px;border:1px solid #334155;margin-bottom:14px}
+#video{width:100%;border-radius:12px;background:#000;display:block;max-height:300px;object-fit:cover}
+#canvas{display:none}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:10px}
+.btn-scan{background:#6366f1;color:#fff}
+.btn-scan:hover{background:#4f46e5}
+.btn-scan:disabled{background:#334155;color:#64748b;cursor:not-allowed}
+.btn-flip{background:#475569;color:#fff;font-size:.85rem;padding:9px;margin-top:6px}
+.tipo-btns{display:flex;gap:10px;margin-bottom:14px}
+.tipo-btn{flex:1;padding:11px;border:2px solid #334155;border-radius:10px;background:transparent;color:#94a3b8;font-weight:700;cursor:pointer;transition:all .2s;font-size:.95rem}
+.tipo-btn.active-entrada{border-color:#10b981;color:#34d399;background:#064e3b}
+.tipo-btn.active-salida{border-color:#ef4444;color:#f87171;background:#450a0a}
+.gps-bar{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px;border-radius:20px;font-size:.82rem;font-weight:600;margin-bottom:12px;width:fit-content;margin-left:auto;margin-right:auto}
+.gps-wait{background:#1e3a5f;color:#93c5fd}
+.gps-ok{background:#064e3b;color:#34d399}
+.gps-err{background:#450a0a;color:#f87171}
+.gps-warn{background:#431407;color:#fdba74}
+.result{width:100%;max-width:420px;border-radius:16px;padding:28px;text-align:center;display:none;margin-bottom:14px}
+.result-ok{background:#064e3b;border:2px solid #10b981}
+.result-err{background:#450a0a;border:2px solid #ef4444}
+.result-warn{background:#431407;border:2px solid #f97316}
+.result-icon{font-size:4rem;margin-bottom:12px}
+.result-name{font-size:1.5rem;font-weight:800;margin-bottom:6px;color:#f1f5f9}
+.result-tipo{font-size:1rem;font-weight:700;margin-bottom:8px}
+.result-detail{font-size:.88rem;color:#94a3b8;line-height:1.7}
+.chip{display:inline-block;background:rgba(255,255,255,.1);border-radius:20px;padding:3px 12px;font-size:.82rem;margin-top:6px}
+.spinner{display:inline-block;width:22px;height:22px;border:3px solid #334155;border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="logo">🪩</div>
+<h1>Control de Asistencia</h1>
+<div class="center"><span class="salon-tag" id="salonLabel">Cargando...</span></div>
+<div class="center" style="margin-bottom:12px">
+  <span class="gps-bar gps-wait" id="gpsBar">📍 Obteniendo ubicación...</span>
+</div>
+
+<div class="card" id="mainCard" style="max-width:420px;width:100%">
+  <div class="tipo-btns">
+    <button class="tipo-btn active-entrada" id="btnE" onclick="setTipo('entrada')">🟢 Entrada</button>
+    <button class="tipo-btn" id="btnS" onclick="setTipo('salida')">🔴 Salida</button>
+  </div>
+  <video id="video" autoplay playsinline muted></video>
+  <canvas id="canvas"></canvas>
+  <button class="btn btn-scan" id="btnScan" onclick="escanear()">📷 Verificar identidad</button>
+  <button class="btn btn-flip" onclick="flipCam()">🔄 Cambiar cámara</button>
+</div>
+
+<div class="result" id="resultBox">
+  <div class="result-icon" id="resIcon"></div>
+  <div class="result-name" id="resName"></div>
+  <div class="result-tipo" id="resTipo"></div>
+  <div class="result-detail" id="resDetail"></div>
+  <button class="btn btn-scan" onclick="reiniciar()" style="margin-top:20px">↩ Siguiente</button>
+</div>
+
+<script>
+const API_URL    = 'https://nha46wbuoo7ajwqqrsgzycavfi0rbcqh.lambda-url.us-east-2.on.aws';
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwFatJVhY37Bq41r18U4-e-BbxzkgOl8qpZ6hxilNMbZITNYr8YkRE4RA2y6RBfTFcK8g/exec';
+const MAX_DIST   = 150;
+
+const SALONES = {
+  "Acceso Oeste":{"lat":-34.630051,"lng":-58.736273},
+  "Acceso Oeste 2":{"lat":-34.6343665,"lng":-58.7541304},
+  "Adrogue":{"lat":-34.79580714896355,"lng":-58.39840871349146},
+  "Avellaneda 1":{"lat":-34.67700663596199,"lng":-58.36926045956796},
+  "Avellaneda 2":{"lat":-34.67700663596199,"lng":-58.36926045956796},
+  "Avellaneda 3":{"lat":-34.67700663596199,"lng":-58.36926045956796},
+  "Avellaneda 4":{"lat":-34.67700663596199,"lng":-58.36926045956796},
+  "Bayres Eventos":{"lat":-34.49386844950456,"lng":-58.59392713305712},
+  "Bella Vista":{"lat":-34.556763,"lng":-58.695852},
+  "Bella Vista 2":{"lat":-34.56558024975642,"lng":-58.70115624468752},
+  "Benavidez 1":{"lat":-34.41328690586904,"lng":-58.70441725767073},
+  "Benavidez 2":{"lat":-34.41283070430927,"lng":-58.71634057565793},
+  "Berazategui":{"lat":-34.78078603561312,"lng":-58.24587579999999},
+  "Berazategui 2":{"lat":-34.77625697288345,"lng":-58.23644127686214},
+  "Berisso":{"lat":-34.88420883790188,"lng":-57.90217764534688},
+  "CABA Boutique":{"lat":-34.60696947952881,"lng":-58.38446560235706},
+  "Caballito 1":{"lat":-34.60976055210654,"lng":-58.4400598},
+  "Caballito 2":{"lat":-34.60976055210654,"lng":-58.4400598},
+  "Campana":{"lat":-34.1570387,"lng":-59.0185956},
+  "Canning":{"lat":-34.85605521068076,"lng":-58.5175497},
+  "Champagnat Boutique":{"lat":-34.451768,"lng":-58.916404},
+  "Costanera 1":{"lat":-34.54545894333134,"lng":-58.43118643173255},
+  "Costanera 2":{"lat":-34.54545894333134,"lng":-58.43118643173255},
+  "Dardo Rocha":{"lat":-34.4907407206998,"lng":-58.52651305767236},
+  "Darwin 1":{"lat":-34.5886717288581,"lng":-58.43687601534143},
+  "Darwin 2":{"lat":-34.5886717288581,"lng":-58.43687601534143},
+  "Del Viso":{"lat":-34.44740216850433,"lng":-58.79489273317542},
+  "DOT":{"lat":-34.54635161803416,"lng":-58.48787506064081},
+  "Escobar":{"lat":-34.376101,"lng":-58.81715},
+  "General Rodriguez":{"lat":-34.59602602954801,"lng":-58.93372882123573},
+  "Haedo":{"lat":-34.6356497,"lng":-58.5896032},
+  "Haedo 2":{"lat":-34.6356497,"lng":-58.5896032},
+  "Hipodromo La Plata":{"lat":-34.90392222834488,"lng":-57.94801235582321},
+  "Holiday Inn":{"lat":-34.73327940981686,"lng":-58.52004444603416},
+  "Holiday Inn 2":{"lat":-34.73327940981686,"lng":-58.52004444603416},
+  "House":{"lat":-34.519991,"lng":-58.742783},
+  "Hudson":{"lat":-34.80735519557907,"lng":-58.17153655397216},
+  "Hudson 2":{"lat":-34.90252141857428,"lng":-58.17218342883579},
+  "Hurlingham":{"lat":-34.601542,"lng":-58.652154},
+  "Ituzaingo":{"lat":-34.638843,"lng":-58.677128},
+  "Ituzaingo 2":{"lat":-34.66464198571634,"lng":-58.67389078886168},
+  "La Plata":{"lat":-34.94450602665787,"lng":-57.96753527384086},
+  "La Plata 2":{"lat":-34.93372659788916,"lng":-57.92991437116449},
+  "La Plata Boutique":{"lat":-34.93372659788916,"lng":-57.92991437116449},
+  "Liniers":{"lat":-34.64489496032444,"lng":-58.51045795302172},
+  "Lomas":{"lat":-34.75689134308413,"lng":-58.39613517301476},
+  "Lomas Boutique":{"lat":-34.7603301378896,"lng":-58.41099933068637},
+  "Los Naranjos":{"lat":-38.00898592439063,"lng":-57.6333206181579},
+  "Martinez":{"lat":-34.492246,"lng":-58.511093},
+  "Maschwitz":{"lat":-34.378192,"lng":-58.752286},
+  "Merlo":{"lat":-34.66875764104189,"lng":-58.7378104106764},
+  "Merlo 2":{"lat":-34.66091039235508,"lng":-58.7535604711642},
+  "Moreno":{"lat":-34.646143,"lng":-58.8033},
+  "Moron":{"lat":-34.63326397571632,"lng":-58.63119241534143},
+  "Nunnez":{"lat":-34.54218327080488,"lng":-58.45969217301391},
+  "Oficina":{"lat":-34.556763,"lng":-58.695852},
+  "Olivos":{"lat":-34.502327,"lng":-58.479292},
+  "Olivos 2":{"lat":-34.502327,"lng":-58.479292},
+  "Palacio Sans Souci":{"lat":-34.44566535800791,"lng":-58.54268630429397},
+  "Palermo Hollywood":{"lat":-34.57802364353802,"lng":-58.43768630184958},
+  "Palermo Soho":{"lat":-34.5920897560759,"lng":-58.43083028650607},
+  "Paseo Colon":{"lat":-34.61123555454792,"lng":-58.36965475270821},
+  "Pilar":{"lat":-34.44639611355176,"lng":-58.89163322778487},
+  "Pilar boutique":{"lat":-34.4074743905739,"lng":-58.85580878895455},
+  "Pilar Hotel":{"lat":-34.4569304,"lng":-58.8888985},
+  "Playa Grande":{"lat":-38.02523486067417,"lng":-57.53059157670718},
+  "Puerto Madero":{"lat":-34.60964874165761,"lng":-58.36383646002772},
+  "Puerto Madero Boutique":{"lat":-34.61439986030064,"lng":-58.3579035},
+  "Quilmes Boutique":{"lat":-34.76490647775054,"lng":-58.27535245767235},
+  "Quinta":{"lat":-34.468832,"lng":-58.797458},
+  "Ramos Boutique":{"lat":-34.64604401098804,"lng":-58.56895834496699},
+  "Ramos Boutique 2":{"lat":-34.64838835018546,"lng":-58.5695002888542},
+  "Ramos Mejia":{"lat":-34.65964903594481,"lng":-58.56208005466929},
+  "Ramos Mejia 2":{"lat":-34.65964903594481,"lng":-58.56208005466929},
+  "Recoleta":{"lat":-34.58606615760529,"lng":-58.39348064232763},
+  "San Isidro":{"lat":-34.48035092232818,"lng":-58.52074157116463},
+  "San Justo":{"lat":-34.67591894028484,"lng":-58.5875203558232},
+  "San Justo 2":{"lat":-34.67875610644857,"lng":-58.59102243181726},
+  "San Martin 1":{"lat":-34.56777583638708,"lng":-58.59138328650755},
+  "San Martin 2":{"lat":-34.56816739887635,"lng":-58.59061621404123},
+  "San Martin 3":{"lat":-34.56784016632005,"lng":-58.59070850702175},
+  "San Miguel":{"lat":-34.55440169283807,"lng":-58.71736887116464},
+  "San Telmo":{"lat":-34.61183,"lng":-58.37469},
+  "San Telmo 2":{"lat":-34.61135331347032,"lng":-58.37388707116464},
+  "San Telmo Boutique":{"lat":-34.61492395543934,"lng":-58.37116922883535},
+  "Temperley":{"lat":-34.78514977472399,"lng":-58.40608038465528},
+  "Vicente Lopez":{"lat":-34.51771,"lng":-58.47866},
+  "Villa de Mayo":{"lat":-34.5141151,"lng":-58.6815573},
+  "Villa de Mayo Boutique":{"lat":-34.5141151,"lng":-58.6815573}
+};
+
+var params   = new URLSearchParams(window.location.search);
+var salonNom = decodeURIComponent(params.get('salon') || '');
+var salonData = SALONES[salonNom] || null;
+var userLat = null, userLng = null, gpsOk = false;
+var tipo = 'entrada';
+var stream = null, facing = 'environment';
+
+document.getElementById('salonLabel').textContent = salonNom || '⚠ Sin salón';
+if (!salonNom) {
+  setGPS('err', '⚠ QR sin salón — contactá al administrador');
+}
+obtenerGPS();
+iniciarCam(facing);
+
+function setTipo(t) {
+  tipo = t;
+  document.getElementById('btnE').className = 'tipo-btn' + (t==='entrada' ? ' active-entrada' : '');
+  document.getElementById('btnS').className = 'tipo-btn' + (t==='salida'  ? ' active-salida'  : '');
+}
+
+function obtenerGPS() {
+  if (!navigator.geolocation) {
+    setGPS('warn', '⚠ GPS no disponible — se permite igualmente');
+    gpsOk = true; return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      userLat = pos.coords.latitude;
+      userLng = pos.coords.longitude;
+      if (salonData) {
+        var d = haversine(userLat, userLng, salonData.lat, salonData.lng);
+        if (d <= MAX_DIST) {
+          setGPS('ok', '✅ Ubicación OK — ' + Math.round(d) + 'm del salón');
+          gpsOk = true;
+        } else {
+          setGPS('err', '⛔ A ' + Math.round(d) + 'm del salón (máx ' + MAX_DIST + 'm)');
+          gpsOk = false;
+        }
+      } else {
+        setGPS('ok', '📍 GPS activo');
+        gpsOk = true;
+      }
+    },
+    function() {
+      setGPS('warn', '⚠ No se pudo obtener ubicación — se permite');
+      gpsOk = true;
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+}
+
+function setGPS(tipo, txt) {
+  var el = document.getElementById('gpsBar');
+  el.className = 'gps-bar gps-' + tipo;
+  el.textContent = txt;
+}
+
+function haversine(lat1, lng1, lat2, lng2) {
+  var R = 6371000;
+  var dLat = (lat2-lat1)*Math.PI/180;
+  var dLng = (lng2-lng1)*Math.PI/180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+
+async function iniciarCam(f) {
+  if (stream) stream.getTracks().forEach(t => t.stop());
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: f, width:{ideal:640}, height:{ideal:480} }, audio: false
+    });
+    document.getElementById('video').srcObject = stream;
+  } catch(e) {
+    mostrarResult('err','❌','Sin cámara','No se pudo acceder: '+e.message);
+  }
+}
+
+function flipCam() {
+  facing = facing==='user' ? 'environment' : 'user';
+  iniciarCam(facing);
+}
+
+async function escanear() {
+  if (!gpsOk) {
+    mostrarResult('warn','⛔','Fuera de rango',
+      'Debés estar a menos de '+MAX_DIST+'m del salón para marcar asistencia.<br>Acercáte al lugar de trabajo.');
+    return;
+  }
+
+  var btn = document.getElementById('btnScan');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Verificando...';
+
+  var video  = document.getElementById('video');
+  var canvas = document.getElementById('canvas');
+  canvas.width  = video.videoWidth  || 640;
+  canvas.height = video.videoHeight || 480;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  var b64 = canvas.toDataURL('image/jpeg', 0.85).split(',')[1];
+
+  try {
+    var res  = await fetch(API_URL + '/verificar', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ imageBase64: b64 })
+    });
+    var data = await res.json();
+
+    if (data.ok) {
+      var sim  = Math.round(data.similarity || 0);
+      var tipoTxt = tipo === 'entrada' ? '🟢 ENTRADA registrada' : '🔴 SALIDA registrada';
+      mostrarResult('ok','✅', data.nombre,
+        tipoTxt + '<br>' + salonNom +
+        '<br><span class="chip">Confianza: ' + sim + '%</span>' +
+        '<br><span class="chip">DNI: ' + data.dni + '</span>');
+
+      var sheetsParams = new URLSearchParams({
+        action:     'registrar_asistencia',
+        employeeId: data.dni,
+        nombre:     data.nombre,
+        salon:      salonNom,
+        tipo:       tipo,
+        confianza:  sim
+      });
+      fetch(SHEETS_URL + '?' + sheetsParams.toString(), { mode: 'no-cors' })
+        .catch(function(){});
+
+    } else {
+      mostrarResult('err','❌','No reconocido',
+        (data.error || 'Rostro no encontrado en la base de datos.') +
+        '<br><br>Si sos empleado, pedí al administrador que te registre primero.');
+    }
+
+  } catch(e) {
+    mostrarResult('err','❌','Error de conexión', e.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '📷 Verificar identidad';
+}
+
+function mostrarResult(tipo, icon, name, detail) {
+  var box = document.getElementById('resultBox');
+  box.className = 'result result-' + tipo;
+  box.style.display = 'block';
+  document.getElementById('resIcon').textContent = icon;
+  document.getElementById('resName').textContent = name;
+  document.getElementById('resTipo').textContent = '';
+  document.getElementById('resDetail').innerHTML = detail;
+  document.getElementById('mainCard').style.display = 'none';
+  document.getElementById('gpsBar').style.display = 'none';
+}
+
+function reiniciar() {
+  document.getElementById('resultBox').style.display = 'none';
+  document.getElementById('mainCard').style.display = 'block';
+  document.getElementById('gpsBar').style.display = '';
+  obtenerGPS();
+}
+</script>
+</body>
+</html>
