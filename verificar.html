@@ -234,13 +234,21 @@ function haversine(lat1, lng1, lat2, lng2) {
 
 async function iniciarCam(f) {
   if (stream) stream.getTracks().forEach(t => t.stop());
+  var vid = document.getElementById('video');
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: f, width:{ideal:640}, height:{ideal:480} }, audio: false
+      video: { facingMode: { ideal: f }, width: { ideal: 640 }, height: { ideal: 480 } }
     });
-    document.getElementById('video').srcObject = stream;
+    vid.srcObject = stream;
+    vid.play().catch(function(){});
   } catch(e) {
-    mostrarResult('err','❌','Sin cámara','No se pudo acceder: '+e.message);
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      vid.srcObject = stream;
+      vid.play().catch(function(){});
+    } catch(e2) {
+      mostrarResult('err','❌','Sin cámara','No se pudo acceder a la cámara.<br>Verificá que diste permiso al sitio.<br><small>' + e2.message + '</small>');
+    }
   }
 }
 
@@ -324,6 +332,7 @@ function reiniciar() {
   document.getElementById('resultBox').style.display = 'none';
   document.getElementById('mainCard').style.display = 'block';
   document.getElementById('gpsBar').style.display = '';
+  iniciarCam(facing);
   obtenerGPS();
 }
 </script>
