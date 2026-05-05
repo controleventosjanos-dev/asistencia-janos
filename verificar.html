@@ -42,33 +42,33 @@ h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-botto
 </style>
 </head>
 <body>
-<div class="logo">ðª©</div>
+<div class="logo">🪩</div>
 <h1>Control de Asistencia</h1>
-<div class="center"><span class="salon-tag" id="salonLabel">ð Detectando salÃ³n...</span></div>
+<div class="center"><span class="salon-tag" id="salonLabel">📍 Detectando salón...</span></div>
 <div class="center" style="margin-bottom:12px">
-  <span class="gps-bar gps-wait" id="gpsBar">ð¡ Obteniendo ubicaciÃ³n...</span>
+  <span class="gps-bar gps-wait" id="gpsBar">📡 Obteniendo ubicación...</span>
 </div>
 <div class="card" id="mainCard" style="max-width:420px;width:100%">
   <div class="tipo-btns">
-    <button class="tipo-btn active-entrada" id="btnE" onclick="setTipo('entrada')">ð¢ Entrada</button>
-    <button class="tipo-btn" id="btnS" onclick="setTipo('salida')">ð´ Salida</button>
+    <button class="tipo-btn active-entrada" id="btnE" onclick="setTipo('entrada')">🟢 Entrada</button>
+    <button class="tipo-btn" id="btnS" onclick="setTipo('salida')">🔴 Salida</button>
   </div>
   <div class="cam-placeholder" id="camPlaceholder" onclick="activarCam()">
     <div style="text-align:center;color:#94a3b8">
-      <div style="font-size:2.5rem;margin-bottom:8px">ð·</div>
-      <div style="font-size:.95rem;font-weight:600">TocÃ¡ aquÃ­ para activar la cÃ¡mara</div>
+      <div style="font-size:2.5rem;margin-bottom:8px">📷</div>
+      <div style="font-size:.95rem;font-weight:600">Tocá aquí para activar la cámara</div>
     </div>
   </div>
   <video id="video" autoplay playsinline muted></video>
   <canvas id="canvas"></canvas>
-  <button class="btn btn-scan" id="btnScan" onclick="escanear()">ð· Verificar identidad</button>
-  <button class="btn btn-flip" id="btnFlip" onclick="flipCam()" style="display:none">ð Cambiar cÃ¡mara</button>
+  <button class="btn btn-scan" id="btnScan" onclick="escanear()">📷 Verificar identidad</button>
+  <button class="btn btn-flip" id="btnFlip" onclick="flipCam()" style="display:none">🔄 Cambiar cámara</button>
 </div>
 <div class="result" id="resultBox">
   <div class="result-icon" id="resIcon"></div>
   <div class="result-name" id="resName"></div>
   <div class="result-detail" id="resDetail"></div>
-  <button class="btn btn-scan" onclick="reiniciar()" style="margin-top:20px">â© Siguiente</button>
+  <button class="btn btn-scan" onclick="reiniciar()" style="margin-top:20px">↩ Siguiente</button>
 </div>
 <script>
 var API_URL = 'https://nha46wbuoo7ajwqqrsgzycavfi0rbcqh.lambda-url.us-east-2.on.aws';
@@ -189,7 +189,7 @@ function obtenerGPS() {
       userLat = pos.coords.latitude; userLng = pos.coords.longitude;
       if (salonForzado && SALONES[salonForzado]) {
         var d = haversine(userLat,userLng,SALONES[salonForzado].lat,SALONES[salonForzado].lng);
-        if (d <= MAX_DIST) { setGPS('ok','Ubicacion OK Â· '+Math.round(d)+'m'); gpsOk=true; }
+        if (d <= MAX_DIST) { setGPS('ok','Ubicacion OK · '+Math.round(d)+'m'); gpsOk=true; }
         else { setGPS('err','A '+Math.round(d)+'m del salon (max '+MAX_DIST+'m)'); gpsOk=false; }
         return;
       }
@@ -201,17 +201,17 @@ function obtenerGPS() {
       if (closest && minDist<=MAX_DIST) {
         salonNom=closest;
         document.getElementById('salonLabel').textContent=salonNom;
-        setGPS('ok','Salon detectado Â· '+Math.round(minDist)+'m');
+        setGPS('ok','Salon detectado · '+Math.round(minDist)+'m');
         gpsOk=true;
       } else {
         var msg=closest ? Math.round(minDist)+'m del mas cercano ('+closest+')' : 'ubicacion desconocida';
-        setGPS('err','Sin salon en rango Â· '+msg);
+        setGPS('err','Sin salon en rango · '+msg);
         document.getElementById('salonLabel').textContent='Fuera de salon';
         gpsOk=false;
       }
     },
     function() {
-      setGPS('warn','Sin ubicacion Â· se permite igualmente');
+      setGPS('warn','Sin ubicacion · se permite igualmente');
       if (!salonNom) { document.getElementById('salonLabel').textContent='Sin GPS'; salonNom='Sin GPS'; }
       gpsOk=true;
     },
