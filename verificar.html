@@ -179,9 +179,9 @@ function setTipo(t) {
 }
 function obtenerGPS() {
   if (!navigator.geolocation) {
-    setGPS('warn','GPS no disponible');
-    if (!salonNom) { document.getElementById('salonLabel').textContent='Sin GPS'; salonNom='Sin GPS'; }
-    gpsOk = true; return;
+    setGPS('err','GPS no disponible Â· ubicaciÃ³n requerida');
+    document.getElementById('salonLabel').textContent='Sin GPS';
+    gpsOk = false; return;
   }
   navigator.geolocation.getCurrentPosition(
     function(pos) {
@@ -210,9 +210,9 @@ function obtenerGPS() {
       }
     },
     function() {
-      setGPS('warn','Sin ubicacion Â· se permite igualmente');
-      if (!salonNom) { document.getElementById('salonLabel').textContent='Sin GPS'; salonNom='Sin GPS'; }
-      gpsOk=true;
+      setGPS('err','GPS denegado Â· ubicaciÃ³n requerida');
+      document.getElementById('salonLabel').textContent='Sin GPS';
+      gpsOk=false;
     },
     { enableHighAccuracy:true, timeout:10000, maximumAge:0 }
   );
