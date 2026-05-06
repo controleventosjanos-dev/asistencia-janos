@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>JANOS - Control de Asistencia</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}h
+*{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px}
-.logo{font-size:3rem;text-align:center;margin-bohttom:4px}h
+.logo{text-align:center;margin-bottom:4px}
 h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-bottom:8px}
 .salon-tag{text-align:center;font-size:1rem;color:#f1f5f9;margin-bottom:12px;padding:8px 20px;background:#1e3a5f;border-radius:20px;display:inline-block;font-weight:600}
 .center{text-align:center;width:100%}
@@ -19,7 +19,6 @@ h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-botto
 .btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .2s;margin-top:8px}
 .btn-scan{background:#6366f1;color:#fff}
 .btn-scan:disabled{background:#334155;color:#64748b;cursor:not-allowed}
-.btn-flip{background:#475569;color:#fff;font-size:.85rem;padding:9px;margin-top:6px}
 .tipo-btns{display:flex;gap:10px;margin-bottom:14px}
 .tipo-btn{flex:1;padding:11px;border:2px solid #334155;border-radius:10px;background:transparent;color:#94a3b8;font-weight:700;cursor:pointer;transition:all .2s;font-size:.95rem}
 .tipo-btn.active-entrada{border-color:#10b981;color:#34d399;background:#064e3b}
@@ -42,128 +41,49 @@ h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-botto
 </style>
 </head>
 <body>
-<div class="logo">ðª©</div>
+<div class="logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" width="110" height="121" style="display:block;margin:0 auto 2px">
+<circle cx="100" cy="95" r="82" fill="none" stroke="#9333ea" stroke-width="2.5" stroke-dasharray="3,6" stroke-linecap="round"/>
+<circle cx="100" cy="95" r="70" fill="none" stroke="#9333ea" stroke-width="1.5"/>
+<path d="M100,32 C88,32 76,39 70,50 C62,63 60,78 60,95 C60,112 62,127 70,140 C76,151 88,158 100,158 Z" fill="#9333ea"/>
+<path d="M100,32 C112,32 124,39 130,50 C138,63 140,78 140,95 C140,112 138,127 130,140 C124,151 112,158 100,158 Z" fill="#9333ea"/>
+<path d="M88,31 Q94,18 100,16 Q106,18 112,31 Q106,23 100,21 Q94,23 88,31 Z" fill="#9333ea"/>
+<path d="M80,37 Q74,27 78,23 Q84,21 88,31 Q85,32 80,37 Z" fill="#9333ea"/>
+<path d="M120,37 Q126,27 122,23 Q116,21 112,31 Q115,32 120,37 Z" fill="#9333ea"/>
+<text x="100" y="200" text-anchor="middle" font-family="Georgia,serif" font-size="24" font-weight="700" fill="#9333ea" letter-spacing="3">JANO'S</text>
+</svg>
+</div>
 <h1>Control de Asistencia</h1>
-<div class="center"><span class="salon-tag" id="salonLabel">ð Detectando salÃ³n...</span></div>
+<div class="center"><span class="salon-tag" id="salonLabel">Detectando salon...</span></div>
 <div class="center" style="margin-bottom:12px">
-  <span class="gps-bar gps-wait" id="gpsBar">ð¡ Obteniendo ubicaciÃ³n...</span>
+<span class="gps-bar gps-wait" id="gpsBar">Obteniendo ubicacion...</span>
 </div>
 <div class="card" id="mainCard" style="max-width:420px;width:100%">
-  <div class="tipo-btns">
-    <button class="tipo-btn active-entrada" id="btnE" onclick="setTipo('entrada')">ð¢ Entrada</button>
-    <button class="tipo-btn" id="btnS" onclick="setTipo('salida')">ð´ Salida</button>
-  </div>
-  <div class="cam-placeholder" id="camPlaceholder" onclick="activarCam()">
-    <div style="text-align:center;color:#94a3b8">
-      <div style="font-size:2.5rem;margin-bottom:8px">ð·</div>
-      <div style="font-size:.95rem;font-weight:600">TocÃ¡ aquÃ­ para activar la cÃ¡mara</div>
-    </div>
-  </div>
-  <video id="video" autoplay playsinline muted></video>
-  <canvas id="canvas"></canvas>
-  <button class="btn btn-scan" id="btnScan" onclick="escanear()">ð· Verificar identidad</button>
+<div class="tipo-btns">
+<button class="tipo-btn active-entrada" id="btnE" onclick="setTipo('entrada')">&#10003; Entrada</button>
+<button class="tipo-btn" id="btnS" onclick="setTipo('salida')">&#10007; Salida</button>
+</div>
+<div class="cam-placeholder" id="camPlaceholder" onclick="activarCam()">
+<div style="text-align:center;color:#94a3b8">
+<svg xmlns="http://www.w3.org/2000/svg" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 10px;display:block"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+<div style="font-size:.95rem;font-weight:600">Toca para activar la camara</div>
+</div>
+</div>
+<video id="video" autoplay playsinline muted></video>
+<canvas id="canvas"></canvas>
+<button class="btn btn-scan" id="btnScan" onclick="escanear()">Verificar identidad</button>
 </div>
 <div class="result" id="resultBox">
-  <div class="result-icon" id="resIcon"></div>
-  <div class="result-name" id="resName"></div>
-  <div class="result-detail" id="resDetail"></div>
-  <button class="btn btn-scan" onclick="reiniciar()" style="margin-top:20px">â© Siguiente</button>
+<div class="result-icon" id="resIcon"></div>
+<div class="result-name" id="resName"></div>
+<div class="result-detail" id="resDetail"></div>
+<button class="btn btn-scan" onclick="reiniciar()" style="margin-top:20px">Siguiente</button>
 </div>
 <script>
 var API_URL = 'https://nha46wbuoo7ajwqqrsgzycavfi0rbcqh.lambda-url.us-east-2.on.aws';
 var SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxtEFH0vi1lE0Wbife6OelmX3tWLKVb6PVEhy4TlfvWdJnNre1bL4MVl3Gb8FvduDD3ng/exec';
 var MAX_DIST = 100;
-var SALONES = {
-  "Acceso Oeste":{"lat":-34.630051,"lng":-58.736273},
-  "Acceso Oeste 2":{"lat":-34.6343665,"lng":-58.7541304},
-  "Adrogue":{"lat":-34.79580714896355,"lng":-58.39840871349146},
-  "Avellaneda 1":{"lat":-34.67700663596199,"lng":-58.36926045956796},
-  "Avellaneda 2":{"lat":-34.67700663596199,"lng":-58.36926045956796},
-  "Avellaneda 3":{"lat":-34.67700663596199,"lng":-58.36926045956796},
-  "Avellaneda 4":{"lat":-34.67700663596199,"lng":-58.36926045956796},
-  "Bayres Eventos":{"lat":-34.49386844950456,"lng":-58.59392713305712},
-  "Bella Vista":{"lat":-34.556763,"lng":-58.695852},
-  "Bella Vista 2":{"lat":-34.56558024975642,"lng":-58.70115624468752},
-  "Benavidez 1":{"lat":-34.41328690586904,"lng":-58.70441725767073},
-  "Benavidez 2":{"lat":-34.41283070430927,"lng":-58.71634057565793},
-  "Berazategui":{"lat":-34.78078603561312,"lng":-58.24587579999999},
-  "Berazategui 2":{"lat":-34.77625697288345,"lng":-58.23644127686214},
-  "Berisso":{"lat":-34.88420883790188,"lng":-57.90217764534688},
-  "CABA Boutique":{"lat":-34.60696947952881,"lng":-58.38446560235706},
-  "Caballito 1":{"lat":-34.60976055210654,"lng":-58.4400598},
-  "Caballito 2":{"lat":-34.60976055210654,"lng":-58.4400598},
-  "Campana":{"lat":-34.1570387,"lng":-59.0185956},
-  "Canning":{"lat":-34.85605521068076,"lng":-58.5175497},
-  "Champagnat Boutique":{"lat":-34.451768,"lng":-58.916404},
-  "Costanera 1":{"lat":-34.54545894333134,"lng":-58.43118643173255},
-  "Costanera 2":{"lat":-34.54545894333134,"lng":-58.43118643173255},
-  "Dardo Rocha":{"lat":-34.4907407206998,"lng":-58.52651305767236},
-  "Darwin 1":{"lat":-34.5886717288581,"lng":-58.43687601534143},
-  "Darwin 2":{"lat":-34.5886717288581,"lng":-58.43687601534143},
-  "Del Viso":{"lat":-34.44740216850433,"lng":-58.79489273317542},
-  "DOT":{"lat":-34.54635161803416,"lng":-58.48787506064081},
-  "Escobar":{"lat":-34.376101,"lng":-58.81715},
-  "General Rodriguez":{"lat":-34.59602602954801,"lng":-58.93372882123573},
-  "Haedo":{"lat":-34.6356497,"lng":-58.5896032},
-  "Haedo 2":{"lat":-34.6356497,"lng":-58.5896032},
-  "Hipodromo La Plata":{"lat":-34.90392222834488,"lng":-57.94801235582321},
-  "Holiday Inn":{"lat":-34.73327940981686,"lng":-58.52004444603416},
-  "Holiday Inn 2":{"lat":-34.73327940981686,"lng":-58.52004444603416},
-  "House":{"lat":-34.519991,"lng":-58.742783},
-  "Hudson":{"lat":-34.80735519557907,"lng":-58.17153655397216},
-  "Hudson 2":{"lat":-34.90252141857428,"lng":-58.17218342883579},
-  "Hurlingham":{"lat":-34.601542,"lng":-58.652154},
-  "Ituzaingo":{"lat":-34.638843,"lng":-58.677128},
-  "Ituzaingo 2":{"lat":-34.66464198571634,"lng":-58.67389078886168},
-  "La Plata":{"lat":-34.94450602665787,"lng":-57.96753527384086},
-  "La Plata 2":{"lat":-34.93372659788916,"lng":-57.92991437116449},
-  "La Plata Boutique":{"lat":-34.93372659788916,"lng":-57.92991437116449},
-  "Liniers":{"lat":-34.64489496032444,"lng":-58.51045795302172},
-  "Lomas":{"lat":-34.75689134308413,"lng":-58.39613517301476},
-  "Lomas Boutique":{"lat":-34.7603301378896,"lng":-58.41099933068637},
-  "Los Naranjos":{"lat":-38.00898592439063,"lng":-57.6333206181579},
-  "Martinez":{"lat":-34.492246,"lng":-58.511093},
-  "Maschwitz":{"lat":-34.378192,"lng":-58.752286},
-  "Merlo":{"lat":-34.66875764104189,"lng":-58.7378104106764},
-  "Merlo 2":{"lat":-34.66091039235508,"lng":-58.7535604711642},
-  "Moreno":{"lat":-34.646143,"lng":-58.8033},
-  "Moron":{"lat":-34.63326397571632,"lng":-58.63119241534143},
-  "Nunnez":{"lat":-34.54218327080488,"lng":-58.45969217301391},
-  "Oficina":{"lat":-34.556763,"lng":-58.695852},
-  "Olivos":{"lat":-34.502327,"lng":-58.479292},
-  "Olivos 2":{"lat":-34.502327,"lng":-58.479292},
-  "Palacio Sans Souci":{"lat":-34.44566535800791,"lng":-58.54268630429397},
-  "Palermo Hollywood":{"lat":-34.57802364353802,"lng":-58.43768630184958},
-  "Palermo Soho":{"lat":-34.5920897560759,"lng":-58.43083028650607},
-  "Paseo Colon":{"lat":-34.61123555454792,"lng":-58.36965475270821},
-  "Pilar":{"lat":-34.44639611355176,"lng":-58.89163322778487},
-  "Pilar boutique":{"lat":-34.4074743905739,"lng":-58.85580878895455},
-  "Pilar Hotel":{"lat":-34.4569304,"lng":-58.8888985},
-  "Playa Grande":{"lat":-38.02523486067417,"lng":-57.53059157670718},
-  "Puerto Madero":{"lat":-34.60964874165761,"lng":-58.36383646002772},
-  "Puerto Madero Boutique":{"lat":-34.61439986030064,"lng":-58.3579035},
-  "Quilmes Boutique":{"lat":-34.76490647775054,"lng":-58.27535245767235},
-  "Quinta":{"lat":-34.468832,"lng":-58.797458},
-  "Ramos Boutique":{"lat":-34.64604401098804,"lng":-58.56895834496699},
-  "Ramos Boutique 2":{"lat":-34.64838835018546,"lng":-58.5695002888542},
-  "Ramos Mejia":{"lat":-34.65964903594481,"lng":-58.56208005466929},
-  "Ramos Mejia 2":{"lat":-34.65964903594481,"lng":-58.56208005466929},
-  "Recoleta":{"lat":-34.58606615760529,"lng":-58.39348064232763},
-  "San Isidro":{"lat":-34.48035092232818,"lng":-58.52074157116463},
-  "San Justo":{"lat":-34.67591894028484,"lng":-58.5875203558232},
-  "San Justo 2":{"lat":-34.67875610644857,"lng":-58.59102243181726},
-  "San Martin 1":{"lat":-34.56777583638708,"lng":-58.59138328650755},
-  "San Martin 2":{"lat":-34.56816739887635,"lng":-58.59061621404123},
-  "San Martin 3":{"lat":-34.56784016632005,"lng":-58.59070850702175},
-  "San Miguel":{"lat":-34.55440169283807,"lng":-58.71736887116464},
-  "San Telmo":{"lat":-34.61183,"lng":-58.37469},
-  "San Telmo 2":{"lat":-34.61135331347032,"lng":-58.37388707116464},
-  "San Telmo Boutique":{"lat":-34.61492395543934,"lng":-58.37116922883535},
-  "Temperley":{"lat":-34.78514977472399,"lng":-58.40608038465528},
-  "Vicente Lopez":{"lat":-34.51771,"lng":-58.47866},
-  "Villa de Mayo":{"lat":-34.5141151,"lng":-58.6815573},
-  "Villa de Mayo Boutique":{"lat":-34.5141151,"lng":-58.6815573}
-};
+var SALONES = {"Acceso Oeste":{"lat":-34.630051,"lng":-58.736273},"Acceso Oeste 2":{"lat":-34.6343665,"lng":-58.7541304},"Adrogue":{"lat":-34.79580714896355,"lng":-58.39840871349146},"Avellaneda 1":{"lat":-34.67700663596199,"lng":-58.36926045956796},"Avellaneda 2":{"lat":-34.67700663596199,"lng":-58.36926045956796},"Avellaneda 3":{"lat":-34.67700663596199,"lng":-58.36926045956796},"Avellaneda 4":{"lat":-34.67700663596199,"lng":-58.36926045956796},"Bayres Eventos":{"lat":-34.49386844950456,"lng":-58.59392713305712},"Bella Vista":{"lat":-34.556763,"lng":-58.695852},"Bella Vista 2":{"lat":-34.56558024975642,"lng":-58.70115624468752},"Benavidez 1":{"lat":-34.41328690586904,"lng":-58.70441725767073},"Benavidez 2":{"lat":-34.41283070430927,"lng":-58.71634057565793},"Berazategui":{"lat":-34.78078603561312,"lng":-58.24587579999999},"Berazategui 2":{"lat":-34.77625697288345,"lng":-58.23644127686214},"Berisso":{"lat":-34.88420883790188,"lng":-57.90217764534688},"CABA Boutique":{"lat":-34.60696947952881,"lng":-58.38446560235706},"Caballito 1":{"lat":-34.60976055210654,"lng":-58.4400598},"Caballito 2":{"lat":-34.60976055210654,"lng":-58.4400598},"Campana":{"lat":-34.1570387,"lng":-59.0185956},"Canning":{"lat":-34.85605521068076,"lng":-58.5175497},"Champagnat Boutique":{"lat":-34.451768,"lng":-58.916404},"Costanera 1":{"lat":-34.54545894333134,"lng":-58.43118643173255},"Costanera 2":{"lat":-34.54545894333134,"lng":-58.43118643173255},"Dardo Rocha":{"lat":-34.4907407206998,"lng":-58.52651305767236},"Darwin 1":{"lat":-34.5886717288581,"lng":-58.43687601534143},"Darwin 2":{"lat":-34.5886717288581,"lng":-58.43687601534143},"Del Viso":{"lat":-34.44740216850433,"lng":-58.79489273317542},"DOT":{"lat":-34.54635161803416,"lng":-58.48787506064081},"Escobar":{"lat":-34.376101,"lng":-58.81715},"General Rodriguez":{"lat":-34.59602602954801,"lng":-58.93372882123573},"Haedo":{"lat":-34.6356497,"lng":-58.5896032},"Haedo 2":{"lat":-34.6356497,"lng":-58.5896032},"Hipodromo La Plata":{"lat":-34.90392222834488,"lng":-57.94801235582321},"Holiday Inn":{"lat":-34.73327940981686,"lng":-58.52004444603416},"Holiday Inn 2":{"lat":-34.73327940981686,"lng":-58.52004444603416},"House":{"lat":-34.519991,"lng":-58.742783},"Hudson":{"lat":-34.80735519557907,"lng":-58.17153655397216},"Hudson 2":{"lat":-34.90252141857428,"lng":-58.17218342883579},"Hurlingham":{"lat":-34.601542,"lng":-58.652154},"Ituzaingo":{"lat":-34.638843,"lng":-58.677128},"Ituzaingo 2":{"lat":-34.66464198571634,"lng":-58.67389078886168},"La Plata":{"lat":-34.94450602665787,"lng":-57.96753527384086},"La Plata 2":{"lat":-34.93372659788916,"lng":-57.92991437116449},"La Plata Boutique":{"lat":-34.93372659788916,"lng":-57.92991437116449},"Liniers":{"lat":-34.64489496032444,"lng":-58.51045795302172},"Lomas":{"lat":-34.75689134308413,"lng":-58.39613517301476},"Lomas Boutique":{"lat":-34.7603301378896,"lng":-58.41099933068637},"Los Naranjos":{"lat":-38.00898592439063,"lng":-57.6333206181579},"Martinez":{"lat":-34.492246,"lng":-58.511093},"Maschwitz":{"lat":-34.378192,"lng":-58.752286},"Merlo":{"lat":-34.66875764104189,"lng":-58.7378104106764},"Merlo 2":{"lat":-34.66091039235508,"lng":-58.7535604711642},"Moreno":{"lat":-34.646143,"lng":-58.8033},"Moron":{"lat":-34.63326397571632,"lng":-58.63119241534143},"Nunnez":{"lat":-34.54218327080488,"lng":-58.45969217301391},"Oficina":{"lat":-34.556763,"lng":-58.695852},"Olivos":{"lat":-34.502327,"lng":-58.479292},"Olivos 2":{"lat":-34.502327,"lng":-58.479292},"Palacio Sans Souci":{"lat":-34.44566535800791,"lng":-58.54268630429397},"Palermo Hollywood":{"lat":-34.57802364353802,"lng":-58.43768630184958},"Palermo Soho":{"lat":-34.5920897560759,"lng":-58.43083028650607},"Paseo Colon":{"lat":-34.61123555454792,"lng":-58.36965475270821},"Pilar":{"lat":-34.44639611355176,"lng":-58.89163322778487},"Pilar boutique":{"lat":-34.4074743905739,"lng":-58.85580878895455},"Pilar Hotel":{"lat":-34.4569304,"lng":-58.8888985},"Playa Grande":{"lat":-38.02523486067417,"lng":-57.53059157670718},"Puerto Madero":{"lat":-34.60964874165761,"lng":-58.36383646002772},"Puerto Madero Boutique":{"lat":-34.61439986030064,"lng":-58.3579035},"Quilmes Boutique":{"lat":-34.76490647775054,"lng":-58.27535245767235},"Quinta":{"lat":-34.468832,"lng":-58.797458},"Ramos Boutique":{"lat":-34.64604401098804,"lng":-58.56895834496699},"Ramos Boutique 2":{"lat":-34.64838835018546,"lng":-58.5695002888542},"Ramos Mejia":{"lat":-34.65964903594481,"lng":-58.56208005466929},"Ramos Mejia 2":{"lat":-34.65964903594481,"lng":-58.56208005466929},"Recoleta":{"lat":-34.58606615760529,"lng":-58.39348064232763},"San Isidro":{"lat":-34.48035092232818,"lng":-58.52074157116463},"San Justo":{"lat":-34.67591894028484,"lng":-58.5875203558232},"San Justo 2":{"lat":-34.67875610644857,"lng":-58.59102243181726},"San Martin 1":{"lat":-34.56777583638708,"lng":-58.59138328650755},"San Martin 2":{"lat":-34.56816739887635,"lng":-58.59061621404123},"San Martin 3":{"lat":-34.56784016632005,"lng":-58.59070850702175},"San Miguel":{"lat":-34.55440169283807,"lng":-58.71736887116464},"San Telmo":{"lat":-34.61183,"lng":-58.37469},"San Telmo 2":{"lat":-34.61135331347032,"lng":-58.37388707116464},"San Telmo Boutique":{"lat":-34.61492395543934,"lng":-58.37116922883535},"Temperley":{"lat":-34.78514977472399,"lng":-58.40608038465528},"Vicente Lopez":{"lat":-34.51771,"lng":-58.47866},"Villa de Mayo":{"lat":-34.5141151,"lng":-58.6815573},"Villa de Mayo Boutique":{"lat":-34.5141151,"lng":-58.6815573}};
 var params = new URLSearchParams(window.location.search);
 var salonForzado = decodeURIComponent(params.get('salon') || '');
 var salonNom = salonForzado;
@@ -178,50 +98,26 @@ function setTipo(t) {
   document.getElementById('btnS').className = 'tipo-btn'+(t==='salida'?' active-salida':'');
 }
 function obtenerGPS() {
-  if (!navigator.geolocation) {
-    setGPS('err','GPS no disponible Â· ubicaciÃ³n requerida');
-    document.getElementById('salonLabel').textContent='Sin GPS';
-    gpsOk = false; return;
-  }
+  if (!navigator.geolocation) { setGPS('err','GPS no disponible'); document.getElementById('salonLabel').textContent='Sin GPS'; gpsOk=false; return; }
   navigator.geolocation.getCurrentPosition(
     function(pos) {
       userLat = pos.coords.latitude; userLng = pos.coords.longitude;
       if (salonForzado && SALONES[salonForzado]) {
         var d = haversine(userLat,userLng,SALONES[salonForzado].lat,SALONES[salonForzado].lng);
-        if (d <= MAX_DIST) { setGPS('ok','Ubicacion OK Â· '+Math.round(d)+'m'); distanciaMetros=Math.round(d); gpsOk=true; }
+        if (d <= MAX_DIST) { setGPS('ok','Ubicacion OK - '+Math.round(d)+'m'); distanciaMetros=Math.round(d); gpsOk=true; }
         else { setGPS('err','A '+Math.round(d)+'m del salon (max '+MAX_DIST+'m)'); gpsOk=false; }
         return;
       }
       var minDist=Infinity, closest=null;
-      for (var n in SALONES) {
-        var d=haversine(userLat,userLng,SALONES[n].lat,SALONES[n].lng);
-        if (d<minDist) { minDist=d; closest=n; }
-      }
-      if (closest && minDist<=MAX_DIST) {
-        salonNom=closest;
-        document.getElementById('salonLabel').textContent=salonNom;
-        setGPS('ok','Salon detectado Â· '+Math.round(minDist)+'m');
-        distanciaMetros=Math.round(minDist); gpsOk=true;
-      } else {
-        var msg=closest ? Math.round(minDist)+'m del mas cercano ('+closest+')' : 'ubicacion desconocida';
-        setGPS('err','Sin salon en rango Â· '+msg);
-        document.getElementById('salonLabel').textContent='Fuera de salon';
-        gpsOk=false;
-      }
+      for (var n in SALONES) { var d=haversine(userLat,userLng,SALONES[n].lat,SALONES[n].lng); if (d<minDist){minDist=d;closest=n;} }
+      if (closest && minDist<=MAX_DIST) { salonNom=closest; document.getElementById('salonLabel').textContent=salonNom; setGPS('ok','Salon detectado - '+Math.round(minDist)+'m'); distanciaMetros=Math.round(minDist); gpsOk=true; }
+      else { var msg=closest ? Math.round(minDist)+'m del mas cercano ('+closest+')' : 'ubicacion desconocida'; setGPS('err','Sin salon en rango - '+msg); document.getElementById('salonLabel').textContent='Fuera de salon'; gpsOk=false; }
     },
-    function() {
-      setGPS('err','GPS denegado Â· ubicaciÃ³n requerida');
-      document.getElementById('salonLabel').textContent='Sin GPS';
-      gpsOk=false;
-    },
-    { enableHighAccuracy:true, timeout:10000, maximumAge:0 }
+    function() { setGPS('err','GPS denegado'); document.getElementById('salonLabel').textContent='Sin GPS'; gpsOk=false; },
+    {enableHighAccuracy:true,timeout:10000,maximumAge:0}
   );
 }
-function setGPS(tipo,txt) {
-  var el=document.getElementById('gpsBar');
-  el.className='gps-bar gps-'+tipo;
-  el.textContent=txt;
-}
+function setGPS(tipo,txt) { var el=document.getElementById('gpsBar'); el.className='gps-bar gps-'+tipo; el.textContent=txt; }
 function haversine(lat1,lng1,lat2,lng2) {
   var R=6371000,dLat=(lat2-lat1)*Math.PI/180,dLng=(lng2-lng1)*Math.PI/180;
   var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
@@ -235,10 +131,7 @@ function activarCam() {
 function iniciarCam(f) {
   if (stream) { stream.getTracks().forEach(function(t){ t.stop(); }); stream=null; }
   var vid=document.getElementById('video');
-  if (!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) {
-    mostrarCamError('El navegador no soporta camara. Usa Chrome o Safari actualizado.');
-    return;
-  }
+  if (!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) { mostrarCamError('El navegador no soporta camara. Usa Chrome o Safari actualizado.'); return; }
   navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:f}}})
     .then(function(s){ stream=s; vid.srcObject=s; camActive=true; var p=vid.play(); if(p!==undefined) p.catch(function(){}); })
     .catch(function(err) {
@@ -269,11 +162,8 @@ async function escanear() {
     if (data.ok) {
       var sim=Math.round(data.similarity||0);
       mostrarResult('ok',data.nombre,(tipo==='entrada'?'ENTRADA registrada':'SALIDA registrada')+'<br>'+salonNom+'<br><span class="chip">Confianza: '+sim+'%</span><span class="chip" style="margin-left:6px">DNI: '+data.dni+'</span>');
-      
       fetch(SHEETS_URL+'?action=registrar_asistencia&employeeId='+encodeURIComponent(data.dni)+'&nombre='+encodeURIComponent(data.nombre)+'&salon='+encodeURIComponent(salonNom)+'&tipo='+encodeURIComponent(tipo.toUpperCase())+'&confianza='+sim+'&distancia='+distanciaMetros+'m',{mode:'no-cors'}).catch(function(){});
-    } else {
-      mostrarResult('err','No reconocido',data.error||'Rostro no encontrado. Pedi al administrador que te registre primero.');
-    }
+    } else { mostrarResult('err','No reconocido',data.error||'Rostro no encontrado. Pedi al administrador que te registre primero.'); }
   } catch(e) { mostrarResult('err','Error de conexion',e.message); }
   btn.disabled=false; btn.innerHTML='Verificar identidad';
 }
