@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>JANOS - Control de Asistencia</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0}h
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:16px}
-.logo{font-size:3rem;text-align:center;margin-bottom:4px}h
+.logo{font-size:3rem;text-align:center;margin-bohttom:4px}h
 h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-bottom:8px}
 .salon-tag{text-align:center;font-size:1rem;color:#f1f5f9;margin-bottom:12px;padding:8px 20px;background:#1e3a5f;border-radius:20px;display:inline-block;font-weight:600}
 .center{text-align:center;width:100%}
@@ -168,7 +168,7 @@ var params = new URLSearchParams(window.location.search);
 var salonForzado = decodeURIComponent(params.get('salon') || '');
 var salonNom = salonForzado;
 var userLat = null, userLng = null, gpsOk = false;
-var tipo = 'entrada';
+var tipo = 'entrada'; var distanciaMetros = 0;
 var stream = null, facing = 'user', camActive = false;
 if (salonForzado) document.getElementById('salonLabel').textContent = salonForzado;
 obtenerGPS();
@@ -188,7 +188,7 @@ function obtenerGPS() {
       userLat = pos.coords.latitude; userLng = pos.coords.longitude;
       if (salonForzado && SALONES[salonForzado]) {
         var d = haversine(userLat,userLng,SALONES[salonForzado].lat,SALONES[salonForzado].lng);
-        if (d <= MAX_DIST) { setGPS('ok','Ubicacion OK Â· '+Math.round(d)+'m'); gpsOk=true; }
+        if (d <= MAX_DIST) { setGPS('ok','Ubicacion OK Â· '+Math.round(d)+'m'); distanciaMetros=Math.round(d); gpsOk=true; }
         else { setGPS('err','A '+Math.round(d)+'m del salon (max '+MAX_DIST+'m)'); gpsOk=false; }
         return;
       }
@@ -201,7 +201,7 @@ function obtenerGPS() {
         salonNom=closest;
         document.getElementById('salonLabel').textContent=salonNom;
         setGPS('ok','Salon detectado Â· '+Math.round(minDist)+'m');
-        gpsOk=true;
+        distanciaMetros=Math.round(minDist); gpsOk=true;
       } else {
         var msg=closest ? Math.round(minDist)+'m del mas cercano ('+closest+')' : 'ubicacion desconocida';
         setGPS('err','Sin salon en rango Â· '+msg);
@@ -270,7 +270,7 @@ async function escanear() {
       var sim=Math.round(data.similarity||0);
       mostrarResult('ok',data.nombre,(tipo==='entrada'?'ENTRADA registrada':'SALIDA registrada')+'<br>'+salonNom+'<br><span class="chip">Confianza: '+sim+'%</span><span class="chip" style="margin-left:6px">DNI: '+data.dni+'</span>');
       
-      fetch(SHEETS_URL+'?action=registrar_asistencia&employeeId='+encodeURIComponent(data.dni)+'&nombre='+encodeURIComponent(data.nombre)+'&salon='+encodeURIComponent(salonNom)+'&tipo='+encodeURIComponent(tipo)+'&confianza='+sim,{mode:'no-cors'}).catch(function(){});
+      fetch(SHEETS_URL+'?action=registrar_asistencia&employeeId='+encodeURIComponent(data.dni)+'&nombre='+encodeURIComponent(data.nombre)+'&salon='+encodeURIComponent(salonNom)+'&tipo='+encodeURIComponent(tipo.toUpperCase())+'&confianza='+sim+'&distancia='+distanciaMetros+'m',{mode:'no-cors'}).catch(function(){});
     } else {
       mostrarResult('err','No reconocido',data.error||'Rostro no encontrado. Pedi al administrador que te registre primero.');
     }
