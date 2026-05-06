@@ -171,7 +171,7 @@
 <div id="msg"></div>
 
 <script>
-const API_URL = 'https://nha46wbuoo7ajwqqrsgzycavfi0rbcqh.lambda-url.us-east-2.on.aws';
+const API_URL = 'https://nha46wbuoo7ajwqqrsgzycavfi0rbcqh.lambda-url.us-east-2.on.aws'; const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxtEFH0vi1lE0Wbife6OelmX3tWLKVb6PVEhy4TlfvWdJnNre1bL4MVl3Gb8FvduDD3ng/exec';
 
 var stream = null, facing = 'user', fotoB64 = null;
 
@@ -247,7 +247,7 @@ async function registrar() {
     });
     var data = await res.json();
     if (!res.ok) { mostrar('❌ ' + (data.Message || data.error || 'Error ' + res.status), 'err'); } else if (data.ok) {
-      mostrar('✅ ' + nombre + ' registrado correctamente en ' + salon + '\nDNI: ' + dni + '\nFaceId: ' + data.employeeId, 'ok');
+      mostrar('✅ ' + nombre + ' registrado correctamente en ' + salon + '\nDNI: ' + dni + '\nFaceId: ' + data.employeeId, 'ok'); fetch(SHEETS_URL+'?action=nuevo_empleado&employeeId='+encodeURIComponent(dni)+'&nombre='+encodeURIComponent(nombre)+'&salon='+encodeURIComponent(salon),{mode:'no-cors'}).catch(function(){});
       document.getElementById('dni').value   = '';
       document.getElementById('nombre').value = '';
       document.getElementById('salon').value  = '';
