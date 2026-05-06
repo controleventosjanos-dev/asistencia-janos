@@ -269,8 +269,8 @@ async function escanear() {
     if (data.ok) {
       var sim=Math.round(data.similarity||0);
       mostrarResult('ok',data.nombre,(tipo==='entrada'?'ENTRADA registrada':'SALIDA registrada')+'<br>'+salonNom+'<br><span class="chip">Confianza: '+sim+'%</span><span class="chip" style="margin-left:6px">DNI: '+data.dni+'</span>');
-      var sp=new URLSearchParams({action:'registrar_asistencia',employeeId:data.dni,nombre:data.nombre,salon:salonNom,tipo:tipo,confianza:sim});
-      fetch(SHEETS_URL+'?'+sp.toString(),{mode:'no-cors'}).catch(function(){});
+      
+      fetch(SHEETS_URL+'?action=registrar_asistencia&employeeId='+encodeURIComponent(data.dni)+'&nombre='+encodeURIComponent(data.nombre)+'&salon='+encodeURIComponent(salonNom)+'&tipo='+encodeURIComponent(tipo)+'&confianza='+sim,{mode:'no-cors'}).catch(function(){});
     } else {
       mostrarResult('err','No reconocido',data.error||'Rostro no encontrado. Pedi al administrador que te registre primero.');
     }
