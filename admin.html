@@ -243,7 +243,7 @@ async function registrar() {
     var res = await fetch(API_URL + '/registrar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ employeeId: dni, name: nombre, salon: salon, imageBase64: fotoB64 })
+      body: JSON.stringify({ employeeId: dni, nombre: nombre, salon: salon, imageBase64: fotoB64 })
     });
     var data = await res.json();
     if (!res.ok) { mostrar('❌ ' + (data.Message || data.error || 'Error ' + res.status), 'err'); } else if (data.ok) {
