@@ -152,8 +152,19 @@ async function escanear() {
     var data=await res.json();
     if (data.ok) {
       var sim=Math.round(data.similarity||0);
-      mostrarResult('ok',data.nombre,(tipo==='entrada'?'ENTRADA registrada':'SALIDA registrada')+'<br>'+salonNom+'<br><span class="chip">Confianza: '+sim+'%</span><span class="chip" style="margin-left:6px">DNI: '+data.dni+'</span>');
-      fetch(SHEETS_URL+'?action=registrar_asistencia&employeeId='+encodeURIComponent(data.dni)+'&nombre='+encodeURIComponent(data.nombre)+'&salon='+encodeURIComponent(salonNom)+'&tipo='+encodeURIComponent(tipo.toUpperCase())+'&confianza='+sim+'&distancia='+distanciaMetros+'m',{mode:'no-cors'}).catch(function(){});
+      var sectorOk=true;
+      try {
+        var secRes=await fetch(SHEETS_URL+'?action=getSector&dni='+encodeURIComponent(data.dni));
+        var secData=await secRes.json();
+        if (secData.ok && secData.sector && secData.sector!==salonNom) {
+          mostrarResult('warn',data.nombre,'No estas asignado a este salon. Tu salon es: '+secData.sector);
+          sectorOk=false;
+        }
+      } catch(e2) { /* si falla consulta sector, se permite el registro */ }
+      if (sectorOk) {
+        mostrarResult('ok',data.nombre,(tipo==='entrada'?'ENTRADA registrada':'SALIDA registrada')+'<br>'+salonNom+'<br><span class="chip">Confianza: '+sim+'%</span><span class="chip" style="margin-left:6px">DNI: '+data.dni+'</span>');
+        fetch(SHEETS_URL+'?action=registrar_asistencia&employeeId='+encodeURIComponent(data.dni)+'&nombre='+encodeURIComponent(data.nombre)+'&salon='+encodeURIComponent(salonNom)+'&tipo='+encodeURIComponent(tipo.toUpperCase())+'&confianza='+sim+'&distancia='+distanciaMetros+'m',{mode:'no-cors'}).catch(function(){});
+      }
     } else { mostrarResult('err','No reconocido',data.error||'Rostro no encontrado. Pedi al administrador que te registre primero.'); }
   } catch(e) { mostrarResult('err','Error de conexion',e.message); }
   btn.disabled=false; btn.innerHTML='Verificar identidad';
