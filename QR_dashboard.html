@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JANOS Â· Asistencia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0f172a;
+      --surface:  #1e293b;
+      --surface2: #263348;
+      --accent:   #38bdf8;
+      --btn:      #6366f1;
+      --btn-hover:#4f46e5;
+      --text:     #f1f5f9;
+      --muted:    #94a3b8;
+      --border:   #334155;
+      --green:    #22c55e;
+      --yellow:   #f59e0b;
+      --red:      #ef4444;
+      --blue:     #38bdf8;
+      --gray:     #64748b;
+      --purple:   #6366f1;
+      --r:        12px;
+      --r-sm:     8px;
+      --r-xs:     6px;
+    }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* âââ LOGIN âââ */
+    #screen-login {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 44px 48px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .brand {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .brand em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .brand-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 5px;
+      font-weight: 400;
+    }
+
+    .fgroup {
+      margin-bottom: 20px;
+    }
+
+    .fgroup label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+    }
+
+    .fgroup input,
+    .fgroup select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      padding: 12px 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+
+    .fgroup input:focus,
+    .fgroup select:focus { border-color: var(--accent); }
+
+    .btn-main {
+      width: 100%;
+      background: var(--btn);
+      color: #fff;
+      border: none;
+      border-radius: var(--r-sm);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 13px;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      margin-top: 4px;
+    }
+
+    .btn-main:hover  { background: var(--btn-hover); }
+    .btn-main:active { transform: scale(.98); }
+
+    .login-err {
+      display: none;
+      background: rgba(239,68,68,.13);
+      border: 1px solid rgba(239,68,68,.35);
+      color: #fca5a5;
+      border-radius: var(--r-xs);
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-top: 14px;
+    }
+
+    .login-err.show { display: block; }
+
+    /* âââ DASHBOARD âââ */
+    #screen-dashboard {
+      display: none;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    #screen-dashboard.on { display: flex; }
+
+    /* header */
+    .hdr {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      height: 58px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .hdr-brand { font-size: 16px; font-weight: 700; white-space: nowrap; }
+    .hdr-brand em { color: var(--accent); font-style: normal; }
+
+    .hdr-area {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: var(--r-xs);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+
+    .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+    /* filters */
+    .filters {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .fg label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--muted);
+    }
+
+    .fg input,
+    .fg select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xs);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      padding: 8px 12px;
+      height: 36px;
+      outline: none;
+      transition: border-color .2s;
+      min-width: 130px;
+    }
+
+    .fg input:focus,
+    .fg select:focus { border-color: var(--accent); }
+
+    .fg select option { background: var(--surface); }
+
+    .btn-search {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: var(--r-xs);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 8px 22px;
+      height: 36px;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      align-self: flex-end;
+    }
+
+    .btn-search:hover  { opacity: .85; }
+    .btn-search:active { transform: scale(.97); }
+
+    /* chips */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 24px;
+    }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .chip-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .chip-n {
+      font-weight: 700;
+      font-size: 15px;
+      min-width: 16px;
+      text-align: center;
+    }
+
+    /* main */
+    .main {
+      flex: 1;
+      padding: 16px 24px 48px;
+    }
+
+    /* loading */
+    .loading {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 64px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .loading.on { display: flex; }
+
+    .spinner {
+      width: 22px;
+      height: 22px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .65s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* error banner */
+    .err-banner {
+      display: none;
+      background: rgba(239,68,68,.13);
+      border: 1px solid rgba(239,68,68,.35);
+      color: #fca5a5;
+      border-radius: var(--r-sm);
+      padding: 14px 18px;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .err-banner.on { display: block; }
+
+    /* grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 14px;
+    }
+
+    /* employee card */
+    .ecard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: border-color .2s, transform .15s;
+    }
+
+    .ecard:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .ecard-name {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .ecard-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .meta-label {
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      min-width: 46px;
+      flex-shrink: 0;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    .times {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .tblock {
+      background: var(--surface2);
+      border-radius: var(--r-xs);
+      padding: 9px 12px;
+    }
+
+    .t-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .t-planned {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .t-real {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .ecard-foot {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .b-puntual     { background: rgba(34,197,94,.18);  color: #4ade80; }
+    .b-tardio      { background: rgba(245,158,11,.18); color: #fbbf24; }
+    .b-ausente     { background: rgba(239,68,68,.18);  color: #f87171; }
+    .b-hora_extra  { background: rgba(56,189,248,.18); color: #38bdf8; }
+    .b-sin_horario { background: rgba(100,116,139,.18);color: #94a3b8; }
+    .b-feriado     { background: rgba(99,102,241,.18); color: #818cf8; }
+
+    .extra-min {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* empty state */
+    .empty {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px;
+      color: var(--muted);
+      font-size: 15px;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .empty.on { display: flex; }
+    .empty-ico { font-size: 44px; opacity: .35; }
+
+    /* responsive */
+    @media (max-width: 640px) {
+      .login-card       { padding: 28px 20px; }
+      .hdr              { padding: 0 14px; }
+      .hdr-brand        { font-size: 14px; }
+      .hdr-area         { display: none; }
+      .filters          { padding: 12px 14px; }
+      .fg               { width: 100%; }
+      .fg input,
+      .fg select        { min-width: unset; }
+      .btn-search       { width: 100%; }
+      .chips            { padding: 10px 14px; }
+      .chip             { font-size: 12px; }
+      .main             { padding: 12px 14px 40px; }
+      .grid             { grid-template-columns: 1fr; }
+    }
+
+    @media (min-width: 641px) and (max-width: 1024px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ââââââââââââââââââââââââââââââââââââââ
+     PANTALLA 1 Â· LOGIN
+ââââââââââââââââââââââââââââââââââââââ -->
+<div id="screen-login">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="brand">JANOS <em>Â·</em> Asistencia</div>
+      <div class="brand-sub">Panel de control de asistencia</div>
+    </div>
+    <div class="fgroup">
+      <label for="inp-codigo">CÃ³digo de acceso</label>
+      <input id="inp-codigo" type="password" placeholder="IngresÃ¡ tu cÃ³digo" autocomplete="off">
+    </div>
+    <button class="btn-main" id="btn-login">Ingresar</button>
+    <div class="login-err" id="login-err">CÃ³digo incorrecto. VerificÃ¡ e intentÃ¡ de nuevo.</div>
+  </div>
+</div>
+
+<!-- ââââââââââââââââââââââââââââââââââââââ
+     PANTALLA 2 Â· DASHBOARD
+ââââââââââââââââââââââââââââââââââââââ -->
+<div id="screen-dashboard">
+
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="hdr-brand">JANOS <em>Â·</em> Asistencia</div>
+    <div class="hdr-area" id="hdr-area">â</div>
+    <button class="btn-logout" id="btn-logout">Cerrar sesiÃ³n</button>
+  </header>
+
+  <!-- FILTROS -->
+  <div class="filters">
+    <div class="fg">
+      <label>Fecha</label>
+      <input id="f-fecha" type="text" placeholder="DD/MM/AAAA" maxlength="10" style="width:130px">
+    </div>
+    <div class="fg" id="fg-area" style="display:none">
+      <label>Ãrea</label>
+      <select id="f-area">
+        <option value="">Todas las Ã¡reas</option>
+        <option value="Jefa de sucursal">Jefa de sucursal</option>
+        <option value="Mantenimiento">Mantenimiento</option>
+        <option value="DJ y TÃ©cnica">DJ y TÃ©cnica</option>
+        <option value="AmbientaciÃ³n">AmbientaciÃ³n</option>
+        <option value="GastronomÃ­a">GastronomÃ­a</option>
+        <option value="CoordinaciÃ³n">CoordinaciÃ³n</option>
+        <option value="Limpieza">Limpieza</option>
+        <option value="PorterÃ­a">PorterÃ­a</option>
+        <option value="Estructura Corporativa">Estructura Corp.</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>SalÃ³n</label>
+      <select id="f-salon">
+        <option value="">Todos los salones</option>
+      </select>
+    </div>
+    <button class="btn-search" id="btn-buscar">Buscar</button>
+  </div>
+
+  <!-- CHIPS RESUMEN -->
+  <div class="chips">
+    <div class="chip"><span class="chip-dot" style="background:var(--green)"></span><span class="chip-n" id="cn-puntual">0</span><span>Puntual</span></div>
+    <div class="chip"><span class="chip-dot" style="background:var(--yellow)"></span><span class="chip-n" id="cn-tardio">0</span><span>TardÃ­o</span></div>
+    <div class="chip"><span class="chip-dot" style="background:var(--red)"></span><span class="chip-n" id="cn-ausente">0</span><span>Ausente</span></div>
+    <div class="chip"><span class="chip-dot" style="background:var(--blue)"></span><span class="chip-n" id="cn-hora_extra">0</span><span>Hora extra</span></div>
+    <div class="chip"><span class="chip-dot" style="background:var(--gray)"></span><span class="chip-n" id="cn-sin_horario">0</span><span>Sin horario</span></div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="err-banner" id="err-banner"></div>
+    <div class="loading" id="loading"><div class="spinner"></div>Cargando asistencia&hellip;</div>
+    <div class="grid" id="emp-grid"></div>
+    <div class="empty" id="empty"><div class="empty-ico">ð</div><div>Sin resultados para los filtros seleccionados.</div></div>
+  </main>
+
+</div>
+
+<script>
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   CONFIG
+ââââââââââââââââââââââââââââââââââââââââââââ */
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxtEFH0vi1lE0Wbife6OelmX3tWLKVb6PVEhy4TlfvWdJnNre1bL4MVl3Gb8FvduDD3ng/exec";
+
+const ACCESOS = {
+  "rrhh2026":   { label: "RRHH",               area: null },
+  "jefa2026":   { label: "Jefa de sucursal",    area: "Jefa de sucursal" },
+  "mant2026":   { label: "Mantenimiento",       area: "Mantenimiento" },
+  "djt2026":    { label: "DJ y TÃ©cnica",         area: "DJ y TÃ©cnica" },
+  "amb2026":    { label: "AmbientaciÃ³n",         area: "AmbientaciÃ³n" },
+  "gastro2026": { label: "GastronomÃ­a",          area: "GastronomÃ­a" },
+  "coord2026":  { label: "CoordinaciÃ³n",         area: "CoordinaciÃ³n" },
+  "limp2026":   { label: "Limpieza",             area: "Limpieza" },
+  "port2026":   { label: "PorterÃ­a",             area: "PorterÃ­a" },
+  "corp2026":   { label: "Estructura Corp.",     area: "Estructura Corporativa" }
+};
+
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   STATE
+ââââââââââââââââââââââââââââââââââââââââââââ */
+let session     = null;
+let allEmps     = [];
+
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   HELPERS
+ââââââââââââââââââââââââââââââââââââââââââââ */
+function todayDDMM() {
+  const d = new Date();
+  return [d.getDate(), d.getMonth()+1, d.getFullYear()]
+    .map((n,i) => i<2 ? String(n).padStart(2,'0') : n)
+    .join('/');
+}
+
+function esc(s) {
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function badgeCls(estado) {
+  return { puntual:'b-puntual', tardio:'b-tardio', ausente:'b-ausente',
+           hora_extra:'b-hora_extra', sin_horario:'b-sin_horario', feriado:'b-feriado' }[estado] || 'b-sin_horario';
+}
+
+function badgeTxt(estado) {
+  return { puntual:'Puntual', tardio:'TardÃ­o', ausente:'Ausente',
+           hora_extra:'Hora extra', sin_horario:'Sin horario', feriado:'Feriado' }[estado] || estado;
+}
+
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   LOGIN
+ââââââââââââââââââââââââââââââââââââââââââââ */
+const $login    = document.getElementById('screen-login');
+const $dash     = document.getElementById('screen-dashboard');
+const $codigo   = document.getElementById('inp-codigo');
+const $btnLogin = document.getElementById('btn-login');
+const $loginErr = document.getElementById('login-err');
+
+function tryLogin() {
+  const c = $codigo.value.trim().toLowerCase();
+  const acc = ACCESOS[c];
+  if (!acc) { $loginErr.classList.add('show'); $codigo.focus(); return; }
+  $loginErr.classList.remove('show');
+  session = { codigo: c, label: acc.label, area: acc.area };
+  sessionStorage.setItem('janos_s', JSON.stringify(session));
+  openDash();
+}
+
+$btnLogin.addEventListener('click', tryLogin);
+$codigo.addEventListener('keydown', e => e.key === 'Enter' && tryLogin());
+$codigo.addEventListener('input',   () => $loginErr.classList.remove('show'));
+
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   DASHBOARD SETUP
+ââââââââââââââââââââââââââââââââââââââââââââ */
+const $hdrArea  = document.getElementById('hdr-area');
+const $fgArea   = document.getElementById('fg-area');
+const $fFecha   = document.getElementById('f-fecha');
+const $fArea    = document.getElementById('f-area');
+const $fSalon   = document.getElementById('f-salon');
+const $buscar   = document.getElementById('btn-buscar');
+const $logout   = document.getElementById('btn-logout');
+const $loading  = document.getElementById('loading');
+const $errBann  = document.getElementById('err-banner');
+const $grid     = document.getElementById('emp-grid');
+const $empty    = document.getElementById('empty');
+
+$logout.addEventListener('click', () => {
+  sessionStorage.removeItem('janos_s');
+  session = null; allEmps = [];
+  $codigo.value = '';
+  $dash.classList.remove('on');
+  $login.style.display = 'flex';
+});
+
+$buscar.addEventListener('click', doFetch);
+$fSalon.addEventListener('change', renderFiltered);
+
+function openDash() {
+  $login.style.display = 'none';
+  $dash.classList.add('on');
+  $hdrArea.textContent = session.area === null ? 'Vista completa Â· RRHH' : session.label;
+  $fgArea.style.display = session.area === null ? 'flex' : 'none';
+  if (!$fFecha.value) $fFecha.value = todayDDMM();
+  doFetch();
+}
+
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   FETCH
+ââââââââââââââââââââââââââââââââââââââââââââ */
+async function doFetch() {
+  const fecha = $fFecha.value || todayDDMM();
+  const area  = session.area !== null ? session.area
+              : $fArea.value || null;
+
+  let url = `${SHEETS_URL}?action=getAsistencia&fecha=${encodeURIComponent(fecha)}`;
+  if (area) url += `&area=${encodeURIComponent(area)}`;
+
+  setLoading(true);
+  hideErr();
+  $grid.innerHTML = '';
+  $empty.classList.remove('on');
+
+  try {
+    const res  = await fetch(url, { redirect:'follow', credentials:'omit' });
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Error del servidor');
+    allEmps = data.empleados || [];
+    populateSalons(allEmps);
+    renderFiltered();
+  } catch(e) {
+    showErr('Error de conexiÃ³n: ' + e.message);
+    allEmps = [];
+  } finally {
+    setLoading(false);
+  }
+}
+
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   RENDER
+ââââââââââââââââââââââââââââââââââââââââââââ */
+function renderFiltered() {
+  const salon = $fSalon.value;
+  const lista = salon ? allEmps.filter(e => (e.salon||'') === salon) : allEmps;
+
+  updateChips(lista);
+  $grid.innerHTML = '';
+
+  if (!lista.length) { $empty.classList.add('on'); return; }
+  $empty.classList.remove('on');
+  lista.forEach(e => $grid.appendChild(buildCard(e)));
+}
+
+function buildCard(e) {
+  const div = document.createElement('div');
+  div.className = 'ecard';
+
+  const entEsp = e.horario_esperado?.entrada || null;
+  const salEsp = e.horario_esperado?.salida  || null;
+  const entReal = e.registro_real?.entrada || null;
+  const salReal = e.registro_real?.salida  || null;
+  const conHor = entEsp !== null;
+
+  div.innerHTML = `
+    <div class="ecard-name">${esc(e.nombre||'â')}</div>
+    <div class="ecard-meta">
+      <div class="meta-row"><span class="meta-label">SalÃ³n</span><span>${esc(e.salon||'â')}</span></div>
+      ${e.area ? `<div class="meta-row"><span class="meta-label">Ãrea</span><span>${esc(e.area)}</span></div>` : ''}
+    </div>
+    <div class="divider"></div>
+    <div class="times">
+      <div class="tblock">
+        <div class="t-label">Entrada</div>
+        <div class="t-planned">${conHor ? 'Esp: '+entEsp : 'Sin horario'}</div>
+        <div class="t-real">${entReal||'â'}</div>
+      </div>
+      <div class="tblock">
+        <div class="t-label">Salida</div>
+        <div class="t-planned">${conHor ? 'Esp: '+(salEsp||'â') : ''}</div>
+        <div class="t-real">${salReal||'â'}</div>
+      </div>
+    </div>
+    <div class="ecard-foot">
+      <span class="badge ${badgeCls(e.estado)}">${badgeTxt(e.estado)}</span>
+      ${e.hora_extra_minutos > 0 ? `<span class="extra-min">+${e.hora_extra_minutos} min extra</span>` : ''}
+    </div>
+  `;
+  return div;
+}
+
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   SALON DROPDOWN
+ââââââââââââââââââââââââââââââââââââââââââââ */
+function populateSalons(emps) {
+  const salons = [...new Set(emps.map(e => e.salon).filter(Boolean))].sort();
+  const prev   = $fSalon.value;
+  $fSalon.innerHTML = '<option value="">Todos los salones</option>';
+  salons.forEach(s => {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = s;
+    if (s === prev) o.selected = true;
+    $fSalon.appendChild(o);
+  });
+}
+
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   CHIPS
+ââââââââââââââââââââââââââââââââââââââââââââ */
+function updateChips(lista) {
+  const c = { puntual:0, tardio:0, ausente:0, hora_extra:0, sin_horario:0 };
+  lista.forEach(e => { if (e.estado in c) c[e.estado]++; });
+  document.getElementById('cn-puntual').textContent    = c.puntual;
+  document.getElementById('cn-tardio').textContent     = c.tardio;
+  document.getElementById('cn-ausente').textContent    = c.ausente;
+  document.getElementById('cn-hora_extra').textContent = c.hora_extra;
+  document.getElementById('cn-sin_horario').textContent= c.sin_horario;
+}
+
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   UI HELPERS
+ââââââââââââââââââââââââââââââââââââââââââââ */
+function setLoading(on) {
+  $loading.classList.toggle('on', on);
+  $grid.style.opacity = on ? '.4' : '1';
+}
+
+function showErr(msg) { $errBann.textContent = 'â  ' + msg; $errBann.classList.add('on'); }
+function hideErr()    { $errBann.classList.remove('on'); }
+
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   DATE FIELD â auto-slash
+ââââââââââââââââââââââââââââââââââââââââââââ */
+$fFecha.addEventListener('input', function() {
+  let v = this.value.replace(/[^0-9\/]/g, '');
+  if (v.length === 2 && !v.includes('/')) v += '/';
+  if (v.length === 5 && v.split('/').length < 3) v += '/';
+  this.value = v.slice(0, 10);
+});
+
+/* ââââââââââââââââââââââââââââââââââââââââââââ
+   INIT â restore session
+ââââââââââââââââââââââââââââââââââââââââââââ */
+(function() {
+  const raw = sessionStorage.getItem('janos_s');
+  if (raw) {
+    try {
+      const s = JSON.parse(raw);
+      if (s && ACCESOS[s.codigo]) { session = s; openDash(); return; }
+    } catch(_) {}
+  }
+  $login.style.display = 'flex';
+})();
+</script>
+</body>
+</html>
