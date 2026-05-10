@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JANOS Â· Asistencia</title>
+  <title>JANOS &middot; Asistencia</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -494,33 +494,33 @@
 <body>
 
 <!-- ââââââââââââââââââââââââââââââââââââââ
-     PANTALLA 1 Â· LOGIN
+     PANTALLA 1 &middot; LOGIN
 ââââââââââââââââââââââââââââââââââââââ -->
 <div id="screen-login">
   <div class="login-card">
     <div class="login-logo">
-      <div class="brand">JANOS <em>Â·</em> Asistencia</div>
+      <div class="brand">JANOS <em>&middot;</em> Asistencia</div>
       <div class="brand-sub">Panel de control de asistencia</div>
     </div>
     <div class="fgroup">
-      <label for="inp-codigo">CÃ³digo de acceso</label>
-      <input id="inp-codigo" type="password" placeholder="IngresÃ¡ tu cÃ³digo" autocomplete="off">
+      <label for="inp-codigo">C&oacute;digo de acceso</label>
+      <input id="inp-codigo" type="password" placeholder="Ingres&aacute; tu c&oacute;digo" autocomplete="off">
     </div>
     <button class="btn-main" id="btn-login">Ingresar</button>
-    <div class="login-err" id="login-err">CÃ³digo incorrecto. VerificÃ¡ e intentÃ¡ de nuevo.</div>
+    <div class="login-err" id="login-err">C&oacute;digo incorrecto. Verific&aacute; e intent&aacute; de nuevo.</div>
   </div>
 </div>
 
 <!-- ââââââââââââââââââââââââââââââââââââââ
-     PANTALLA 2 Â· DASHBOARD
+     PANTALLA 2 &middot; DASHBOARD
 ââââââââââââââââââââââââââââââââââââââ -->
 <div id="screen-dashboard">
 
   <!-- HEADER -->
   <header class="hdr">
-    <div class="hdr-brand">JANOS <em>Â·</em> Asistencia</div>
+    <div class="hdr-brand">JANOS <em>&middot;</em> Asistencia</div>
     <div class="hdr-area" id="hdr-area">â</div>
-    <button class="btn-logout" id="btn-logout">Cerrar sesiÃ³n</button>
+    <button class="btn-logout" id="btn-logout">Cerrar sesi&oacute;n</button>
   </header>
 
   <!-- FILTROS -->
@@ -530,22 +530,22 @@
       <input id="f-fecha" type="text" placeholder="DD/MM/AAAA" maxlength="10" style="width:130px">
     </div>
     <div class="fg" id="fg-area" style="display:none">
-      <label>Ãrea</label>
+      <label>&Aacute;rea</label>
       <select id="f-area">
-        <option value="">Todas las Ã¡reas</option>
+        <option value="">Todas las &aacute;reas</option>
         <option value="Jefa de sucursal">Jefa de sucursal</option>
         <option value="Mantenimiento">Mantenimiento</option>
-        <option value="DJ y TÃ©cnica">DJ y TÃ©cnica</option>
-        <option value="AmbientaciÃ³n">AmbientaciÃ³n</option>
-        <option value="GastronomÃ­a">GastronomÃ­a</option>
-        <option value="CoordinaciÃ³n">CoordinaciÃ³n</option>
+        <option value="DJ y T&eacute;cnica">DJ y T&eacute;cnica</option>
+        <option value="Ambientaci&oacute;n">Ambientaci&oacute;n</option>
+        <option value="Gastronom&iacute;a">Gastronom&iacute;a</option>
+        <option value="Coordinaci&oacute;n">Coordinaci&oacute;n</option>
         <option value="Limpieza">Limpieza</option>
-        <option value="PorterÃ­a">PorterÃ­a</option>
+        <option value="Porter&iacute;a">Porter&iacute;a</option>
         <option value="Estructura Corporativa">Estructura Corp.</option>
       </select>
     </div>
     <div class="fg">
-      <label>SalÃ³n</label>
+      <label>Sal&oacute;n</label>
       <select id="f-salon">
         <option value="">Todos los salones</option>
       </select>
@@ -556,7 +556,7 @@
   <!-- CHIPS RESUMEN -->
   <div class="chips">
     <div class="chip"><span class="chip-dot" style="background:var(--green)"></span><span class="chip-n" id="cn-puntual">0</span><span>Puntual</span></div>
-    <div class="chip"><span class="chip-dot" style="background:var(--yellow)"></span><span class="chip-n" id="cn-tardio">0</span><span>TardÃ­o</span></div>
+    <div class="chip"><span class="chip-dot" style="background:var(--yellow)"></span><span class="chip-n" id="cn-tardio">0</span><span>Tard&iacute;o</span></div>
     <div class="chip"><span class="chip-dot" style="background:var(--red)"></span><span class="chip-n" id="cn-ausente">0</span><span>Ausente</span></div>
     <div class="chip"><span class="chip-dot" style="background:var(--blue)"></span><span class="chip-n" id="cn-hora_extra">0</span><span>Hora extra</span></div>
     <div class="chip"><span class="chip-dot" style="background:var(--gray)"></span><span class="chip-n" id="cn-sin_horario">0</span><span>Sin horario</span></div>
@@ -582,12 +582,12 @@ const ACCESOS = {
   "rrhh2026":   { label: "RRHH",               area: null },
   "jefa2026":   { label: "Jefa de sucursal",    area: "Jefa de sucursal" },
   "mant2026":   { label: "Mantenimiento",       area: "Mantenimiento" },
-  "djt2026":    { label: "DJ y TÃ©cnica",         area: "DJ y TÃ©cnica" },
-  "amb2026":    { label: "AmbientaciÃ³n",         area: "AmbientaciÃ³n" },
-  "gastro2026": { label: "GastronomÃ­a",          area: "GastronomÃ­a" },
-  "coord2026":  { label: "CoordinaciÃ³n",         area: "CoordinaciÃ³n" },
+  "djt2026":    { label: "DJ y T&eacute;cnica",         area: "DJ y T&eacute;cnica" },
+  "amb2026":    { label: "Ambientaci&oacute;n",         area: "Ambientaci&oacute;n" },
+  "gastro2026": { label: "Gastronom&iacute;a",          area: "Gastronom&iacute;a" },
+  "coord2026":  { label: "Coordinaci&oacute;n",         area: "Coordinaci&oacute;n" },
   "limp2026":   { label: "Limpieza",             area: "Limpieza" },
-  "port2026":   { label: "PorterÃ­a",             area: "PorterÃ­a" },
+  "port2026":   { label: "Porter&iacute;a",             area: "Porter&iacute;a" },
   "corp2026":   { label: "Estructura Corp.",     area: "Estructura Corporativa" }
 };
 
@@ -618,7 +618,7 @@ function badgeCls(estado) {
 }
 
 function badgeTxt(estado) {
-  return { puntual:'Puntual', tardio:'TardÃ­o', ausente:'Ausente',
+  return { puntual:'Puntual', tardio:'Tard&iacute;o', ausente:'Ausente',
            hora_extra:'Hora extra', sin_horario:'Sin horario', feriado:'Feriado' }[estado] || estado;
 }
 
@@ -674,7 +674,7 @@ $fSalon.addEventListener('change', renderFiltered);
 function openDash() {
   $login.style.display = 'none';
   $dash.classList.add('on');
-  $hdrArea.textContent = session.area === null ? 'Vista completa Â· RRHH' : session.label;
+  $hdrArea.textContent = session.area === null ? 'Vista completa &middot; RRHH' : session.label;
   $fgArea.style.display = session.area === null ? 'flex' : 'none';
   if (!$fFecha.value) $fFecha.value = todayDDMM();
   doFetch();
@@ -704,7 +704,7 @@ async function doFetch() {
     populateSalons(allEmps);
     renderFiltered();
   } catch(e) {
-    showErr('Error de conexiÃ³n: ' + e.message);
+    showErr('Error de conexi&oacute;n: ' + e.message);
     allEmps = [];
   } finally {
     setLoading(false);
@@ -739,8 +739,8 @@ function buildCard(e) {
   div.innerHTML = `
     <div class="ecard-name">${esc(e.nombre||'â')}</div>
     <div class="ecard-meta">
-      <div class="meta-row"><span class="meta-label">SalÃ³n</span><span>${esc(e.salon||'â')}</span></div>
-      ${e.area ? `<div class="meta-row"><span class="meta-label">Ãrea</span><span>${esc(e.area)}</span></div>` : ''}
+      <div class="meta-row"><span class="meta-label">Sal&oacute;n</span><span>${esc(e.salon||'â')}</span></div>
+      ${e.area ? `<div class="meta-row"><span class="meta-label">&Aacute;rea</span><span>${esc(e.area)}</span></div>` : ''}
     </div>
     <div class="divider"></div>
     <div class="times">
