@@ -342,6 +342,7 @@ gap: 14px;
 }
 
 .ecard {
+cursor: pointer;
 background: var(--surface);
 border: 1px solid var(--border);
 border-radius: var(--r);
@@ -437,12 +438,12 @@ font-size: 12px;
 font-weight: 600;
 }
 
-.b-puntual    { background: rgba(34,197,94,.18);  color: #4ade80; }
-.b-tardio     { background: rgba(245,158,11,.18); color: #fbbf24; }
-.b-ausente    { background: rgba(239,68,68,.18);  color: #f87171; }
+.b-puntual { background: rgba(34,197,94,.18); color: #4ade80; }
+.b-tardio { background: rgba(245,158,11,.18); color: #fbbf24; }
+.b-ausente { background: rgba(239,68,68,.18); color: #f87171; }
 .b-hora_extra { background: rgba(56,189,248,.18); color: #38bdf8; }
 .b-sin_horario{ background: rgba(100,116,139,.18);color: #94a3b8; }
-.b-feriado    { background: rgba(99,102,241,.18); color: #818cf8; }
+.b-feriado { background: rgba(99,102,241,.18); color: #818cf8; }
 
 /* chips pequeños dentro de la tarjeta en modo rango */
 .ecard-range-chips {
@@ -461,11 +462,11 @@ font-size: 11px;
 font-weight: 600;
 }
 
-.rchip-puntual { background: rgba(34,197,94,.18);  color: #4ade80; }
-.rchip-tardio  { background: rgba(245,158,11,.18); color: #fbbf24; }
-.rchip-ausente { background: rgba(239,68,68,.18);  color: #f87171; }
-.rchip-extra   { background: rgba(56,189,248,.18); color: #38bdf8; }
-.rchip-sin     { background: rgba(100,116,139,.18);color: #94a3b8; }
+.rchip-puntual { background: rgba(34,197,94,.18); color: #4ade80; }
+.rchip-tardio { background: rgba(245,158,11,.18); color: #fbbf24; }
+.rchip-ausente { background: rgba(239,68,68,.18); color: #f87171; }
+.rchip-extra { background: rgba(56,189,248,.18); color: #38bdf8; }
+.rchip-sin { background: rgba(100,116,139,.18);color: #94a3b8; }
 
 .extra-min {
 font-size: 12px;
@@ -507,6 +508,206 @@ gap: 12px;
 @media (min-width: 641px) and (max-width: 1024px) {
 .grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* MODAL */
+#modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: mFadeIn .2s ease;
+}
+
+#modal-box {
+  background: #1e293b;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: mScaleIn .2s ease;
+  overflow: hidden;
+}
+
+#modal-hdr {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+#modal-nombre {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+#modal-sub {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+#modal-close {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color .2s, color .2s;
+}
+
+#modal-close:hover { border-color: var(--red); color: var(--red); }
+
+#modal-body {
+  overflow-y: auto;
+  padding: 20px 24px 28px;
+  flex: 1;
+}
+
+.modal-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.modal-horario-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.modal-horario-row {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.modal-horario-dia {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.modal-horario-horas {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.modal-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.modal-table-wrap {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.modal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.modal-table th {
+  background: var(--surface2);
+  padding: 9px 12px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.modal-table td {
+  padding: 9px 12px;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.modal-table tr:hover td { background: rgba(255,255,255,0.03); }
+
+.badge-entrada {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(34,197,94,.18);
+  color: #4ade80;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.badge-salida {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(100,116,139,.18);
+  color: #94a3b8;
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.modal-empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  padding: 32px 0;
+}
+
+.modal-no-config {
+  background: var(--surface2);
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 24px;
+}
+
+@keyframes mFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mScaleIn { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
+
+@media (max-width: 640px) {
+  #modal-box { max-height: 95vh; border-radius: 10px; }
+  #modal-body { padding: 16px 16px 24px; }
+  #modal-hdr { padding: 16px 16px 14px; }
+}
+
 </style>
 </head>
 <body>
@@ -694,297 +895,419 @@ gap: 12px;
 const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxtEFH0vi1lE0Wbife6OelmX3tWLKVb6PVEhy4TlfvWdJnNre1bL4MVl3Gb8FvduDD3ng/exec";
 
 const ACCESOS = {
-  "rrhh2026":   { label: "RRHH",               area: null },
-  "jefa2026":   { label: "Jefa de sucursal",    area: "Jefa de sucursal" },
-  "mant2026":   { label: "Mantenimiento",       area: "Mantenimiento" },
-  "djt2026":    { label: "DJ y Técnica",   area: "DJ y Técnica" },
-  "amb2026":    { label: "Ambientación",   area: "Ambientación" },
-  "gastro2026": { label: "Gastronomía",    area: "Gastronomía" },
-  "coord2026":  { label: "Coordinación",   area: "Coordinación" },
-  "limp2026":   { label: "Limpieza",            area: "Limpieza" },
-  "port2026":   { label: "Portería",       area: "Portería" },
-  "corp2026":   { label: "Estructura Corp.",    area: "Estructura Corporativa" }
+"rrhh2026": { label: "RRHH", area: null },
+"jefa2026": { label: "Jefa de sucursal", area: "Jefa de sucursal" },
+"mant2026": { label: "Mantenimiento", area: "Mantenimiento" },
+"djt2026": { label: "DJ y Técnica", area: "DJ y Técnica" },
+"amb2026": { label: "Ambientación", area: "Ambientación" },
+"gastro2026": { label: "Gastronomía", area: "Gastronomía" },
+"coord2026": { label: "Coordinación", area: "Coordinación" },
+"limp2026": { label: "Limpieza", area: "Limpieza" },
+"port2026": { label: "Portería", area: "Portería" },
+"corp2026": { label: "Estructura Corp.", area: "Estructura Corporativa" }
 };
 
 /* Mapa de zonas para filtro local de salón */
 const ZONAS = {
-  CABA: ['CABA Boutique','Caballito 1','Caballito 2','Costanera 1','Costanera 2',
-         'Dardo Rocha','Darwin 1','Darwin 2','DOT','Nuñez','Palermo Hollywood',
-         'Palermo Soho','Paseo Colon','Puerto Madero','Puerto Madero Boutique',
-         'Recoleta','San Isidro','San Telmo','San Telmo 2','San Telmo Boutique',
-         'Vicente Lopez'],
-  NORTE:['Bayres Eventos','Bella Vista','Bella Vista 2','Benavidez 1','Benavidez 2',
-         'Campana','Champagnat Boutique','Del Viso','Escobar','House','Hurlingham',
-         'Martinez','Maschwitz','Oficina','Olivos','Olivos 2','Palacio Sans Souci',
-         'Pilar','Pilar boutique','Pilar Hotel','Quinta','San Miguel',
-         'Villa de Mayo','Villa de Mayo Boutique'],
-  OESTE:['Acceso Oeste','Acceso Oeste 2','General Rodriguez','Haedo','Haedo 2',
-         'Ituzaingo','Ituzaingo 2','Liniers','Merlo','Merlo 2','Moreno','Moron',
-         'Ramos Boutique','Ramos Boutique 2','Ramos Mejia','Ramos Mejia 2',
-         'San Justo','San Justo 2','San Martin 1','San Martin 2','San Martin 3'],
-  SUR:  ['Adrogue','Avellaneda 1','Avellaneda 2','Avellaneda 3','Avellaneda 4',
-         'Berazategui','Berazategui 2','Berisso','Canning','Hipodromo La Plata',
-         'Holiday Inn','Holiday Inn 2','Hudson','Hudson 2','La Plata','La Plata 2',
-         'La Plata Boutique','Lomas','Lomas Boutique','Los Naranjos',
-         'Playa Grande','Quilmes Boutique','Temperley']
+CABA: ['CABA Boutique','Caballito 1','Caballito 2','Costanera 1','Costanera 2',
+'Dardo Rocha','Darwin 1','Darwin 2','DOT','Nuñez','Palermo Hollywood',
+'Palermo Soho','Paseo Colon','Puerto Madero','Puerto Madero Boutique',
+'Recoleta','San Isidro','San Telmo','San Telmo 2','San Telmo Boutique',
+'Vicente Lopez'],
+NORTE:['Bayres Eventos','Bella Vista','Bella Vista 2','Benavidez 1','Benavidez 2',
+'Campana','Champagnat Boutique','Del Viso','Escobar','House','Hurlingham',
+'Martinez','Maschwitz','Oficina','Olivos','Olivos 2','Palacio Sans Souci',
+'Pilar','Pilar boutique','Pilar Hotel','Quinta','San Miguel',
+'Villa de Mayo','Villa de Mayo Boutique'],
+OESTE:['Acceso Oeste','Acceso Oeste 2','General Rodriguez','Haedo','Haedo 2',
+'Ituzaingo','Ituzaingo 2','Liniers','Merlo','Merlo 2','Moreno','Moron',
+'Ramos Boutique','Ramos Boutique 2','Ramos Mejia','Ramos Mejia 2',
+'San Justo','San Justo 2','San Martin 1','San Martin 2','San Martin 3'],
+SUR: ['Adrogue','Avellaneda 1','Avellaneda 2','Avellaneda 3','Avellaneda 4',
+'Berazategui','Berazategui 2','Berisso','Canning','Hipodromo La Plata',
+'Holiday Inn','Holiday Inn 2','Hudson','Hudson 2','La Plata','La Plata 2',
+'La Plata Boutique','Lomas','Lomas Boutique','Los Naranjos',
+'Playa Grande','Quilmes Boutique','Temperley']
 };
 
 /* STATE */
-let session     = null;
-let allEmps     = [];
+let session = null;
+let allEmps = [];
 let isRangeMode = false;
 
 /* HELPERS */
 function todayISO() {
-  const d = new Date();
-  const y  = d.getFullYear();
-  const m  = String(d.getMonth()+1).padStart(2,'0');
-  const dd = String(d.getDate()).padStart(2,'0');
-  return y + '-' + m + '-' + dd;
+const d = new Date();
+const y = d.getFullYear();
+const m = String(d.getMonth()+1).padStart(2,'0');
+const dd = String(d.getDate()).padStart(2,'0');
+return y + '-' + m + '-' + dd;
 }
 
 function toBackend(iso) {
-  if (!iso) return '';
-  const parts = iso.split('-');
-  return parts[2] + '/' + parts[1] + '/' + parts[0];
+if (!iso) return '';
+const parts = iso.split('-');
+return parts[2] + '/' + parts[1] + '/' + parts[0];
 }
 
 function esc(s) {
-  return String(s||'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+return String(s||'')
+.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function badgeCls(estado) {
-  const m = { puntual:'b-puntual', tardio:'b-tardio', ausente:'b-ausente',
-              hora_extra:'b-hora_extra', sin_horario:'b-sin_horario', feriado:'b-feriado' };
-  return m[estado] || 'b-sin_horario';
+const m = { puntual:'b-puntual', tardio:'b-tardio', ausente:'b-ausente',
+hora_extra:'b-hora_extra', sin_horario:'b-sin_horario', feriado:'b-feriado' };
+return m[estado] || 'b-sin_horario';
 }
 
 function badgeTxt(estado) {
-  const m = { puntual:'Puntual', tardio:'Tardío', ausente:'Ausente',
-              hora_extra:'Hora extra', sin_horario:'Sin horario', feriado:'Feriado' };
-  return m[estado] || estado;
+const m = { puntual:'Puntual', tardio:'Tardío', ausente:'Ausente',
+hora_extra:'Hora extra', sin_horario:'Sin horario', feriado:'Feriado' };
+return m[estado] || estado;
 }
 
 /* LOGIN */
-const $login    = document.getElementById('screen-login');
-const $dash     = document.getElementById('screen-dashboard');
-const $codigo   = document.getElementById('inp-codigo');
+const $login = document.getElementById('screen-login');
+const $dash = document.getElementById('screen-dashboard');
+const $codigo = document.getElementById('inp-codigo');
 const $btnLogin = document.getElementById('btn-login');
 const $loginErr = document.getElementById('login-err');
 
 function tryLogin() {
-  const c   = $codigo.value.trim().toLowerCase();
-  const acc = ACCESOS[c];
-  if (!acc) { $loginErr.classList.add('show'); $codigo.focus(); return; }
-  $loginErr.classList.remove('show');
-  session = { codigo: c, label: acc.label, area: acc.area };
-  sessionStorage.setItem('janos_s', JSON.stringify(session));
-  openDash();
+const c = $codigo.value.trim().toLowerCase();
+const acc = ACCESOS[c];
+if (!acc) { $loginErr.classList.add('show'); $codigo.focus(); return; }
+$loginErr.classList.remove('show');
+session = { codigo: c, label: acc.label, area: acc.area };
+sessionStorage.setItem('janos_s', JSON.stringify(session));
+openDash();
 }
 
 $btnLogin.addEventListener('click', tryLogin);
 $codigo.addEventListener('keydown', function(e) { if (e.key === 'Enter') tryLogin(); });
-$codigo.addEventListener('input',   function()  { $loginErr.classList.remove('show'); });
+$codigo.addEventListener('input', function() { $loginErr.classList.remove('show'); });
 
 /* DASHBOARD SETUP */
 const $hdrArea = document.getElementById('hdr-area');
-const $fgArea  = document.getElementById('fg-area');
-const $fDesde  = document.getElementById('f-fecha-desde');
-const $fHasta  = document.getElementById('f-fecha-hasta');
-const $fArea   = document.getElementById('f-area');
-const $fSalon  = document.getElementById('f-salon');
-const $buscar  = document.getElementById('btn-buscar');
-const $logout  = document.getElementById('btn-logout');
+const $fgArea = document.getElementById('fg-area');
+const $fDesde = document.getElementById('f-fecha-desde');
+const $fHasta = document.getElementById('f-fecha-hasta');
+const $fArea = document.getElementById('f-area');
+const $fSalon = document.getElementById('f-salon');
+const $buscar = document.getElementById('btn-buscar');
+const $logout = document.getElementById('btn-logout');
 const $loading = document.getElementById('loading');
 const $errBann = document.getElementById('err-banner');
-const $grid    = document.getElementById('emp-grid');
-const $empty   = document.getElementById('empty');
+const $grid = document.getElementById('emp-grid');
+const $empty = document.getElementById('empty');
 
 $logout.addEventListener('click', function() {
-  sessionStorage.removeItem('janos_s');
-  session = null; allEmps = []; isRangeMode = false;
-  $codigo.value = '';
-  $dash.classList.remove('on');
-  $login.style.display = 'flex';
+sessionStorage.removeItem('janos_s');
+session = null; allEmps = []; isRangeMode = false;
+$codigo.value = '';
+$dash.classList.remove('on');
+$login.style.display = 'flex';
 });
 
 $buscar.addEventListener('click', doFetch);
 $fSalon.addEventListener('change', renderFiltered);
 
 function openDash() {
-  $login.style.display = 'none';
-  $dash.classList.add('on');
-  $hdrArea.textContent = session.area === null ? 'Vista completa · RRHH' : session.label;
-  $fgArea.style.display = session.area === null ? 'flex' : 'none';
-  var hoy = todayISO();
-  if (!$fDesde.value) $fDesde.value = hoy;
-  if (!$fHasta.value) $fHasta.value = hoy;
-  doFetch();
+$login.style.display = 'none';
+$dash.classList.add('on');
+$hdrArea.textContent = session.area === null ? 'Vista completa · RRHH' : session.label;
+$fgArea.style.display = session.area === null ? 'flex' : 'none';
+var hoy = todayISO();
+if (!$fDesde.value) $fDesde.value = hoy;
+if (!$fHasta.value) $fHasta.value = hoy;
+doFetch();
 }
 
 /* FETCH */
 async function doFetch() {
-  var desde = $fDesde.value || todayISO();
-  var hasta = $fHasta.value || todayISO();
-  var area  = session.area !== null ? session.area : ($fArea.value || null);
+var desde = $fDesde.value || todayISO();
+var hasta = $fHasta.value || todayISO();
+var area = session.area !== null ? session.area : ($fArea.value || null);
 
-  var url = SHEETS_URL + '?action=getAsistencia';
+var url = SHEETS_URL + '?action=getAsistencia';
 
-  if (desde === hasta) {
-    isRangeMode = false;
-    url += '&fecha=' + encodeURIComponent(toBackend(desde));
-  } else {
-    isRangeMode = true;
-    url += '&fecha_desde=' + encodeURIComponent(toBackend(desde));
-    url += '&fecha_hasta=' + encodeURIComponent(toBackend(hasta));
-  }
+if (desde === hasta) {
+isRangeMode = false;
+url += '&fecha=' + encodeURIComponent(toBackend(desde));
+} else {
+isRangeMode = true;
+url += '&fecha_desde=' + encodeURIComponent(toBackend(desde));
+url += '&fecha_hasta=' + encodeURIComponent(toBackend(hasta));
+}
 
-  if (area) url += '&area=' + encodeURIComponent(area);
+if (area) url += '&area=' + encodeURIComponent(area);
 
-  setLoading(true);
-  hideErr();
-  $grid.innerHTML = '';
-  $empty.classList.remove('on');
+setLoading(true);
+hideErr();
+$grid.innerHTML = '';
+$empty.classList.remove('on');
 
-  try {
-    var res  = await fetch(url, { redirect:'follow', credentials:'omit' });
-    var data = await res.json();
-    if (!data.ok) throw new Error(data.error || 'Error del servidor');
-    allEmps = data.empleados || [];
-    renderFiltered();
-  } catch(e) {
-    showErr('Error de conexión: ' + e.message);
-    allEmps = [];
-  } finally {
-    setLoading(false);
-  }
+try {
+var res = await fetch(url, { redirect:'follow', credentials:'omit' });
+var data = await res.json();
+if (!data.ok) throw new Error(data.error || 'Error del servidor');
+allEmps = data.empleados || [];
+renderFiltered();
+} catch(e) {
+showErr('Error de conexión: ' + e.message);
+allEmps = [];
+} finally {
+setLoading(false);
+}
 }
 
 /* RENDER */
 function renderFiltered() {
-  var salon = $fSalon.value;
-  var lista;
+var salon = $fSalon.value;
+var lista;
 
-  if (!salon) {
-    lista = allEmps;
-  } else if (salon.indexOf('zona:') === 0) {
-    var zona     = salon.slice(5);
-    var salonesZ = ZONAS[zona] || [];
-    lista = allEmps.filter(function(e) { return salonesZ.indexOf(e.salon || '') !== -1; });
-  } else {
-    lista = allEmps.filter(function(e) { return (e.salon || '') === salon; });
-  }
+if (!salon) {
+lista = allEmps;
+} else if (salon.indexOf('zona:') === 0) {
+var zona = salon.slice(5);
+var salonesZ = ZONAS[zona] || [];
+lista = allEmps.filter(function(e) { return salonesZ.indexOf(e.salon || '') !== -1; });
+} else {
+lista = allEmps.filter(function(e) { return (e.salon || '') === salon; });
+}
 
-  updateChips(lista);
-  $grid.innerHTML = '';
+updateChips(lista);
+$grid.innerHTML = '';
 
-  if (!lista.length) { $empty.classList.add('on'); return; }
-  $empty.classList.remove('on');
-  lista.forEach(function(e) { $grid.appendChild(buildCard(e)); });
+if (!lista.length) { $empty.classList.add('on'); return; }
+$empty.classList.remove('on');
+lista.forEach(function(e) { $grid.appendChild(buildCard(e)); });
 }
 
 function buildCard(e) {
-  var div = document.createElement('div');
-  div.className = 'ecard';
+var div = document.createElement('div');
+div.className = 'ecard';
 
-  if (isRangeMode) {
-    var extraMin = e.hora_extra_minutos_total || 0;
-    div.innerHTML =
-      '<div class="ecard-name">' + esc(e.nombre||'—') + '</div>' +
-      '<div class="ecard-meta">' +
-        '<div class="meta-row"><span class="meta-label">Salón</span><span>' + esc(e.salon||'—') + '</span></div>' +
-        (e.area ? '<div class="meta-row"><span class="meta-label">Área</span><span>' + esc(e.area) + '</span></div>' : '') +
-      '</div>' +
-      '<div class="divider"></div>' +
-      '<div class="ecard-foot">' +
-        '<div class="ecard-range-chips">' +
-          '<span class="rchip rchip-puntual">Puntual ' + (e.puntual||0) + '</span>' +
-          '<span class="rchip rchip-tardio">Tardío ' + (e.tardio||0) + '</span>' +
-          '<span class="rchip rchip-ausente">Ausente ' + (e.ausente||0) + '</span>' +
-          '<span class="rchip rchip-extra">H.Extra ' + (e.hora_extra||0) + '</span>' +
-          '<span class="rchip rchip-sin">Sin horario ' + (e.sin_horario||0) + '</span>' +
-        '</div>' +
-        (extraMin > 0 ? '<span class="extra-min">+' + extraMin + ' min extra total</span>' : '') +
-      '</div>';
-  } else {
-    var entEsp  = (e.horario_esperado && e.horario_esperado.entrada) ? e.horario_esperado.entrada : null;
-    var salEsp  = (e.horario_esperado && e.horario_esperado.salida)  ? e.horario_esperado.salida  : null;
-    var entReal = (e.registro_real    && e.registro_real.entrada)    ? e.registro_real.entrada    : null;
-    var salReal = (e.registro_real    && e.registro_real.salida)     ? e.registro_real.salida     : null;
-    var conHor  = entEsp !== null;
+if (isRangeMode) {
+var extraMin = e.hora_extra_minutos_total || 0;
+div.innerHTML =
+'<div class="ecard-name">' + esc(e.nombre||'—') + '</div>' +
+'<div class="ecard-meta">' +
+'<div class="meta-row"><span class="meta-label">Salón</span><span>' + esc(e.salon||'—') + '</span></div>' +
+(e.area ? '<div class="meta-row"><span class="meta-label">Área</span><span>' + esc(e.area) + '</span></div>' : '') +
+'</div>' +
+'<div class="divider"></div>' +
+'<div class="ecard-foot">' +
+'<div class="ecard-range-chips">' +
+'<span class="rchip rchip-puntual">Puntual ' + (e.puntual||0) + '</span>' +
+'<span class="rchip rchip-tardio">Tardío ' + (e.tardio||0) + '</span>' +
+'<span class="rchip rchip-ausente">Ausente ' + (e.ausente||0) + '</span>' +
+'<span class="rchip rchip-extra">H.Extra ' + (e.hora_extra||0) + '</span>' +
+'<span class="rchip rchip-sin">Sin horario ' + (e.sin_horario||0) + '</span>' +
+'</div>' +
+(extraMin > 0 ? '<span class="extra-min">+' + extraMin + ' min extra total</span>' : '') +
+'</div>';
+} else {
+var entEsp = (e.horario_esperado && e.horario_esperado.entrada) ? e.horario_esperado.entrada : null;
+var salEsp = (e.horario_esperado && e.horario_esperado.salida) ? e.horario_esperado.salida : null;
+var entReal = (e.registro_real && e.registro_real.entrada) ? e.registro_real.entrada : null;
+var salReal = (e.registro_real && e.registro_real.salida) ? e.registro_real.salida : null;
+var conHor = entEsp !== null;
 
-    div.innerHTML =
-      '<div class="ecard-name">' + esc(e.nombre||'—') + '</div>' +
-      '<div class="ecard-meta">' +
-        '<div class="meta-row"><span class="meta-label">Salón</span><span>' + esc(e.salon||'—') + '</span></div>' +
-        (e.area ? '<div class="meta-row"><span class="meta-label">Área</span><span>' + esc(e.area) + '</span></div>' : '') +
-      '</div>' +
-      '<div class="divider"></div>' +
-      '<div class="times">' +
-        '<div class="tblock">' +
-          '<div class="t-label">Entrada</div>' +
-          '<div class="t-planned">' + (conHor ? 'Esp: '+entEsp : 'Sin horario') + '</div>' +
-          '<div class="t-real">' + (entReal||'—') + '</div>' +
-        '</div>' +
-        '<div class="tblock">' +
-          '<div class="t-label">Salida</div>' +
-          '<div class="t-planned">' + (conHor ? 'Esp: '+(salEsp||'—') : '') + '</div>' +
-          '<div class="t-real">' + (salReal||'—') + '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="ecard-foot">' +
-        '<span class="badge ' + badgeCls(e.estado) + '">' + badgeTxt(e.estado) + '</span>' +
-        ((e.hora_extra_minutos||0) > 0 ? '<span class="extra-min">+' + e.hora_extra_minutos + ' min extra</span>' : '') +
-      '</div>';
-  }
+div.innerHTML =
+'<div class="ecard-name">' + esc(e.nombre||'—') + '</div>' +
+'<div class="ecard-meta">' +
+'<div class="meta-row"><span class="meta-label">Salón</span><span>' + esc(e.salon||'—') + '</span></div>' +
+(e.area ? '<div class="meta-row"><span class="meta-label">Área</span><span>' + esc(e.area) + '</span></div>' : '') +
+'</div>' +
+'<div class="divider"></div>' +
+'<div class="times">' +
+'<div class="tblock">' +
+'<div class="t-label">Entrada</div>' +
+'<div class="t-planned">' + (conHor ? 'Esp: '+entEsp : 'Sin horario') + '</div>' +
+'<div class="t-real">' + (entReal||'—') + '</div>' +
+'</div>' +
+'<div class="tblock">' +
+'<div class="t-label">Salida</div>' +
+'<div class="t-planned">' + (conHor ? 'Esp: '+(salEsp||'—') : '') + '</div>' +
+'<div class="t-real">' + (salReal||'—') + '</div>' +
+'</div>' +
+'</div>' +
+'<div class="ecard-foot">' +
+'<span class="badge ' + badgeCls(e.estado) + '">' + badgeTxt(e.estado) + '</span>' +
+((e.hora_extra_minutos||0) > 0 ? '<span class="extra-min">+' + e.hora_extra_minutos + ' min extra</span>' : '') +
+'</div>';
+}
 
+  div.addEventListener('click', function() { openHistorial(e); });
   return div;
 }
 
 /* CHIPS GLOBALES */
 function updateChips(lista) {
-  var c = { puntual:0, tardio:0, ausente:0, hora_extra:0, sin_horario:0 };
+var c = { puntual:0, tardio:0, ausente:0, hora_extra:0, sin_horario:0 };
 
-  if (isRangeMode) {
-    lista.forEach(function(e) {
-      c.puntual     += (e.puntual     || 0);
-      c.tardio      += (e.tardio      || 0);
-      c.ausente     += (e.ausente     || 0);
-      c.hora_extra  += (e.hora_extra  || 0);
-      c.sin_horario += (e.sin_horario || 0);
-    });
-  } else {
-    lista.forEach(function(e) { if (e.estado in c) c[e.estado]++; });
-  }
+if (isRangeMode) {
+lista.forEach(function(e) {
+c.puntual += (e.puntual || 0);
+c.tardio += (e.tardio || 0);
+c.ausente += (e.ausente || 0);
+c.hora_extra += (e.hora_extra || 0);
+c.sin_horario += (e.sin_horario || 0);
+});
+} else {
+lista.forEach(function(e) { if (e.estado in c) c[e.estado]++; });
+}
 
-  document.getElementById('cn-puntual').textContent    = c.puntual;
-  document.getElementById('cn-tardio').textContent     = c.tardio;
-  document.getElementById('cn-ausente').textContent    = c.ausente;
-  document.getElementById('cn-hora_extra').textContent = c.hora_extra;
-  document.getElementById('cn-sin_horario').textContent= c.sin_horario;
+document.getElementById('cn-puntual').textContent = c.puntual;
+document.getElementById('cn-tardio').textContent = c.tardio;
+document.getElementById('cn-ausente').textContent = c.ausente;
+document.getElementById('cn-hora_extra').textContent = c.hora_extra;
+document.getElementById('cn-sin_horario').textContent= c.sin_horario;
 }
 
 /* UI HELPERS */
 function setLoading(on) {
-  $loading.classList.toggle('on', on);
-  $grid.style.opacity = on ? '.4' : '1';
+$loading.classList.toggle('on', on);
+$grid.style.opacity = on ? '.4' : '1';
 }
 
 function showErr(msg) { $errBann.textContent = '⚠ ' + msg; $errBann.classList.add('on'); }
-function hideErr()    { $errBann.classList.remove('on'); }
+function hideErr() { $errBann.classList.remove('on'); }
 
 /* INIT */
 (function() {
-  var raw = sessionStorage.getItem('janos_s');
-  if (raw) {
-    try {
-      var s = JSON.parse(raw);
-      if (s && ACCESOS[s.codigo]) { session = s; openDash(); return; }
-    } catch(_) {}
-  }
-  $login.style.display = 'flex';
+var raw = sessionStorage.getItem('janos_s');
+if (raw) {
+try {
+var s = JSON.parse(raw);
+if (s && ACCESOS[s.codigo]) { session = s; openDash(); return; }
+} catch(_) {}
+}
+$login.style.display = 'flex';
 })();
+
+/* MODAL DETALLE */
+var $modalOverlay = document.getElementById('modal-overlay');
+var $modalNombre  = document.getElementById('modal-nombre');
+var $modalSub     = document.getElementById('modal-sub');
+var $modalClose   = document.getElementById('modal-close');
+var $modalBody    = document.getElementById('modal-body');
+
+function closeModal() {
+  $modalOverlay.style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function openModal() {
+  $modalOverlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+$modalClose.addEventListener('click', closeModal);
+$modalOverlay.addEventListener('click', function(ev) {
+  if (ev.target === $modalOverlay) closeModal();
+});
+document.addEventListener('keydown', function(ev) {
+  if (ev.key === 'Escape' && $modalOverlay.style.display !== 'none') closeModal();
+});
+
+function openHistorial(emp) {
+  $modalNombre.textContent = emp.nombre || '—';
+  $modalSub.textContent    = '';
+  $modalBody.innerHTML     = '<div class="modal-spinner"><div class="spinner"></div>Cargando historial…</div>';
+  openModal();
+
+  var desde = $fDesde.value || todayISO();
+  var hasta  = $fHasta.value || todayISO();
+  var url = SHEETS_URL
+    + '?action=getHistorial'
+    + '&id='          + encodeURIComponent(emp.id || '')
+    + '&fecha_desde=' + encodeURIComponent(toBackend(desde))
+    + '&fecha_hasta=' + encodeURIComponent(toBackend(hasta));
+
+  fetch(url, { redirect:'follow', credentials:'omit' })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (!data.ok) throw new Error(data.error || 'Error del servidor');
+      $modalSub.textContent = (data.empleado.salon || '') + (data.empleado.area ? ' · ' + data.empleado.area : '');
+      renderModalContent(data);
+    })
+    .catch(function(err) {
+      $modalBody.innerHTML = '<div class="modal-empty">⚠ ' + esc(err.message) + '</div>';
+    });
+}
+
+function renderModalContent(data) {
+  var html = '';
+
+  /* HORARIO BASE */
+  html += '<div class="modal-section-title">Horario base</div>';
+  var dias = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+  var horario = data.horario_base;
+  if (!horario || Object.keys(horario).length === 0) {
+    html += '<div class="modal-no-config">Sin horario configurado para esta área</div>';
+  } else {
+    html += '<div class="modal-horario-grid">';
+    dias.forEach(function(dia) {
+      var h = horario[dia];
+      if (!h) return;
+      html += '<div class="modal-horario-row">'
+            + '<div class="modal-horario-dia">' + esc(dia) + '</div>'
+            + '<div class="modal-horario-horas">' + esc(h.entrada || '—') + ' – ' + esc(h.salida || '—') + '</div>'
+            + '</div>';
+    });
+    html += '</div>';
+  }
+
+  /* HISTORIAL */
+  html += '<div class="modal-section-title">Historial</div>';
+  var regs = (data.registros || []).slice().sort(function(a, b) {
+    var fa = a.fecha.split('/').reverse().join('') + (a.hora || '');
+    var fb = b.fecha.split('/').reverse().join('') + (b.hora || '');
+    return fb > fa ? 1 : fb < fa ? -1 : 0;
+  });
+
+  if (!regs.length) {
+    html += '<div class="modal-empty">Sin registros en el período seleccionado</div>';
+  } else {
+    html += '<div class="modal-table-wrap"><table class="modal-table">'
+          + '<thead><tr>'
+          + '<th>Fecha</th><th>Día</th><th>Hora</th><th>Tipo</th><th>Confianza</th><th>Distancia</th>'
+          + '</tr></thead><tbody>';
+    regs.forEach(function(r) {
+      var badgeCls = r.tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-salida';
+      html += '<tr>'
+            + '<td>' + esc(r.fecha) + '</td>'
+            + '<td>' + esc(r.dia)   + '</td>'
+            + '<td>' + esc(r.hora)  + '</td>'
+            + '<td><span class="' + badgeCls + '">' + esc(r.tipo) + '</span></td>'
+            + '<td>' + esc(r.confianza)  + '</td>'
+            + '<td>' + esc(r.distancia) + '</td>'
+            + '</tr>';
+    });
+    html += '</tbody></table></div>';
+  }
+
+  $modalBody.innerHTML = html;
+}
+
 </script>
+
+<!-- MODAL DETALLE EMPLEADO -->
+<div id="modal-overlay" style="display:none" role="dialog" aria-modal="true">
+  <div id="modal-box">
+    <div id="modal-hdr">
+      <div>
+        <div id="modal-nombre"></div>
+        <div id="modal-sub"></div>
+      </div>
+      <button id="modal-close" aria-label="Cerrar">&#x2715;</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
 </body>
 </html>
