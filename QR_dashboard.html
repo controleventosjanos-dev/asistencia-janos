@@ -1189,11 +1189,7 @@ $login.style.display = 'flex';
 })();
 
 /* MODAL DETALLE */
-var $modalOverlay = document.getElementById('modal-overlay');
-var $modalNombre  = document.getElementById('modal-nombre');
-var $modalSub     = document.getElementById('modal-sub');
-var $modalClose   = document.getElementById('modal-close');
-var $modalBody    = document.getElementById('modal-body');
+var $modalOverlay, $modalNombre, $modalSub, $modalClose, $modalBody;
 
 function closeModal() {
   $modalOverlay.style.display = 'none';
@@ -1205,12 +1201,19 @@ function openModal() {
   document.body.style.overflow = 'hidden';
 }
 
-$modalClose.addEventListener('click', closeModal);
-$modalOverlay.addEventListener('click', function(ev) {
-  if (ev.target === $modalOverlay) closeModal();
-});
-document.addEventListener('keydown', function(ev) {
-  if (ev.key === 'Escape' && $modalOverlay.style.display !== 'none') closeModal();
+document.addEventListener('DOMContentLoaded', function() {
+  $modalOverlay = document.getElementById('modal-overlay');
+  $modalNombre  = document.getElementById('modal-nombre');
+  $modalSub     = document.getElementById('modal-sub');
+  $modalClose   = document.getElementById('modal-close');
+  $modalBody    = document.getElementById('modal-body');
+  $modalClose.addEventListener('click', closeModal);
+  $modalOverlay.addEventListener('click', function(e) {
+    if (e.target === $modalOverlay) closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && $modalOverlay.style.display !== 'none') closeModal();
+  });
 });
 
 function openHistorial(emp) {
