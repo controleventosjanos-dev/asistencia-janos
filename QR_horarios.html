@@ -334,6 +334,84 @@
   .row-status.ok    { color: var(--green); }
   .row-status.error { color: var(--red); }
 
+  /* ─── BULK APPLY BAR ─── */
+  .bulk-bar {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.85rem 1rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .bulk-bar-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    margin-right: 0.25rem;
+  }
+
+  .bulk-select-links {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-left: auto;
+    white-space: nowrap;
+  }
+
+  .bulk-select-links a {
+    color: var(--accent);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .bulk-select-links a:hover { text-decoration: underline; }
+
+  .btn-bulk-apply {
+    background: var(--indigo);
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-bulk-apply:hover { background: var(--indigo-h); }
+  .btn-bulk-apply:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .bulk-status {
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .bulk-status.ok    { color: var(--green); }
+  .bulk-status.error { color: var(--red); }
+
+  /* checkbox column */
+  .schedule-table td:first-child,
+  .schedule-table th:first-child {
+    width: 34px;
+    padding-left: 0.5rem;
+    padding-right: 0.2rem;
+  }
+
+  .day-chk {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--indigo);
+    display: block;
+  }
+
   /* ─── RESPONSIVE ─── */
   @media (max-width: 680px) {
     .main-content {
@@ -354,8 +432,11 @@
 
     .time-input { width: 90px; }
 
-    .schedule-table th:nth-child(5),
-    .schedule-table td:nth-child(5) { display: none; } /* hide status on tiny screens */
+    .schedule-table th:nth-child(1),
+    .schedule-table td:nth-child(1) { display: none; } /* hide checkbox on tiny screens */
+    .schedule-table th:nth-child(6),
+    .schedule-table td:nth-child(6) { display: none; } /* hide status on tiny screens */
+    .bulk-select-links { margin-left: 0; }
   }
 
   @media (max-width: 420px) {
@@ -412,9 +493,21 @@
           <h2 id="selected-area-name"></h2>
           <p id="selected-area-count"></p>
         </div>
+        <!-- ── Bulk apply bar ── -->
+        <div class="bulk-bar">
+          <span class="bulk-bar-label">Aplicar a seleccionados</span>
+          <input class="time-input" type="time" id="bulk-entrada" aria-label="Entrada masiva" style="width:110px;color-scheme:dark;">
+          <input class="time-input" type="time" id="bulk-salida"  aria-label="Salida masiva"  style="width:110px;color-scheme:dark;">
+          <button class="btn-bulk-apply" id="btn-bulk-apply">Aplicar a seleccionados</button>
+          <span class="bulk-status" id="bulk-status"></span>
+          <span class="bulk-select-links">
+            <a id="lnk-sel-all">Seleccionar todos</a> | <a id="lnk-desel-all">Deseleccionar todos</a>
+          </span>
+        </div>
         <table class="schedule-table">
           <thead>
             <tr>
+              <th></th>
               <th>Día</th>
               <th>Entrada</th>
               <th>Salida</th>
@@ -629,6 +722,7 @@ function renderScheduleGrid(area) {
     tr.dataset.dia = dia;
 
     tr.innerHTML = `
+      <td><input class="day-chk" type="checkbox" data-dia="${escAttr(dia)}" aria-label="Seleccionar ${dia}"></td>
       <td class="day-name">${escHtml(dia)}</td>
       <td><input class="time-input inp-entrada" type="time" value="${escAttr(entrada)}" aria-label="Entrada ${dia}"></td>
       <td><input class="time-input inp-salida"  type="time" value="${escAttr(salida)}"  aria-label="Salida ${dia}"></td>
@@ -694,6 +788,94 @@ async function saveRow(area, dia, entradaEl, salidaEl, btnEl, statusEl) {
 }
 
 /* ══════════════════════════════════════════════════════
+   BULK APPLY
+══════════════════════════════════════════════════════ */
+function initBulkBar() {
+  $("lnk-sel-all").addEventListener("click", e => {
+    e.preventDefault();
+    document.querySelectorAll(".day-chk").forEach(c => c.checked = true);
+  });
+  $("lnk-desel-all").addEventListener("click", e => {
+    e.preventDefault();
+    document.querySelectorAll(".day-chk").forEach(c => c.checked = false);
+  });
+  $("btn-bulk-apply").addEventListener("click", applyBulk);
+}
+
+async function applyBulk() {
+  const area      = state.selectedArea;
+  const entrada   = $("bulk-entrada").value.trim();
+  const salida    = $("bulk-salida").value.trim();
+  const statusEl  = $("bulk-status");
+  const btn       = $("btn-bulk-apply");
+
+  const checked = Array.from(document.querySelectorAll(".day-chk:checked")).map(c => c.dataset.dia);
+
+  statusEl.className   = "bulk-status";
+  statusEl.textContent = "";
+
+  if (!area) {
+    statusEl.className   = "bulk-status error";
+    statusEl.textContent = "✗ Seleccioná un área primero";
+    return;
+  }
+  if (!checked.length) {
+    statusEl.className   = "bulk-status error";
+    statusEl.textContent = "✗ Seleccioná al menos un día";
+    return;
+  }
+  if (!entrada || !salida) {
+    statusEl.className   = "bulk-status error";
+    statusEl.textContent = "✗ Completá Entrada y Salida";
+    return;
+  }
+
+  btn.disabled         = true;
+  statusEl.className   = "bulk-status";
+  statusEl.textContent = "Guardando…";
+
+  let errors = 0;
+  await Promise.all(checked.map(async dia => {
+    const tr       = document.querySelector(`tr[data-dia="${CSS.escape(dia)}"]`);
+    const statusTd = tr ? tr.querySelector(".row-status") : null;
+    try {
+      await apiFetch({ action: "setHorario", area, dia, entrada, salida });
+      if (!state.horarios[area]) state.horarios[area] = {};
+      state.horarios[area][dia] = { entrada, salida };
+      if (tr) {
+        tr.querySelector(".inp-entrada").value = entrada;
+        tr.querySelector(".inp-salida").value  = salida;
+        if (statusTd) {
+          statusTd.className   = "row-status ok";
+          statusTd.textContent = "✓ Guardado";
+          setTimeout(() => { if (statusTd.textContent === "✓ Guardado") statusTd.textContent = ""; }, 3000);
+        }
+      }
+    } catch(err) {
+      errors++;
+      if (statusTd) {
+        statusTd.className   = "row-status error";
+        statusTd.textContent = `✗ ${err.message}`;
+      }
+    }
+  }));
+
+  // Deseleccionar todos
+  document.querySelectorAll(".day-chk").forEach(c => c.checked = false);
+  updateAreaIndicator(area);
+
+  if (errors === 0) {
+    statusEl.className   = "bulk-status ok";
+    statusEl.textContent = `✓ ${checked.length} día${checked.length > 1 ? "s" : ""} guardados`;
+    setTimeout(() => { if (statusEl.textContent.startsWith("✓")) statusEl.textContent = ""; }, 3000);
+  } else {
+    statusEl.className   = "bulk-status error";
+    statusEl.textContent = `✗ ${errors} error${errors > 1 ? "es" : ""}`;
+  }
+  btn.disabled = false;
+}
+
+/* ══════════════════════════════════════════════════════
    UPDATE AREA INDICATOR (after save)
 ══════════════════════════════════════════════════════ */
 function updateAreaIndicator(area) {
@@ -723,6 +905,7 @@ function escAttr(str) { return escHtml(str); }
 ══════════════════════════════════════════════════════ */
 (function boot() {
   initLogin();
+  initBulkBar();
   if (checkSession()) {
     showMain();
     loadHorarios();
