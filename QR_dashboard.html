@@ -738,6 +738,9 @@ border-color: #38bdf8;
 #modal-hdr { padding: 16px 16px 14px; }
 }
 
+
+.row-tardio td { background: rgba(245, 158, 11, 0.15); }
+.row-extra  td { background: rgba(56, 189, 248, 0.12); }
 </style>
 </head>
 <body>
@@ -1384,15 +1387,31 @@ html += '<div class="modal-table-wrap"><table class="modal-table">'
 + '<th>Fecha</th><th>Día</th><th>Hora</th><th>Tipo</th><th>Confianza</th><th>Distancia</th>'
 + '</tr></thead><tbody>';
 regs.forEach(function(r) {
-var bc = r.tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-salida';
-/* CAMBIO 1: día en español — CAMBIO 2: data-tipo en cada fila */
-html += '<tr data-tipo="' + esc(r.tipo) + '">'
-+ '<td>' + esc(r.fecha) + '</td>'
-+ '<td>' + esc(DIAS_ES[r.dia] || r.dia) + '</td>'
-+ '<td>' + esc(r.hora) + '</td>'
+var bc       = r.tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-salida';
+var diaSp    = DIAS_ES[r.dia] || r.dia;
+var horDia   = (horario && horario[diaSp]) ? horario[diaSp] : null;
+var rowClass = '';
+if (horDia && r.hora) {
+if (r.tipo === 'ENTRADA' && horDia.entrada) {
+var partsE = horDia.entrada.split(':').map(Number);
+var partsR = r.hora.split(':').map(Number);
+var diff   = (partsR[0]*60 + partsR[1]) - (partsE[0]*60 + partsE[1]);
+if (diff > 15) rowClass = 'row-tardio';
+}
+if (r.tipo === 'SALIDA' && horDia.salida) {
+var partsS  = horDia.salida.split(':').map(Number);
+var partsRS = r.hora.split(':').map(Number);
+if ((partsRS[0]*60 + partsRS[1]) > (partsS[0]*60 + partsS[1]))
+rowClass = 'row-extra';
+}
+}
+html += '<tr data-tipo="' + esc(r.tipo) + '" class="' + rowClass + '">'
++ '<td>' + esc(r.fecha)                 + '</td>'
++ '<td>' + esc(diaSp)                   + '</td>'
++ '<td>' + esc(r.hora)                  + '</td>'
 + '<td><span class="' + bc + '">' + esc(r.tipo) + '</span></td>'
-+ '<td>' + esc(r.confianza) + '</td>'
-+ '<td>' + esc(r.distancia) + '</td>'
++ '<td>' + esc(r.confianza)             + '</td>'
++ '<td>' + esc(r.distancia)             + '</td>'
 + '</tr>';
 });
 html += '</tbody></table></div>';
