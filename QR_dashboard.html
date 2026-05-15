@@ -1141,11 +1141,11 @@ div.className = 'ecard';
 if (isRangeMode) {
 /* CAMBIO 3: marcar estados presentes para filtro por chip en rango */
 var estadosList = [];
-if ((e.puntual || 0) > 0) estadosList.push('puntual');
-if ((e.tardio || 0) > 0) estadosList.push('tardio');
-if ((e.ausente || 0) > 0) estadosList.push('ausente');
-if ((e.hora_extra || 0) > 0) estadosList.push('hora_extra');
-if ((e.sin_horario || 0) > 0) estadosList.push('sin_horario');
+if ((r.puntual || 0) > 0) estadosList.push('puntual');
+if ((r.tardio || 0) > 0) estadosList.push('tardio');
+if ((r.ausente || 0) > 0) estadosList.push('ausente');
+if ((r.hora_extra || 0) > 0) estadosList.push('hora_extra');
+if ((r.sin_horario || 0) > 0) estadosList.push('sin_horario');
 div.dataset.estados = estadosList.join(',');
 
 var extraMin = e.hora_extra_minutos_total || 0;
@@ -1234,11 +1234,12 @@ var c = { puntual:0, tardio:0, ausente:0, hora_extra:0, sin_horario:0 };
 
 if (isRangeMode) {
 lista.forEach(function(e) {
-c.puntual += (e.puntual || 0);
-c.tardio += (e.tardio || 0);
-c.ausente += (e.ausente || 0);
-c.hora_extra += (e.hora_extra || 0);
-c.sin_horario += (e.sin_horario || 0);
+  var r = e.resumen || e;
+c.puntual += (r.puntual || 0);
+c.tardio += (r.tardio || 0);
+c.ausente += (r.ausente || 0);
+c.hora_extra += (r.hora_extra || 0);
+c.sin_horario += (r.sin_horario || 0);
 });
 } else {
 lista.forEach(function(e) { if (e.estado in c) c[e.estado]++; });
