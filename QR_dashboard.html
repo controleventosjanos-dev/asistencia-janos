@@ -1134,6 +1134,13 @@ lista.forEach(function(e) { $grid.appendChild(buildCard(e)); });
 if (activeChip) applyChipFilter();
 }
 
+function formatExtra(min) {
+  if (!min || min <= 0) return '';
+  if (min < 60) return '+' + min + 'min extra';
+  var h = Math.floor(min / 60);
+  var m = min % 60;
+  return '+' + h + 'h' + (m > 0 ? ' ' + m + 'min' : '') + ' extra';
+}
 function buildCard(e) {
 var div = document.createElement('div');
 div.className = 'ecard';
@@ -1148,7 +1155,7 @@ if ((e.hora_extra || 0) > 0) estadosList.push('hora_extra');
 if ((e.sin_horario || 0) > 0) estadosList.push('sin_horario');
 div.dataset.estados = estadosList.join(',');
 
-var extraMin = e.hora_extra_minutos_total || 0;
+var extraMin = e.hora_extra_minutos || 0;
 div.innerHTML =
 '<div class="ecard-name">' + esc(e.nombre||'—') + '</div>' +
 '<div class="ecard-meta">' +
@@ -1164,7 +1171,7 @@ div.innerHTML =
 '<span class="rchip rchip-extra">H.Extra ' + (e.hora_extra||0) + '</span>' +
 '<span class="rchip rchip-sin">Sin horario ' + (e.sin_horario||0) + '</span>' +
 '</div>' +
-(extraMin > 0 ? '<span class="extra-min">+' + extraMin + ' min extra total</span>' : '') +
+(extraMin > 0 ? '<span class="extra-min">' + formatExtra(extraMin) + '</span>' : '') +
 '</div>';
 } else {
 /* CAMBIO 3: marcar estado para filtro por chip en modo día */
@@ -1239,7 +1246,7 @@ c.puntual += (e.puntual || 0);
 c.tardio += (e.tardio || 0);
 c.ausente += (e.ausente || 0);
 c.hora_extra += (e.hora_extra || 0);
-c.sin_horario += (e.sin_horario || 0);
+if ((r.puntual||0) + (r.tardio||0) + (r.ausente||0) + (r.feriado||0) === 0) c.sin_horario++;
 });
 } else {
 lista.forEach(function(e) { if (e.estado in c) c[e.estado]++; });
