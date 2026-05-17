@@ -461,6 +461,23 @@ max-height: 40vh;
 .time-input { width: 80px; font-size: 0.8rem; }
 .btn-save-row { padding: 0.35rem 0.6rem; font-size: 0.78rem; }
 }
+
+.btn-volver {
+  background: #38bdf8;
+  color: #0f172a;
+  border: 1px solid #38bdf8;
+  border-radius: var(--r-xs);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  text-decoration: none;
+  transition: opacity .2s;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+}
+.btn-volver:hover { opacity: .85; }
 </style>
 </head>
 <body>
@@ -487,6 +504,7 @@ max-height: 40vh;
 <header class="app-header">
 <span class="header-brand">JANOS</span>
 <span class="header-title">Configuración de horarios</span>
+<a href="QR_dashboard.html" class="btn-volver">Volver al dashboard</a>
 <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
 </header>
 
