@@ -743,7 +743,9 @@ border-color: #38bdf8;
 
 .row-tardio td { color: #f59e0b; }
 .row-extra td { color: #38bdf8; }
-</style>
+    .rchip-flexible { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+    .badge-flexible  { background: rgba(168, 85, 247, 0.2);  color: #a855f7; }
+  </style>
 </head>
 <body>
 
@@ -918,6 +920,11 @@ border-color: #38bdf8;
 <div class="chip" data-estado="ausente"><span class="chip-dot" style="background:var(--red)"></span><span class="chip-n" id="cn-ausente">0</span><span>Ausente</span></div>
 <div class="chip" data-estado="hora_extra"><span class="chip-dot" style="background:var(--blue)"></span><span class="chip-n" id="cn-hora_extra">0</span><span>Hora extra</span></div>
 <div class="chip" data-estado="sin_horario"><span class="chip-dot" style="background:var(--gray)"></span><span class="chip-n" id="cn-sin_horario">0</span><span>Sin horario</span></div>
+          <div class="chip" data-estado="flexible">
+            <span class="chip-dot" style="background:#a855f7"></span>
+            <span class="chip-n" id="cn-flexible">0</span>
+            <span>Flexible</span>
+          </div>
 </div>
 
 <main class="main">
@@ -1003,13 +1010,13 @@ return String(s||'')
 
 function badgeCls(estado) {
 const m = { puntual:'b-puntual', tardio:'b-tardio', ausente:'b-ausente',
-hora_extra:'b-hora_extra', sin_horario:'b-sin_horario', feriado:'b-feriado' };
+hora_extra:'b-hora_extra', sin_horario:'b-sin_horario', feriado:'b-feriado', flexible:'badge-flexible' };
 return m[estado] || 'b-sin_horario';
 }
 
 function badgeTxt(estado) {
 const m = { puntual:'Puntual', tardio:'Tardío', ausente:'Ausente',
-hora_extra:'Hora extra', sin_horario:'Sin horario', feriado:'Feriado' };
+hora_extra:'Hora extra', sin_horario:'Sin horario', flexible:'Flexible', feriado:'Feriado' };
 return m[estado] || estado;
 }
 
@@ -1186,6 +1193,7 @@ if ((e.tardio || 0) > 0) estadosList.push('tardio');
 if ((e.ausente || 0) > 0) estadosList.push('ausente');
 if ((e.hora_extra || 0) > 0) estadosList.push('hora_extra');
 if ((e.sin_horario || 0) > 0) estadosList.push('sin_horario');
+          if ((e.flexible || 0) > 0) estadosList.push('flexible');
 div.dataset.estados = estadosList.join(',');
 
 var extraMin = e.hora_extra_minutos || 0;
@@ -1203,6 +1211,7 @@ div.innerHTML =
 '<span class="rchip rchip-ausente">Ausente ' + (e.ausente||0) + '</span>' +
 '<span class="rchip rchip-extra">H.Extra ' + (e.hora_extra||0) + '</span>' +
 '<span class="rchip rchip-sin">Sin horario ' + (e.sin_horario||0) + '</span>' +
+'<span class="rchip rchip-flexible">Flexible ' + (e.flexible||0) + '</span>' +
 '</div>' +
 (extraMin > 0 ? '<span class="extra-min">' + formatExtra(extraMin) + '</span>' : '') +
 '</div>';
@@ -1267,7 +1276,7 @@ applyChipFilter();
 }
 
 function updateChips(lista) {
-var c = { puntual:0, tardio:0, ausente:0, hora_extra:0, sin_horario:0 };
+var c = { puntual:0, tardio:0, ausente:0, hora_extra:0, sin_horario:0, flexible:0 };
 
 if (isRangeMode) {
 lista.forEach(function(e) {
@@ -1277,6 +1286,7 @@ c.tardio += (e.tardio || 0);
 c.ausente += (e.ausente || 0);
 c.hora_extra += (e.hora_extra || 0);
 if ((r.puntual||0) + (r.tardio||0) + (r.ausente||0) + (r.feriado||0) === 0) c.sin_horario++;
+      c.flexible += (r.flexible || 0);
 });
 } else {
 lista.forEach(function(e) { if (e.estado in c) c[e.estado]++; });
@@ -1287,6 +1297,7 @@ document.getElementById('cn-tardio').textContent = c.tardio;
 document.getElementById('cn-ausente').textContent = c.ausente;
 document.getElementById('cn-hora_extra').textContent = c.hora_extra;
 document.getElementById('cn-sin_horario').textContent= c.sin_horario;
+    document.getElementById('cn-flexible').textContent= c.flexible;
 }
 
 function setLoading(on) {
