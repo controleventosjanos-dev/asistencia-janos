@@ -860,7 +860,7 @@ async function applyBulk() {
           if (isFlexible) {
             tr.querySelector(".inp-entrada").value = "";
             tr.querySelector(".inp-salida").value = "";
-            if (flexChk) { flexChk.checked = true; flexChk.dispatchEvent(new Event("change")); }
+            if (flexChk && !flexChk.checked) { flexChk.click(); }
           } else {
             tr.querySelector(".inp-entrada").value = entrada;
             tr.querySelector(".inp-salida").value = salida;
