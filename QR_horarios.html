@@ -5,913 +5,914 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JANOS · Horarios</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg:       #0f172a;
-    --surface:  #1e293b;
-    --surface2: #273548;
-    --accent:   #38bdf8;
-    --indigo:   #6366f1;
-    --indigo-h: #4f52d4;
-    --text:     #f1f5f9;
-    --muted:    #94a3b8;
-    --border:   #334155;
-    --green:    #22c55e;
-    --red:      #ef4444;
-    --radius:   10px;
-  }
+:root {
+--bg: #0f172a;
+--surface: #1e293b;
+--surface2: #273548;
+--accent: #38bdf8;
+--indigo: #6366f1;
+--indigo-h: #4f52d4;
+--text: #f1f5f9;
+--muted: #94a3b8;
+--border: #334155;
+--green: #22c55e;
+--red: #ef4444;
+--radius: 10px;
+}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    min-height: 100vh;
-  }
+body {
+background: var(--bg);
+color: var(--text);
+font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+min-height: 100vh;
+}
 
-  /* ─── LOGIN ─── */
-  #screen-login {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 1.5rem;
-  }
+/* ─── LOGIN ─── */
+#screen-login {
+display: flex;
+align-items: center;
+justify-content: center;
+min-height: 100vh;
+padding: 1.5rem;
+}
 
-  .login-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 2.5rem 2rem;
-    width: 100%;
-    max-width: 380px;
-    text-align: center;
-  }
+.login-card {
+background: var(--surface);
+border: 1px solid var(--border);
+border-radius: var(--radius);
+padding: 2.5rem 2rem;
+width: 100%;
+max-width: 380px;
+text-align: center;
+}
 
-  .login-logo {
-    font-size: 2rem;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    color: var(--accent);
-    margin-bottom: 0.25rem;
-  }
+.login-logo {
+font-size: 2rem;
+font-weight: 800;
+letter-spacing: -0.5px;
+color: var(--accent);
+margin-bottom: 0.25rem;
+}
 
-  .login-subtitle {
-    color: var(--muted);
-    font-size: 0.95rem;
-    margin-bottom: 2rem;
-  }
+.login-subtitle {
+color: var(--muted);
+font-size: 0.95rem;
+margin-bottom: 2rem;
+}
 
-  .form-group {
-    margin-bottom: 1.25rem;
-    text-align: left;
-  }
+.form-group {
+margin-bottom: 1.25rem;
+text-align: left;
+}
 
-  .form-group label {
-    display: block;
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin-bottom: 0.4rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
+.form-group label {
+display: block;
+font-size: 0.82rem;
+color: var(--muted);
+margin-bottom: 0.4rem;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+}
 
-  .form-group input {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    color: var(--text);
-    font-size: 1rem;
-    padding: 0.65rem 0.85rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
+.form-group input {
+width: 100%;
+background: var(--bg);
+border: 1px solid var(--border);
+border-radius: 7px;
+color: var(--text);
+font-size: 1rem;
+padding: 0.65rem 0.85rem;
+outline: none;
+transition: border-color 0.2s;
+}
 
-  .form-group input:focus { border-color: var(--accent); }
+.form-group input:focus { border-color: var(--accent); }
 
-  .btn-primary {
-    width: 100%;
-    background: var(--indigo);
-    border: none;
-    border-radius: 7px;
-    color: #fff;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
-    padding: 0.75rem;
-    transition: background 0.2s;
-    margin-top: 0.5rem;
-  }
+.btn-primary {
+width: 100%;
+background: var(--indigo);
+border: none;
+border-radius: 7px;
+color: #fff;
+cursor: pointer;
+font-size: 1rem;
+font-weight: 600;
+padding: 0.75rem;
+transition: background 0.2s;
+margin-top: 0.5rem;
+}
 
-  .btn-primary:hover { background: var(--indigo-h); }
-  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary:hover { background: var(--indigo-h); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
-  .login-error {
-    color: var(--red);
-    font-size: 0.88rem;
-    margin-top: 0.75rem;
-    min-height: 1.2em;
-  }
+.login-error {
+color: var(--red);
+font-size: 0.88rem;
+margin-top: 0.75rem;
+min-height: 1.2em;
+}
 
-  /* ─── MAIN SCREEN ─── */
-  #screen-main { display: none; min-height: 100vh; flex-direction: column; }
+/* ─── MAIN SCREEN ─── */
+#screen-main { display: none; min-height: 100vh; flex-direction: column; }
 
-  /* Header */
-  .app-header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0.85rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
+/* Header */
+.app-header {
+background: var(--surface);
+border-bottom: 1px solid var(--border);
+padding: 0.85rem 1.5rem;
+display: flex;
+align-items: center;
+gap: 1rem;
+position: sticky;
+top: 0;
+z-index: 10;
+}
 
-  .header-brand {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--accent);
-    white-space: nowrap;
-  }
+.header-brand {
+font-size: 1.1rem;
+font-weight: 800;
+color: var(--accent);
+white-space: nowrap;
+}
 
-  .header-title {
-    flex: 1;
-    text-align: center;
-    font-size: 0.95rem;
-    color: var(--muted);
-    font-weight: 500;
-  }
+.header-title {
+flex: 1;
+text-align: center;
+font-size: 0.95rem;
+color: var(--muted);
+font-weight: 500;
+}
 
-  .btn-logout {
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 0.85rem;
-    padding: 0.4rem 0.85rem;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
+.btn-logout {
+background: transparent;
+border: 1px solid var(--border);
+border-radius: 7px;
+color: var(--muted);
+cursor: pointer;
+font-size: 0.85rem;
+padding: 0.4rem 0.85rem;
+transition: all 0.2s;
+white-space: nowrap;
+}
 
-  .btn-logout:hover { border-color: var(--red); color: var(--red); }
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
 
-  /* Two-column layout */
-  .main-content {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 0;
-    flex: 1;
-    min-height: calc(100vh - 57px);
-  }
+/* Two-column layout */
+.main-content {
+display: grid;
+grid-template-columns: 280px 1fr;
+gap: 0;
+flex: 1;
+min-height: calc(100vh - 57px);
+}
 
-  /* Left column — areas */
-  .areas-panel {
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    overflow-y: auto;
-  }
+/* Left column — areas */
+.areas-panel {
+background: var(--surface);
+border-right: 1px solid var(--border);
+overflow-y: auto;
+}
 
-  .panel-header {
-    padding: 1rem 1.25rem 0.75rem;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--muted);
-    font-weight: 600;
-  }
+.panel-header {
+padding: 1rem 1.25rem 0.75rem;
+border-bottom: 1px solid var(--border);
+font-size: 0.78rem;
+text-transform: uppercase;
+letter-spacing: 0.07em;
+color: var(--muted);
+font-weight: 600;
+}
 
-  .area-item {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.85rem 1.25rem;
-    cursor: pointer;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.15s;
-    user-select: none;
-  }
+.area-item {
+display: flex;
+align-items: center;
+gap: 0.6rem;
+padding: 0.85rem 1.25rem;
+cursor: pointer;
+border-bottom: 1px solid var(--border);
+transition: background 0.15s;
+user-select: none;
+}
 
-  .area-item:hover { background: var(--surface2); }
-  .area-item.active { background: #1a2540; border-left: 3px solid var(--accent); padding-left: calc(1.25rem - 3px); }
+.area-item:hover { background: var(--surface2); }
+.area-item.active { background: #1a2540; border-left: 3px solid var(--accent); padding-left: calc(1.25rem - 3px); }
 
-  .area-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
+.area-indicator {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+flex-shrink: 0;
+}
 
-  .area-indicator.has-data { background: var(--green); }
-  .area-indicator.no-data  { background: var(--muted); opacity: 0.5; }
+.area-indicator.has-data { background: var(--green); }
+.area-indicator.no-data { background: var(--muted); opacity: 0.5; }
 
-  .area-name {
-    flex: 1;
-    font-size: 0.9rem;
-    line-height: 1.3;
-  }
+.area-name {
+flex: 1;
+font-size: 0.9rem;
+line-height: 1.3;
+}
 
-  .area-count {
-    font-size: 0.78rem;
-    color: var(--muted);
-    white-space: nowrap;
-  }
+.area-count {
+font-size: 0.78rem;
+color: var(--muted);
+white-space: nowrap;
+}
 
-  .areas-loading {
-    padding: 1.5rem 1.25rem;
-    color: var(--muted);
-    font-size: 0.9rem;
-    text-align: center;
-  }
+.areas-loading {
+padding: 1.5rem 1.25rem;
+color: var(--muted);
+font-size: 0.9rem;
+text-align: center;
+}
 
-  /* Right column — schedule grid */
-  .schedule-panel {
-    padding: 1.5rem;
-    overflow-y: auto;
-  }
+/* Right column — schedule grid */
+.schedule-panel {
+padding: 1.5rem;
+overflow-y: auto;
+}
 
-  .schedule-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    min-height: 200px;
-    color: var(--muted);
-    font-size: 0.95rem;
-    text-align: center;
-    padding: 2rem;
-  }
+.schedule-placeholder {
+display: flex;
+align-items: center;
+justify-content: center;
+height: 100%;
+min-height: 200px;
+color: var(--muted);
+font-size: 0.95rem;
+text-align: center;
+padding: 2rem;
+}
 
-  .schedule-area-title {
-    margin-bottom: 1.25rem;
-  }
+.schedule-area-title {
+margin-bottom: 1.25rem;
+}
 
-  .schedule-area-title h2 {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--text);
-  }
+.schedule-area-title h2 {
+font-size: 1.15rem;
+font-weight: 700;
+color: var(--text);
+}
 
-  .schedule-area-title p {
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-top: 0.2rem;
-  }
+.schedule-area-title p {
+font-size: 0.85rem;
+color: var(--muted);
+margin-top: 0.2rem;
+}
 
-  /* Schedule table */
-  .schedule-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
+/* Schedule table */
+.schedule-table {
+width: 100%;
+border-collapse: collapse;
+}
 
-  .schedule-table th {
-    text-align: left;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--border);
-    font-weight: 600;
-  }
+.schedule-table th {
+text-align: left;
+font-size: 0.78rem;
+text-transform: uppercase;
+letter-spacing: 0.06em;
+color: var(--muted);
+padding: 0.5rem 0.75rem;
+border-bottom: 1px solid var(--border);
+font-weight: 600;
+}
 
-  .schedule-table td {
-    padding: 0.55rem 0.75rem;
-    border-bottom: 1px solid var(--border);
-    vertical-align: middle;
-  }
+.schedule-table td {
+padding: 0.55rem 0.75rem;
+border-bottom: 1px solid var(--border);
+vertical-align: middle;
+}
 
-  .day-name {
-    font-size: 0.9rem;
-    font-weight: 500;
-    white-space: nowrap;
-    min-width: 100px;
-  }
+.day-name {
+font-size: 0.9rem;
+font-weight: 500;
+white-space: nowrap;
+min-width: 100px;
+}
 
-  .time-input {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    font-size: 0.9rem;
-    padding: 0.4rem 0.55rem;
-    width: 110px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
+.time-input {
+background: var(--bg);
+border: 1px solid var(--border);
+border-radius: 6px;
+color: var(--text);
+font-size: 0.9rem;
+padding: 0.4rem 0.55rem;
+width: 110px;
+outline: none;
+transition: border-color 0.2s;
+}
 
-  .time-input:focus { border-color: var(--accent); }
+.time-input:focus { border-color: var(--accent); }
 
-  /* color-scheme for time picker in dark browsers */
-  .time-input { color-scheme: dark; }
+/* color-scheme for time picker in dark browsers */
+.time-input { color-scheme: dark; }
 
-  .btn-save-row {
-    background: var(--indigo);
-    border: none;
-    border-radius: 6px;
-    color: #fff;
-    cursor: pointer;
-    font-size: 0.82rem;
-    font-weight: 600;
-    padding: 0.4rem 0.85rem;
-    transition: background 0.2s;
-    white-space: nowrap;
-  }
+.btn-save-row {
+background: var(--indigo);
+border: none;
+border-radius: 6px;
+color: #fff;
+cursor: pointer;
+font-size: 0.82rem;
+font-weight: 600;
+padding: 0.4rem 0.85rem;
+transition: background 0.2s;
+white-space: nowrap;
+}
 
-  .btn-save-row:hover { background: var(--indigo-h); }
-  .btn-save-row:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-save-row:hover { background: var(--indigo-h); }
+.btn-save-row:disabled { opacity: 0.6; cursor: not-allowed; }
 
-  .row-status {
-    font-size: 0.8rem;
-    min-width: 90px;
-    white-space: nowrap;
-  }
+.row-status {
+font-size: 0.8rem;
+min-width: 90px;
+white-space: nowrap;
+}
 
-  .row-status.ok    { color: var(--green); }
-  .row-status.error { color: var(--red); }
+.row-status.ok { color: var(--green); }
+.row-status.error { color: var(--red); }
+/* flexible */
+.is-flexible { border-left: 3px solid #38bdf8; }
+.flex-toggle { display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
+.flex-toggle input[type="checkbox"] {
+  -webkit-appearance:none; appearance:none;
+  width:36px; height:20px; border-radius:10px;
+  background:#555; cursor:pointer; transition:background .2s;
+  position:relative; flex-shrink:0; vertical-align:middle;
+}
+.flex-toggle input[type="checkbox"]::after {
+  content:""; position:absolute;
+  top:3px; left:3px; width:14px; height:14px;
+  border-radius:50%; background:#fff; transition:left .2s;
+}
+.flex-toggle input[type="checkbox"]:checked { background:#38bdf8; }
+.flex-toggle input[type="checkbox"]:checked::after { left:19px; }
+.is-flexible .inp-entrada, .is-flexible .inp-salida { opacity:.35; pointer-events:none; }
 
-  /* ─── BULK APPLY BAR ─── */
-  .bulk-bar {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 0.85rem 1rem;
-    margin-bottom: 1.25rem;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 0.65rem;
-  }
+/* ─── BULK APPLY BAR ─── */
+.bulk-bar {
+background: var(--surface2);
+border: 1px solid var(--border);
+border-radius: var(--radius);
+padding: 0.85rem 1rem;
+margin-bottom: 1.25rem;
+display: flex;
+align-items: center;
+flex-wrap: wrap;
+gap: 0.65rem;
+}
 
-  .bulk-bar-label {
-    font-size: 0.78rem;
-    color: var(--muted);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-    margin-right: 0.25rem;
-  }
+.bulk-bar-label {
+font-size: 0.78rem;
+color: var(--muted);
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+white-space: nowrap;
+margin-right: 0.25rem;
+}
 
-  .bulk-select-links {
-    font-size: 0.8rem;
-    color: var(--muted);
-    margin-left: auto;
-    white-space: nowrap;
-  }
+.bulk-select-links {
+font-size: 0.8rem;
+color: var(--muted);
+margin-left: auto;
+white-space: nowrap;
+}
 
-  .bulk-select-links a {
-    color: var(--accent);
-    cursor: pointer;
-    text-decoration: none;
-  }
+.bulk-select-links a {
+color: var(--accent);
+cursor: pointer;
+text-decoration: none;
+}
 
-  .bulk-select-links a:hover { text-decoration: underline; }
+.bulk-select-links a:hover { text-decoration: underline; }
 
-  .btn-bulk-apply {
-    background: var(--indigo);
-    border: none;
-    border-radius: 6px;
-    color: #fff;
-    cursor: pointer;
-    font-size: 0.82rem;
-    font-weight: 600;
-    padding: 0.4rem 0.9rem;
-    transition: background 0.2s;
-    white-space: nowrap;
-  }
+.btn-bulk-apply {
+background: var(--indigo);
+border: none;
+border-radius: 6px;
+color: #fff;
+cursor: pointer;
+font-size: 0.82rem;
+font-weight: 600;
+padding: 0.4rem 0.9rem;
+transition: background 0.2s;
+white-space: nowrap;
+}
 
-  .btn-bulk-apply:hover { background: var(--indigo-h); }
-  .btn-bulk-apply:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-bulk-apply:hover { background: var(--indigo-h); }
+.btn-bulk-apply:disabled { opacity: 0.6; cursor: not-allowed; }
 
-  .bulk-status {
-    font-size: 0.8rem;
-    white-space: nowrap;
-  }
+.bulk-status {
+font-size: 0.8rem;
+white-space: nowrap;
+}
 
-  .bulk-status.ok    { color: var(--green); }
-  .bulk-status.error { color: var(--red); }
+.bulk-status.ok { color: var(--green); }
+.bulk-status.error { color: var(--red); }
 
-  /* checkbox column */
-  .schedule-table td:first-child,
-  .schedule-table th:first-child {
-    width: 34px;
-    padding-left: 0.5rem;
-    padding-right: 0.2rem;
-  }
+/* checkbox column */
+.schedule-table td:first-child,
+.schedule-table th:first-child {
+width: 34px;
+padding-left: 0.5rem;
+padding-right: 0.2rem;
+}
 
-  .day-chk {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    accent-color: var(--indigo);
-    display: block;
-  }
+.day-chk {
+width: 16px;
+height: 16px;
+cursor: pointer;
+accent-color: var(--indigo);
+display: block;
+}
 
-  /* ─── RESPONSIVE ─── */
-  @media (max-width: 680px) {
-    .main-content {
-      grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr;
-    }
+/* ─── RESPONSIVE ─── */
+@media (max-width: 680px) {
+.main-content {
+grid-template-columns: 1fr;
+grid-template-rows: auto 1fr;
+}
 
-    .areas-panel {
-      border-right: none;
-      border-bottom: 1px solid var(--border);
-      max-height: 40vh;
-    }
+.areas-panel {
+border-right: none;
+border-bottom: 1px solid var(--border);
+max-height: 40vh;
+}
 
-    .schedule-panel { padding: 1rem; }
+.schedule-panel { padding: 1rem; }
 
-    .app-header { padding: 0.75rem 1rem; }
-    .header-title { font-size: 0.82rem; }
+.app-header { padding: 0.75rem 1rem; }
+.header-title { font-size: 0.82rem; }
 
-    .time-input { width: 90px; }
+.time-input { width: 90px; }
 
-    .schedule-table th:nth-child(1),
-    .schedule-table td:nth-child(1) { display: none; } /* hide checkbox on tiny screens */
-    .schedule-table th:nth-child(6),
-    .schedule-table td:nth-child(6) { display: none; } /* hide status on tiny screens */
-    .bulk-select-links { margin-left: 0; }
-  }
+.schedule-table th:nth-child(1),
+.schedule-table td:nth-child(1) { display: none; } /* hide checkbox on tiny screens */
+.schedule-table th:nth-child(7),
+.schedule-table td:nth-child(7) { display: none; } /* hide status on tiny screens */
+.bulk-select-links { margin-left: 0; }
+}
 
-  @media (max-width: 420px) {
-    .schedule-table { font-size: 0.82rem; }
-    .time-input { width: 80px; font-size: 0.8rem; }
-    .btn-save-row { padding: 0.35rem 0.6rem; font-size: 0.78rem; }
-  }
+@media (max-width: 420px) {
+.schedule-table { font-size: 0.82rem; }
+.time-input { width: 80px; font-size: 0.8rem; }
+.btn-save-row { padding: 0.35rem 0.6rem; font-size: 0.78rem; }
+}
 </style>
 </head>
 <body>
 
 <!-- ═══════════════════════════════════ SCREEN 1 — LOGIN ═══════════════════════════════════ -->
 <div id="screen-login">
-  <div class="login-card">
-    <div class="login-logo">JANOS</div>
-    <div class="login-subtitle">Horarios</div>
+<div class="login-card">
+<div class="login-logo">JANOS</div>
+<div class="login-subtitle">Horarios</div>
 
-    <div class="form-group">
-      <label for="codigo-input">Código de acceso</label>
-      <input id="codigo-input" type="password" placeholder="••••••••" autocomplete="off">
-    </div>
+<div class="form-group">
+<label for="codigo-input">Código de acceso</label>
+<input id="codigo-input" type="password" placeholder="••••••••" autocomplete="off">
+</div>
 
-    <button class="btn-primary" id="btn-ingresar">Ingresar</button>
-    <div class="login-error" id="login-error"></div>
-  </div>
+<button class="btn-primary" id="btn-ingresar">Ingresar</button>
+<div class="login-error" id="login-error"></div>
+</div>
 </div>
 
 <!-- ═══════════════════════════════════ SCREEN 2 — MAIN ════════════════════════════════════ -->
 <div id="screen-main">
 
-  <header class="app-header">
-    <span class="header-brand">JANOS</span>
-    <span class="header-title">Configuración de horarios</span>
-    <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
-  </header>
+<header class="app-header">
+<span class="header-brand">JANOS</span>
+<span class="header-title">Configuración de horarios</span>
+<button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+</header>
 
-  <div class="main-content">
+<div class="main-content">
 
-    <!-- Left: areas list -->
-    <aside class="areas-panel">
-      <div class="panel-header">Áreas</div>
-      <div id="areas-list">
-        <div class="areas-loading">Cargando...</div>
-      </div>
-    </aside>
+<!-- Left: areas list -->
+<aside class="areas-panel">
+<div class="panel-header">Áreas</div>
+<div id="areas-list">
+<div class="areas-loading">Cargando...</div>
+</div>
+</aside>
 
-    <!-- Right: schedule grid -->
-    <section class="schedule-panel" id="schedule-panel">
-      <div class="schedule-placeholder" id="schedule-placeholder">
-        Seleccioná un área para configurar su horario
-      </div>
-      <div id="schedule-content" style="display:none;">
-        <div class="schedule-area-title">
-          <h2 id="selected-area-name"></h2>
-          <p id="selected-area-count"></p>
-        </div>
-        <!-- ── Bulk apply bar ── -->
-        <div class="bulk-bar">
-          <span class="bulk-bar-label">Aplicar a seleccionados</span>
-          <input class="time-input" type="time" id="bulk-entrada" aria-label="Entrada masiva" style="width:110px;color-scheme:dark;">
-          <input class="time-input" type="time" id="bulk-salida"  aria-label="Salida masiva"  style="width:110px;color-scheme:dark;">
-          <button class="btn-bulk-apply" id="btn-bulk-apply">Aplicar a seleccionados</button>
-          <span class="bulk-status" id="bulk-status"></span>
-          <span class="bulk-select-links">
-            <a id="lnk-sel-all">Seleccionar todos</a> | <a id="lnk-desel-all">Deseleccionar todos</a>
-          </span>
-        </div>
-        <table class="schedule-table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Día</th>
-              <th>Entrada</th>
-              <th>Salida</th>
-              <th></th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody id="schedule-tbody"></tbody>
-        </table>
-      </div>
-    </section>
+<!-- Right: schedule grid -->
+<section class="schedule-panel" id="schedule-panel">
+<div class="schedule-placeholder" id="schedule-placeholder">
+Seleccioná un área para configurar su horario
+</div>
+<div id="schedule-content" style="display:none;">
+<div class="schedule-area-title">
+<h2 id="selected-area-name"></h2>
+<p id="selected-area-count"></p>
+</div>
+<!-- ── Bulk apply bar ── -->
+<div class="bulk-bar">
+<span class="bulk-bar-label">Aplicar a seleccionados</span>
+<input class="time-input" type="time" id="bulk-entrada" aria-label="Entrada masiva" style="width:110px;color-scheme:dark;">
+<input class="time-input" type="time" id="bulk-salida" aria-label="Salida masiva" style="width:110px;color-scheme:dark;">
+<label class="flex-toggle" style="margin:0 8px">
+          <input type="checkbox" id="bulk-flex-chk" aria-label="Flexible masivo">
+          <span style="font-size:13px;color:#bbb">Flexible</span>
+        </label>
+        <button class="btn-bulk-apply" id="btn-bulk-apply">Aplicar a seleccionados</button>
+<span class="bulk-status" id="bulk-status"></span>
+<span class="bulk-select-links">
+<a id="lnk-sel-all">Seleccionar todos</a> | <a id="lnk-desel-all">Deseleccionar todos</a>
+</span>
+</div>
+<table class="schedule-table">
+<thead>
+<tr>
+<th></th>
+<th>Día</th>
+<th>Entrada</th>
+<th>Salida</th>
+          <th>Flexible</th>
+<th></th>
+<th>Estado</th>
+</tr>
+</thead>
+<tbody id="schedule-tbody"></tbody>
+</table>
+</div>
+</section>
 
-  </div>
+</div>
 </div>
 
 <script>
 /* ══════════════════════════════════════════════════════
-   CONFIG
+CONFIG
 ══════════════════════════════════════════════════════ */
-const SHEETS_URL  = "https://script.google.com/macros/s/AKfycbxtEFH0vi1lE0Wbife6OelmX3tWLKVb6PVEhy4TlfvWdJnNre1bL4MVl3Gb8FvduDD3ng/exec";
+const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxtEFH0vi1lE0Wbife6OelmX3tWLKVb6PVEhy4TlfvWdJnNre1bL4MVl3Gb8FvduDD3ng/exec";
 const CODIGO_RRHH = "rrhh2026";
-const DIAS        = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+const DIAS = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
 const SESSION_KEY = "janos_horarios_auth";
 
 /* ══════════════════════════════════════════════════════
-   STATE
+STATE
 ══════════════════════════════════════════════════════ */
 let state = {
-  areas:        [],   // ["Area1", ...]
-  horarios:     {},   // { "Area": { "Lunes": { entrada, salida }, ... } }
-  conteo:       {},   // { "Area": N }
-  selectedArea: null,
+areas: [], // ["Area1", ...]
+horarios: {}, // { "Area": { "Lunes": { entrada, salida }, ... } }
+conteo: {}, // { "Area": N }
+selectedArea: null,
 };
 
 /* ══════════════════════════════════════════════════════
-   HELPERS
+HELPERS
 ══════════════════════════════════════════════════════ */
 function $(id) { return document.getElementById(id); }
 
 function buildUrl(params) {
-  const u = new URL(SHEETS_URL);
-  Object.entries(params).forEach(([k,v]) => u.searchParams.set(k, v));
-  return u.toString();
+const u = new URL(SHEETS_URL);
+Object.entries(params).forEach(([k,v]) => u.searchParams.set(k, v));
+return u.toString();
 }
 
 async function apiFetch(params) {
-  const url = buildUrl(params);
-  const res  = await fetch(url, { method: 'GET', redirect: 'follow', credentials: 'omit' });
-  const json = await res.json();
-  if (!json.ok) throw new Error(json.error || 'Error desconocido');
-  return json;
+const url = buildUrl(params);
+const res = await fetch(url, { method: 'GET', redirect: 'follow', credentials: 'omit' });
+const json = await res.json();
+if (!json.ok) throw new Error(json.error || 'Error desconocido');
+return json;
 }
 
 function hasHorario(area) {
-  const h = state.horarios[area];
-  if (!h) return false;
-  return Object.keys(h).some(d => h[d] && h[d].entrada && h[d].salida);
+const h = state.horarios[area];
+if (!h) return false;
+return Object.keys(h).some(d => h[d] && h[d].entrada && h[d].salida);
 }
 
 /* ══════════════════════════════════════════════════════
-   AUTH
+AUTH
 ══════════════════════════════════════════════════════ */
 function checkSession() {
-  return sessionStorage.getItem(SESSION_KEY) === "1";
+return sessionStorage.getItem(SESSION_KEY) === "1";
 }
 
 function saveSession() {
-  sessionStorage.setItem(SESSION_KEY, "1");
+sessionStorage.setItem(SESSION_KEY, "1");
 }
 
 function clearSession() {
-  sessionStorage.removeItem(SESSION_KEY);
+sessionStorage.removeItem(SESSION_KEY);
 }
 
 function showLogin() {
-  $("screen-login").style.display = "flex";
-  $("screen-main").style.display  = "none";
+$("screen-login").style.display = "flex";
+$("screen-main").style.display = "none";
 }
 
 function showMain() {
-  $("screen-login").style.display = "none";
-  $("screen-main").style.display  = "flex";
+$("screen-login").style.display = "none";
+$("screen-main").style.display = "flex";
 }
 
 /* ══════════════════════════════════════════════════════
-   LOGIN LOGIC
+LOGIN LOGIC
 ══════════════════════════════════════════════════════ */
 function initLogin() {
-  const input  = $("codigo-input");
-  const btn    = $("btn-ingresar");
-  const errDiv = $("login-error");
+const input = $("codigo-input");
+const btn = $("btn-ingresar");
+const errDiv = $("login-error");
 
-  function attempt() {
-    errDiv.textContent = "";
-    const val = input.value.trim();
-    if (!val) return;
-    if (val === CODIGO_RRHH) {
-      saveSession();
-      input.value = "";
-      showMain();
-      loadHorarios();
-    } else {
-      errDiv.textContent = "Código incorrecto";
-      input.select();
-    }
-  }
+function attempt() {
+errDiv.textContent = "";
+const val = input.value.trim();
+if (!val) return;
+if (val === CODIGO_RRHH) {
+saveSession();
+input.value = "";
+showMain();
+loadHorarios();
+} else {
+errDiv.textContent = "Código incorrecto";
+input.select();
+}
+}
 
-  btn.addEventListener("click", attempt);
-  input.addEventListener("keydown", e => { if (e.key === "Enter") attempt(); });
+btn.addEventListener("click", attempt);
+input.addEventListener("keydown", e => { if (e.key === "Enter") attempt(); });
 }
 
 /* ══════════════════════════════════════════════════════
-   LOGOUT
+LOGOUT
 ══════════════════════════════════════════════════════ */
 $("btn-logout").addEventListener("click", () => {
-  clearSession();
-  state = { areas: [], horarios: {}, conteo: {}, selectedArea: null };
-  $("areas-list").innerHTML = '<div class="areas-loading">Cargando...</div>';
-  $("schedule-placeholder").style.display = "flex";
-  $("schedule-content").style.display     = "none";
-  showLogin();
+clearSession();
+state = { areas: [], horarios: {}, conteo: {}, selectedArea: null };
+$("areas-list").innerHTML = '<div class="areas-loading">Cargando...</div>';
+$("schedule-placeholder").style.display = "flex";
+$("schedule-content").style.display = "none";
+showLogin();
 });
 
 /* ══════════════════════════════════════════════════════
-   LOAD HORARIOS
+LOAD HORARIOS
 ══════════════════════════════════════════════════════ */
 async function loadHorarios() {
-  $("areas-list").innerHTML = '<div class="areas-loading">Cargando áreas...</div>';
+$("areas-list").innerHTML = '<div class="areas-loading">Cargando áreas...</div>';
 
-  try {
-    const data = await apiFetch({ action: "getHorarios" });
-    state.areas    = data.areas    || [];
-    state.horarios = data.horarios || {};
-    state.conteo   = data.conteo   || {};
-    renderAreasList();
-  } catch(err) {
-    $("areas-list").innerHTML =
-      `<div class="areas-loading" style="color:var(--red);">Error al cargar: ${err.message}</div>`;
-  }
+try {
+const data = await apiFetch({ action: "getHorarios" });
+state.areas = data.areas || [];
+state.horarios = data.horarios || {};
+state.conteo = data.conteo || {};
+renderAreasList();
+} catch(err) {
+$("areas-list").innerHTML =
+`<div class="areas-loading" style="color:var(--red);">Error al cargar: ${err.message}</div>`;
+}
 }
 
 /* ══════════════════════════════════════════════════════
-   RENDER AREAS LIST
+RENDER AREAS LIST
 ══════════════════════════════════════════════════════ */
 function renderAreasList() {
-  if (!state.areas.length) {
-    $("areas-list").innerHTML = '<div class="areas-loading">Sin áreas registradas</div>';
-    return;
-  }
+if (!state.areas.length) {
+$("areas-list").innerHTML = '<div class="areas-loading">Sin áreas registradas</div>';
+return;
+}
 
-  const frag = document.createDocumentFragment();
-  state.areas.forEach(area => {
-    const item = document.createElement("div");
-    item.className = "area-item" + (state.selectedArea === area ? " active" : "");
-    item.dataset.area = area;
+const frag = document.createDocumentFragment();
+state.areas.forEach(area => {
+const item = document.createElement("div");
+item.className = "area-item" + (state.selectedArea === area ? " active" : "");
+item.dataset.area = area;
 
-    const hasData  = hasHorario(area);
-    const count    = state.conteo[area] || 0;
-    const empLabel = count === 1 ? "1 empleado" : `${count} empleados`;
+const hasData = hasHorario(area);
+const count = state.conteo[area] || 0;
+const empLabel = count === 1 ? "1 empleado" : `${count} empleados`;
 
-    item.innerHTML = `
-      <span class="area-indicator ${hasData ? 'has-data' : 'no-data'}"></span>
-      <span class="area-name">${escHtml(area)}</span>
-      <span class="area-count">${empLabel}</span>
-    `;
+item.innerHTML = `
+<span class="area-indicator ${hasData ? 'has-data' : 'no-data'}"></span>
+<span class="area-name">${escHtml(area)}</span>
+<span class="area-count">${empLabel}</span>
+`;
 
-    item.addEventListener("click", () => selectArea(area));
-    frag.appendChild(item);
-  });
+item.addEventListener("click", () => selectArea(area));
+frag.appendChild(item);
+});
 
-  $("areas-list").innerHTML = "";
-  $("areas-list").appendChild(frag);
+$("areas-list").innerHTML = "";
+$("areas-list").appendChild(frag);
 }
 
 /* ══════════════════════════════════════════════════════
-   SELECT AREA
+SELECT AREA
 ══════════════════════════════════════════════════════ */
 function selectArea(area) {
-  state.selectedArea = area;
+state.selectedArea = area;
 
-  // Update active class
-  document.querySelectorAll(".area-item").forEach(el => {
-    el.classList.toggle("active", el.dataset.area === area);
-  });
+// Update active class
+document.querySelectorAll(".area-item").forEach(el => {
+el.classList.toggle("active", el.dataset.area === area);
+});
 
-  // Show schedule panel
-  $("schedule-placeholder").style.display = "none";
-  $("schedule-content").style.display     = "block";
+// Show schedule panel
+$("schedule-placeholder").style.display = "none";
+$("schedule-content").style.display = "block";
 
-  const count    = state.conteo[area] || 0;
-  const empLabel = count === 1 ? "1 empleado" : `${count} empleados`;
-  $("selected-area-name").textContent  = area;
-  $("selected-area-count").textContent = empLabel;
+const count = state.conteo[area] || 0;
+const empLabel = count === 1 ? "1 empleado" : `${count} empleados`;
+$("selected-area-name").textContent = area;
+$("selected-area-count").textContent = empLabel;
 
-  renderScheduleGrid(area);
+renderScheduleGrid(area);
 }
 
 /* ══════════════════════════════════════════════════════
-   RENDER SCHEDULE GRID
+RENDER SCHEDULE GRID
 ══════════════════════════════════════════════════════ */
 function renderScheduleGrid(area) {
-  const horarios = state.horarios[area] || {};
-  const tbody    = $("schedule-tbody");
-  tbody.innerHTML = "";
-
-  DIAS.forEach(dia => {
-    const saved   = horarios[dia] || {};
-    const entrada = saved.entrada || "";
-    const salida  = saved.salida  || "";
-
-    const tr = document.createElement("tr");
-    tr.dataset.dia = dia;
-
-    tr.innerHTML = `
-      <td><input class="day-chk" type="checkbox" data-dia="${escAttr(dia)}" aria-label="Seleccionar ${dia}"></td>
-      <td class="day-name">${escHtml(dia)}</td>
-      <td><input class="time-input inp-entrada" type="time" value="${escAttr(entrada)}" aria-label="Entrada ${dia}"></td>
-      <td><input class="time-input inp-salida"  type="time" value="${escAttr(salida)}"  aria-label="Salida ${dia}"></td>
-      <td><button class="btn-save-row" data-area="${escAttr(area)}" data-dia="${escAttr(dia)}">Guardar</button></td>
-      <td><span class="row-status"></span></td>
-    `;
-
-    // Save button handler
-    tr.querySelector(".btn-save-row").addEventListener("click", function() {
-      const btnEl     = this;
-      const statusEl  = tr.querySelector(".row-status");
+    const horarios = state.horarios[area] || {};
+    const tbody = $("schedule-tbody");
+    tbody.innerHTML = "";
+    DIAS.forEach(dia => {
+      const saved = horarios[dia] || {};
+      const rawEntrada = saved.entrada || "";
+      const isFlexible = rawEntrada === "FLEXIBLE";
+      const entrada = isFlexible ? "" : rawEntrada;
+      const salida = isFlexible ? "" : (saved.salida || "");
+      const tr = document.createElement("tr");
+      tr.dataset.dia = dia;
+      if (isFlexible) tr.classList.add("is-flexible");
+      tr.innerHTML = `
+        <td><input class="day-chk" type="checkbox" data-dia="${escAttr(dia)}" aria-label="Seleccionar ${dia}"></td>
+        <td class="day-name">${escHtml(dia)}</td>
+        <td><input class="time-input inp-entrada" type="time" value="${escAttr(entrada)}" aria-label="Entrada ${dia}"></td>
+        <td><input class="time-input inp-salida" type="time" value="${escAttr(salida)}" aria-label="Salida ${dia}"></td>
+        <td><label class="flex-toggle">
+          <input type="checkbox" class="flex-chk" aria-label="Flexible ${dia}" ${isFlexible ? "checked" : ""}>
+          <span style="font-size:12px;color:#aaa">Flex</span>
+        </label></td>
+        <td><button class="btn-save-row" data-area="${escAttr(area)}" data-dia="${escAttr(dia)}">Guardar</button></td>
+        <td><span class="row-status"></span></td>
+      `;
+      const flexChk = tr.querySelector(".flex-chk");
       const entradaEl = tr.querySelector(".inp-entrada");
-      const salidaEl  = tr.querySelector(".inp-salida");
-      saveRow(area, dia, entradaEl, salidaEl, btnEl, statusEl);
+      const salidaEl = tr.querySelector(".inp-salida");
+      flexChk.addEventListener("change", function() {
+        if (this.checked) tr.classList.add("is-flexible");
+        else tr.classList.remove("is-flexible");
+      });
+      tr.querySelector(".btn-save-row").addEventListener("click", function() {
+        const btnEl = this;
+        const statusEl = tr.querySelector(".row-status");
+        saveRow(area, dia, entradaEl, salidaEl, flexChk, btnEl, statusEl);
+      });
+      tbody.appendChild(tr);
     });
-
-    tbody.appendChild(tr);
-  });
-}
+  }
 
 /* ══════════════════════════════════════════════════════
-   SAVE ROW
+SAVE ROW
 ══════════════════════════════════════════════════════ */
-async function saveRow(area, dia, entradaEl, salidaEl, btnEl, statusEl) {
-  const entrada = entradaEl.value.trim();
-  const salida  = salidaEl.value.trim();
-
-  // Validate
-  if (!entrada || !salida) {
-    statusEl.className  = "row-status error";
-    statusEl.textContent = "✗ Completá ambos campos";
-    return;
+async function saveRow(area, dia, entradaEl, salidaEl, flexEl, btnEl, statusEl) {
+    const isFlexible = flexEl.checked;
+    const entrada = entradaEl.value.trim();
+    const salida = salidaEl.value.trim();
+    if (!isFlexible && (!entrada || !salida)) {
+      statusEl.className = "row-status error";
+      statusEl.textContent = "✗ Completá ambos campos";
+      return;
+    }
+    btnEl.disabled = true;
+    statusEl.className = "row-status";
+    statusEl.textContent = "Guardando…";
+    try {
+      const params = isFlexible
+        ? { action: "setHorario", area, dia, flexible: "true" }
+        : { action: "setHorario", area, dia, entrada, salida };
+      await apiFetch(params);
+      if (!state.horarios[area]) state.horarios[area] = {};
+      state.horarios[area][dia] = isFlexible
+        ? { entrada: "FLEXIBLE", salida: "FLEXIBLE" }
+        : { entrada, salida };
+      statusEl.className = "row-status ok";
+      statusEl.textContent = "✓ Guardado";
+      updateAreaIndicator(area);
+      setTimeout(() => { if (statusEl.textContent === "✓ Guardado") statusEl.textContent = ""; }, 3000);
+    } catch(err) {
+      statusEl.className = "row-status error";
+      statusEl.textContent = `✗ ${err.message}`;
+    } finally {
+      btnEl.disabled = false;
+    }
   }
-
-  btnEl.disabled       = true;
-  statusEl.className   = "row-status";
-  statusEl.textContent = "Guardando…";
-
-  try {
-    await apiFetch({ action: "setHorario", area, dia, entrada, salida });
-
-    // Update local state
-    if (!state.horarios[area]) state.horarios[area] = {};
-    state.horarios[area][dia] = { entrada, salida };
-
-    statusEl.className   = "row-status ok";
-    statusEl.textContent = "✓ Guardado";
-
-    // Refresh area indicator in left column
-    updateAreaIndicator(area);
-
-    // Auto-clear status after 3 s
-    setTimeout(() => {
-      if (statusEl.textContent === "✓ Guardado") statusEl.textContent = "";
-    }, 3000);
-
-  } catch(err) {
-    statusEl.className   = "row-status error";
-    statusEl.textContent = `✗ ${err.message}`;
-  } finally {
-    btnEl.disabled = false;
-  }
-}
 
 /* ══════════════════════════════════════════════════════
-   BULK APPLY
+BULK APPLY
 ══════════════════════════════════════════════════════ */
 function initBulkBar() {
-  $("lnk-sel-all").addEventListener("click", e => {
-    e.preventDefault();
-    document.querySelectorAll(".day-chk").forEach(c => c.checked = true);
-  });
-  $("lnk-desel-all").addEventListener("click", e => {
-    e.preventDefault();
-    document.querySelectorAll(".day-chk").forEach(c => c.checked = false);
-  });
-  $("btn-bulk-apply").addEventListener("click", applyBulk);
-}
+    $("lnk-sel-all").addEventListener("click", () =>
+      document.querySelectorAll(".day-chk").forEach(c => c.checked = true));
+    $("lnk-desel-all").addEventListener("click", () =>
+      document.querySelectorAll(".day-chk").forEach(c => c.checked = false));
+    $("btn-bulk-apply").addEventListener("click", applyBulk);
+    const bulkFlex = $("bulk-flex-chk");
+    const bulkEnt  = $("bulk-entrada");
+    const bulkSal  = $("bulk-salida");
+    bulkFlex.addEventListener("change", function() {
+      bulkEnt.disabled = this.checked;
+      bulkSal.disabled = this.checked;
+    });
+  }
 
 async function applyBulk() {
-  const area      = state.selectedArea;
-  const entrada   = $("bulk-entrada").value.trim();
-  const salida    = $("bulk-salida").value.trim();
-  const statusEl  = $("bulk-status");
-  const btn       = $("btn-bulk-apply");
-
-  const checked = Array.from(document.querySelectorAll(".day-chk:checked")).map(c => c.dataset.dia);
-
-  statusEl.className   = "bulk-status";
-  statusEl.textContent = "";
-
-  if (!area) {
-    statusEl.className   = "bulk-status error";
-    statusEl.textContent = "✗ Seleccioná un área primero";
-    return;
-  }
-  if (!checked.length) {
-    statusEl.className   = "bulk-status error";
-    statusEl.textContent = "✗ Seleccioná al menos un día";
-    return;
-  }
-  if (!entrada || !salida) {
-    statusEl.className   = "bulk-status error";
-    statusEl.textContent = "✗ Completá Entrada y Salida";
-    return;
-  }
-
-  btn.disabled         = true;
-  statusEl.className   = "bulk-status";
-  statusEl.textContent = "Guardando…";
-
-  let errors = 0;
-  await Promise.all(checked.map(async dia => {
-    const tr       = document.querySelector(`tr[data-dia="${CSS.escape(dia)}"]`);
-    const statusTd = tr ? tr.querySelector(".row-status") : null;
-    try {
-      await apiFetch({ action: "setHorario", area, dia, entrada, salida });
-      if (!state.horarios[area]) state.horarios[area] = {};
-      state.horarios[area][dia] = { entrada, salida };
-      if (tr) {
-        tr.querySelector(".inp-entrada").value = entrada;
-        tr.querySelector(".inp-salida").value  = salida;
-        if (statusTd) {
-          statusTd.className   = "row-status ok";
-          statusTd.textContent = "✓ Guardado";
-          setTimeout(() => { if (statusTd.textContent === "✓ Guardado") statusTd.textContent = ""; }, 3000);
-        }
-      }
-    } catch(err) {
-      errors++;
-      if (statusTd) {
-        statusTd.className   = "row-status error";
-        statusTd.textContent = `✗ ${err.message}`;
-      }
+    const area = state.selectedArea;
+    if (!area) return;
+    const isFlexible = $("bulk-flex-chk").checked;
+    const entrada = $("bulk-entrada").value.trim();
+    const salida  = $("bulk-salida").value.trim();
+    if (!isFlexible && (!entrada || !salida)) {
+      const st = $("bulk-status");
+      st.className = "bulk-status error";
+      st.textContent = "✗ Completá entrada y salida";
+      return;
     }
-  }));
-
-  // Deseleccionar todos
-  document.querySelectorAll(".day-chk").forEach(c => c.checked = false);
-  updateAreaIndicator(area);
-
-  if (errors === 0) {
-    statusEl.className   = "bulk-status ok";
-    statusEl.textContent = `✓ ${checked.length} día${checked.length > 1 ? "s" : ""} guardados`;
-    setTimeout(() => { if (statusEl.textContent.startsWith("✓")) statusEl.textContent = ""; }, 3000);
-  } else {
-    statusEl.className   = "bulk-status error";
-    statusEl.textContent = `✗ ${errors} error${errors > 1 ? "es" : ""}`;
+    const checked = [...document.querySelectorAll(".day-chk:checked")];
+    if (!checked.length) return;
+    const st = $("bulk-status");
+    st.className = "bulk-status";
+    st.textContent = "Aplicando…";
+    const dias = checked.map(c => c.dataset.dia);
+    let ok = 0, fail = 0;
+    for (const dia of dias) {
+      try {
+        const params = isFlexible
+          ? { action: "setHorario", area, dia, flexible: "true" }
+          : { action: "setHorario", area, dia, entrada, salida };
+        await apiFetch(params);
+        if (!state.horarios[area]) state.horarios[area] = {};
+        state.horarios[area][dia] = isFlexible
+          ? { entrada: "FLEXIBLE", salida: "FLEXIBLE" }
+          : { entrada, salida };
+        const tr = [...document.querySelectorAll("tr[data-dia]")].find(t => t.dataset.dia === dia);
+        if (tr) {
+          const flexChk = tr.querySelector(".flex-chk");
+          if (isFlexible) {
+            tr.querySelector(".inp-entrada").value = "";
+            tr.querySelector(".inp-salida").value = "";
+            if (flexChk && !flexChk.checked) { flexChk.click(); }
+          } else {
+            tr.querySelector(".inp-entrada").value = entrada;
+            tr.querySelector(".inp-salida").value = salida;
+            if (flexChk) { flexChk.checked = false; flexChk.dispatchEvent(new Event("change")); }
+          }
+        }
+        ok++;
+      } catch(e) { fail++; }
+    }
+    updateAreaIndicator(area);
+    st.className = "bulk-status ok";
+    st.textContent = fail ? `✓ ${ok} ok, ✗ ${fail} error` : `✓ ${ok} guardados`;
+    setTimeout(() => { if (st.textContent.startsWith("✓")) st.textContent = ""; }, 4000);
   }
-  btn.disabled = false;
-}
 
 /* ══════════════════════════════════════════════════════
-   UPDATE AREA INDICATOR (after save)
+UPDATE AREA INDICATOR (after save)
 ══════════════════════════════════════════════════════ */
 function updateAreaIndicator(area) {
-  const item = document.querySelector(`.area-item[data-area="${CSS.escape(area)}"]`);
-  if (!item) return;
-  const indicator = item.querySelector(".area-indicator");
-  if (!indicator) return;
-  const hasData = hasHorario(area);
-  indicator.className = "area-indicator " + (hasData ? "has-data" : "no-data");
+const item = document.querySelector(`.area-item[data-area="${CSS.escape(area)}"]`);
+if (!item) return;
+const indicator = item.querySelector(".area-indicator");
+if (!indicator) return;
+const hasData = hasHorario(area);
+indicator.className = "area-indicator " + (hasData ? "has-data" : "no-data");
 }
 
 /* ══════════════════════════════════════════════════════
-   UTILS
+UTILS
 ══════════════════════════════════════════════════════ */
 function escHtml(str) {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+return String(str)
+.replace(/&/g, "&amp;")
+.replace(/</g, "&lt;")
+.replace(/>/g, "&gt;")
+.replace(/"/g, "&quot;");
 }
 
 function escAttr(str) { return escHtml(str); }
 
 /* ══════════════════════════════════════════════════════
-   BOOT
+BOOT
 ══════════════════════════════════════════════════════ */
 (function boot() {
-  initLogin();
-  initBulkBar();
-  if (checkSession()) {
-    showMain();
-    loadHorarios();
-  } else {
-    showLogin();
-  }
+initLogin();
+initBulkBar();
+if (checkSession()) {
+showMain();
+loadHorarios();
+} else {
+showLogin();
+}
 })();
 </script>
 </body>
