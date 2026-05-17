@@ -745,7 +745,24 @@ border-color: #38bdf8;
 .row-extra td { color: #38bdf8; }
     .rchip-flexible { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
     .badge-flexible  { background: rgba(168, 85, 247, 0.2);  color: #a855f7; }
-  </style>
+  
+.btn-horarios {
+  background: #38bdf8;
+  color: #0f172a;
+  border: 1px solid #38bdf8;
+  border-radius: var(--r-xs);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  text-decoration: none;
+  transition: opacity .2s;
+  white-space: nowrap;
+  display: none;
+  align-items: center;
+}
+.btn-horarios:hover { opacity: .85; }
+</style>
 </head>
 <body>
 
@@ -771,6 +788,7 @@ border-color: #38bdf8;
 <header class="hdr">
 <div class="hdr-brand">JANOS <em>&middot;</em> Asistencia</div>
 <div class="hdr-area" id="hdr-area">&mdash;</div>
+<a href="QR_horarios.html" id="link-horarios" class="btn-horarios">Configurar horarios</a>
 <button class="btn-logout" id="btn-logout">Cerrar sesi&oacute;n</button>
 </header>
 
@@ -1059,6 +1077,7 @@ const $fBusqueda = document.getElementById('fBusqueda');
 $logout.addEventListener('click', function() {
 sessionStorage.removeItem('janos_s');
 session = null; allEmps = []; isRangeMode = false;
+	document.getElementById('link-horarios').style.display = 'none';
 $codigo.value = '';
 $dash.classList.remove('on');
 $login.style.display = 'flex';
@@ -1078,6 +1097,7 @@ $login.style.display = 'none';
 $dash.classList.add('on');
 $hdrArea.textContent = session.area === null ? 'Vista completa · RRHH' : session.label;
 $fgArea.style.display = session.area === null ? 'flex' : 'none';
+	document.getElementById('link-horarios').style.display = session.area === null ? 'inline-flex' : 'none';
 var hoy = todayISO();
 if (!$fDesde.value) $fDesde.value = hoy;
 if (!$fHasta.value) $fHasta.value = hoy;
