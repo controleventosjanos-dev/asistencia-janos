@@ -826,7 +826,7 @@ function initBulkBar() {
   }
 
 async function applyBulk() {
-    const area = state.currentArea;
+    const area = state.selectedArea;
     if (!area) return;
     const isFlexible = $("bulk-flex-chk").checked;
     const entrada = $("bulk-entrada").value.trim();
