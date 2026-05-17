@@ -333,6 +333,23 @@ white-space: nowrap;
 
 .row-status.ok { color: var(--green); }
 .row-status.error { color: var(--red); }
+/* flexible */
+.is-flexible { border-left: 3px solid #38bdf8; }
+.flex-toggle { display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
+.flex-toggle input[type="checkbox"] {
+  -webkit-appearance:none; appearance:none;
+  width:36px; height:20px; border-radius:10px;
+  background:#555; cursor:pointer; transition:background .2s;
+  position:relative; flex-shrink:0; vertical-align:middle;
+}
+.flex-toggle input[type="checkbox"]::after {
+  content:""; position:absolute;
+  top:3px; left:3px; width:14px; height:14px;
+  border-radius:50%; background:#fff; transition:left .2s;
+}
+.flex-toggle input[type="checkbox"]:checked { background:#38bdf8; }
+.flex-toggle input[type="checkbox"]:checked::after { left:19px; }
+.is-flexible .inp-entrada, .is-flexible .inp-salida { opacity:.35; pointer-events:none; }
 
 /* ─── BULK APPLY BAR ─── */
 .bulk-bar {
@@ -434,8 +451,8 @@ max-height: 40vh;
 
 .schedule-table th:nth-child(1),
 .schedule-table td:nth-child(1) { display: none; } /* hide checkbox on tiny screens */
-.schedule-table th:nth-child(6),
-.schedule-table td:nth-child(6) { display: none; } /* hide status on tiny screens */
+.schedule-table th:nth-child(7),
+.schedule-table td:nth-child(7) { display: none; } /* hide status on tiny screens */
 .bulk-select-links { margin-left: 0; }
 }
 
@@ -498,7 +515,11 @@ Seleccioná un área para configurar su horario
 <span class="bulk-bar-label">Aplicar a seleccionados</span>
 <input class="time-input" type="time" id="bulk-entrada" aria-label="Entrada masiva" style="width:110px;color-scheme:dark;">
 <input class="time-input" type="time" id="bulk-salida" aria-label="Salida masiva" style="width:110px;color-scheme:dark;">
-<button class="btn-bulk-apply" id="btn-bulk-apply">Aplicar a seleccionados</button>
+<label class="flex-toggle" style="margin:0 8px">
+          <input type="checkbox" id="bulk-flex-chk" aria-label="Flexible masivo">
+          <span style="font-size:13px;color:#bbb">Flexible</span>
+        </label>
+        <button class="btn-bulk-apply" id="btn-bulk-apply">Aplicar a seleccionados</button>
 <span class="bulk-status" id="bulk-status"></span>
 <span class="bulk-select-links">
 <a id="lnk-sel-all">Seleccionar todos</a> | <a id="lnk-desel-all">Deseleccionar todos</a>
@@ -511,6 +532,7 @@ Seleccioná un área para configurar su horario
 <th>Día</th>
 <th>Entrada</th>
 <th>Salida</th>
+          <th>Flexible</th>
 <th></th>
 <th>Estado</th>
 </tr>
@@ -709,171 +731,150 @@ renderScheduleGrid(area);
 RENDER SCHEDULE GRID
 ══════════════════════════════════════════════════════ */
 function renderScheduleGrid(area) {
-const horarios = state.horarios[area] || {};
-const tbody = $("schedule-tbody");
-tbody.innerHTML = "";
-
-DIAS.forEach(dia => {
-const saved = horarios[dia] || {};
-const entrada = saved.entrada || "";
-const salida = saved.salida || "";
-
-const tr = document.createElement("tr");
-tr.dataset.dia = dia;
-
-tr.innerHTML = `
-<td><input class="day-chk" type="checkbox" data-dia="${escAttr(dia)}" aria-label="Seleccionar ${dia}"></td>
-<td class="day-name">${escHtml(dia)}</td>
-<td><input class="time-input inp-entrada" type="time" value="${escAttr(entrada)}" aria-label="Entrada ${dia}"></td>
-<td><input class="time-input inp-salida" type="time" value="${escAttr(salida)}" aria-label="Salida ${dia}"></td>
-<td><button class="btn-save-row" data-area="${escAttr(area)}" data-dia="${escAttr(dia)}">Guardar</button></td>
-<td><span class="row-status"></span></td>
-`;
-
-// Save button handler
-tr.querySelector(".btn-save-row").addEventListener("click", function() {
-const btnEl = this;
-const statusEl = tr.querySelector(".row-status");
-const entradaEl = tr.querySelector(".inp-entrada");
-const salidaEl = tr.querySelector(".inp-salida");
-saveRow(area, dia, entradaEl, salidaEl, btnEl, statusEl);
-});
-
-tbody.appendChild(tr);
-});
-}
+    const horarios = state.horarios[area] || {};
+    const tbody = $("schedule-tbody");
+    tbody.innerHTML = "";
+    DIAS.forEach(dia => {
+      const saved = horarios[dia] || {};
+      const rawEntrada = saved.entrada || "";
+      const isFlexible = rawEntrada === "FLEXIBLE";
+      const entrada = isFlexible ? "" : rawEntrada;
+      const salida = isFlexible ? "" : (saved.salida || "");
+      const tr = document.createElement("tr");
+      tr.dataset.dia = dia;
+      if (isFlexible) tr.classList.add("is-flexible");
+      tr.innerHTML = `
+        <td><input class="day-chk" type="checkbox" data-dia="${escAttr(dia)}" aria-label="Seleccionar ${dia}"></td>
+        <td class="day-name">${escHtml(dia)}</td>
+        <td><input class="time-input inp-entrada" type="time" value="${escAttr(entrada)}" aria-label="Entrada ${dia}"></td>
+        <td><input class="time-input inp-salida" type="time" value="${escAttr(salida)}" aria-label="Salida ${dia}"></td>
+        <td><label class="flex-toggle">
+          <input type="checkbox" class="flex-chk" aria-label="Flexible ${dia}" ${isFlexible ? "checked" : ""}>
+          <span style="font-size:12px;color:#aaa">Flex</span>
+        </label></td>
+        <td><button class="btn-save-row" data-area="${escAttr(area)}" data-dia="${escAttr(dia)}">Guardar</button></td>
+        <td><span class="row-status"></span></td>
+      `;
+      const flexChk = tr.querySelector(".flex-chk");
+      const entradaEl = tr.querySelector(".inp-entrada");
+      const salidaEl = tr.querySelector(".inp-salida");
+      flexChk.addEventListener("change", function() {
+        if (this.checked) tr.classList.add("is-flexible");
+        else tr.classList.remove("is-flexible");
+      });
+      tr.querySelector(".btn-save-row").addEventListener("click", function() {
+        const btnEl = this;
+        const statusEl = tr.querySelector(".row-status");
+        saveRow(area, dia, entradaEl, salidaEl, flexChk, btnEl, statusEl);
+      });
+      tbody.appendChild(tr);
+    });
+  }
 
 /* ══════════════════════════════════════════════════════
 SAVE ROW
 ══════════════════════════════════════════════════════ */
-async function saveRow(area, dia, entradaEl, salidaEl, btnEl, statusEl) {
-const entrada = entradaEl.value.trim();
-const salida = salidaEl.value.trim();
-
-// Validate
-if (!entrada || !salida) {
-statusEl.className = "row-status error";
-statusEl.textContent = "✗ Completá ambos campos";
-return;
-}
-
-btnEl.disabled = true;
-statusEl.className = "row-status";
-statusEl.textContent = "Guardando…";
-
-try {
-await apiFetch({ action: "setHorario", area, dia, entrada, salida });
-
-// Update local state
-if (!state.horarios[area]) state.horarios[area] = {};
-state.horarios[area][dia] = { entrada, salida };
-
-statusEl.className = "row-status ok";
-statusEl.textContent = "✓ Guardado";
-
-// Refresh area indicator in left column
-updateAreaIndicator(area);
-
-// Auto-clear status after 3 s
-setTimeout(() => {
-if (statusEl.textContent === "✓ Guardado") statusEl.textContent = "";
-}, 3000);
-
-} catch(err) {
-statusEl.className = "row-status error";
-statusEl.textContent = `✗ ${err.message}`;
-} finally {
-btnEl.disabled = false;
-}
-}
+async function saveRow(area, dia, entradaEl, salidaEl, flexEl, btnEl, statusEl) {
+    const isFlexible = flexEl.checked;
+    const entrada = entradaEl.value.trim();
+    const salida = salidaEl.value.trim();
+    if (!isFlexible && (!entrada || !salida)) {
+      statusEl.className = "row-status error";
+      statusEl.textContent = "✗ Completá ambos campos";
+      return;
+    }
+    btnEl.disabled = true;
+    statusEl.className = "row-status";
+    statusEl.textContent = "Guardando…";
+    try {
+      const params = isFlexible
+        ? { action: "setHorario", area, dia, flexible: "true" }
+        : { action: "setHorario", area, dia, entrada, salida };
+      await apiFetch(params);
+      if (!state.horarios[area]) state.horarios[area] = {};
+      state.horarios[area][dia] = isFlexible
+        ? { entrada: "FLEXIBLE", salida: "FLEXIBLE" }
+        : { entrada, salida };
+      statusEl.className = "row-status ok";
+      statusEl.textContent = "✓ Guardado";
+      updateAreaIndicator(area);
+      setTimeout(() => { if (statusEl.textContent === "✓ Guardado") statusEl.textContent = ""; }, 3000);
+    } catch(err) {
+      statusEl.className = "row-status error";
+      statusEl.textContent = `✗ ${err.message}`;
+    } finally {
+      btnEl.disabled = false;
+    }
+  }
 
 /* ══════════════════════════════════════════════════════
 BULK APPLY
 ══════════════════════════════════════════════════════ */
 function initBulkBar() {
-$("lnk-sel-all").addEventListener("click", e => {
-e.preventDefault();
-document.querySelectorAll(".day-chk").forEach(c => c.checked = true);
-});
-$("lnk-desel-all").addEventListener("click", e => {
-e.preventDefault();
-document.querySelectorAll(".day-chk").forEach(c => c.checked = false);
-});
-$("btn-bulk-apply").addEventListener("click", applyBulk);
-}
+    $("lnk-sel-all").addEventListener("click", () =>
+      document.querySelectorAll(".day-chk").forEach(c => c.checked = true));
+    $("lnk-desel-all").addEventListener("click", () =>
+      document.querySelectorAll(".day-chk").forEach(c => c.checked = false));
+    $("btn-bulk-apply").addEventListener("click", applyBulk);
+    const bulkFlex = $("bulk-flex-chk");
+    const bulkEnt  = $("bulk-entrada");
+    const bulkSal  = $("bulk-salida");
+    bulkFlex.addEventListener("change", function() {
+      bulkEnt.disabled = this.checked;
+      bulkSal.disabled = this.checked;
+    });
+  }
 
 async function applyBulk() {
-const area = state.selectedArea;
-const entrada = $("bulk-entrada").value.trim();
-const salida = $("bulk-salida").value.trim();
-const statusEl = $("bulk-status");
-const btn = $("btn-bulk-apply");
-
-const checked = Array.from(document.querySelectorAll(".day-chk:checked")).map(c => c.dataset.dia);
-
-statusEl.className = "bulk-status";
-statusEl.textContent = "";
-
-if (!area) {
-statusEl.className = "bulk-status error";
-statusEl.textContent = "✗ Seleccioná un área primero";
-return;
-}
-if (!checked.length) {
-statusEl.className = "bulk-status error";
-statusEl.textContent = "✗ Seleccioná al menos un día";
-return;
-}
-if (!entrada || !salida) {
-statusEl.className = "bulk-status error";
-statusEl.textContent = "✗ Completá Entrada y Salida";
-return;
-}
-
-btn.disabled = true;
-statusEl.className = "bulk-status";
-statusEl.textContent = "Guardando…";
-
-let errors = 0;
-await Promise.all(checked.map(async dia => {
-const tr = document.querySelector(`tr[data-dia="${CSS.escape(dia)}"]`);
-const statusTd = tr ? tr.querySelector(".row-status") : null;
-try {
-await apiFetch({ action: "setHorario", area, dia, entrada, salida });
-if (!state.horarios[area]) state.horarios[area] = {};
-state.horarios[area][dia] = { entrada, salida };
-if (tr) {
-tr.querySelector(".inp-entrada").value = entrada;
-tr.querySelector(".inp-salida").value = salida;
-if (statusTd) {
-statusTd.className = "row-status ok";
-statusTd.textContent = "✓ Guardado";
-setTimeout(() => { if (statusTd.textContent === "✓ Guardado") statusTd.textContent = ""; }, 3000);
-}
-}
-} catch(err) {
-errors++;
-if (statusTd) {
-statusTd.className = "row-status error";
-statusTd.textContent = `✗ ${err.message}`;
-}
-}
-}));
-
-// Deseleccionar todos
-document.querySelectorAll(".day-chk").forEach(c => c.checked = false);
-updateAreaIndicator(area);
-
-if (errors === 0) {
-statusEl.className = "bulk-status ok";
-statusEl.textContent = `✓ ${checked.length} día${checked.length > 1 ? "s" : ""} guardados`;
-setTimeout(() => { if (statusEl.textContent.startsWith("✓")) statusEl.textContent = ""; }, 3000);
-} else {
-statusEl.className = "bulk-status error";
-statusEl.textContent = `✗ ${errors} error${errors > 1 ? "es" : ""}`;
-}
-btn.disabled = false;
-}
+    const area = state.currentArea;
+    if (!area) return;
+    const isFlexible = $("bulk-flex-chk").checked;
+    const entrada = $("bulk-entrada").value.trim();
+    const salida  = $("bulk-salida").value.trim();
+    if (!isFlexible && (!entrada || !salida)) {
+      const st = $("bulk-status");
+      st.className = "bulk-status error";
+      st.textContent = "✗ Completá entrada y salida";
+      return;
+    }
+    const checked = [...document.querySelectorAll(".day-chk:checked")];
+    if (!checked.length) return;
+    const st = $("bulk-status");
+    st.className = "bulk-status";
+    st.textContent = "Aplicando…";
+    const dias = checked.map(c => c.dataset.dia);
+    let ok = 0, fail = 0;
+    for (const dia of dias) {
+      try {
+        const params = isFlexible
+          ? { action: "setHorario", area, dia, flexible: "true" }
+          : { action: "setHorario", area, dia, entrada, salida };
+        await apiFetch(params);
+        if (!state.horarios[area]) state.horarios[area] = {};
+        state.horarios[area][dia] = isFlexible
+          ? { entrada: "FLEXIBLE", salida: "FLEXIBLE" }
+          : { entrada, salida };
+        const tr = [...document.querySelectorAll("tr[data-dia]")].find(t => t.dataset.dia === dia);
+        if (tr) {
+          const flexChk = tr.querySelector(".flex-chk");
+          if (isFlexible) {
+            tr.querySelector(".inp-entrada").value = "";
+            tr.querySelector(".inp-salida").value = "";
+            if (flexChk) { flexChk.checked = true; flexChk.dispatchEvent(new Event("change")); }
+          } else {
+            tr.querySelector(".inp-entrada").value = entrada;
+            tr.querySelector(".inp-salida").value = salida;
+            if (flexChk) { flexChk.checked = false; flexChk.dispatchEvent(new Event("change")); }
+          }
+        }
+        ok++;
+      } catch(e) { fail++; }
+    }
+    updateAreaIndicator(area);
+    st.className = "bulk-status ok";
+    st.textContent = fail ? `✓ ${ok} ok, ✗ ${fail} error` : `✓ ${ok} guardados`;
+    setTimeout(() => { if (st.textContent.startsWith("✓")) st.textContent = ""; }, 4000);
+  }
 
 /* ══════════════════════════════════════════════════════
 UPDATE AREA INDICATOR (after save)
