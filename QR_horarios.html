@@ -156,6 +156,7 @@ font-size: 0.85rem;
 padding: 0.4rem 0.85rem;
 transition: all 0.2s;
 white-space: nowrap;
+  margin-right: 110px;
 }
 
 .btn-logout:hover { border-color: var(--red); color: var(--red); }
@@ -514,6 +515,9 @@ max-height: 40vh;
   .product-brand-by   { font-size: 8px; }
   .product-brand      { right: 12px; top: 10px; }
 }
+
+.app-hdr-title { font-size: 16px; font-weight: 700; white-space: nowrap; }
+.app-hdr-title em { color: var(--accent); font-style: normal; }
 </style>
 </head>
 <body>
@@ -538,7 +542,7 @@ max-height: 40vh;
 <div id="screen-main">
 
 <header class="app-header">
-<div class="brand"><span class="brand-name">FaceCheck</span><span class="brand-by">by Kama</span></div>
+<div class="app-hdr-title"><em>JANO'S</em> – Horarios</div>
 <span class="header-title">Configuración de horarios</span>
 <a href="QR_dashboard.html" class="btn-volver">Volver al dashboard</a>
 <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
