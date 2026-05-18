@@ -568,7 +568,19 @@ Seleccioná un área para configurar su horario
 CONFIG
 ══════════════════════════════════════════════════════ */
 const SHEETS_URL = "https://script.google.com/macros/s/AKfycbxtEFH0vi1lE0Wbife6OelmX3tWLKVb6PVEhy4TlfvWdJnNre1bL4MVl3Gb8FvduDD3ng/exec";
-const CODIGO_RRHH = "rrhh2026";
+const ACCESOS = {
+  "rrhh2026":   { label: "RRHH",          area: null },
+  "coord2026":  { label: "COORDINACION",  area: "COORDINACION" },
+  "oper2026":   { label: "OPERACIONES",   area: "OPERACIONES" },
+  "mant2026":   { label: "MANTENIMIENTO", area: "MANTENIMIENTO" },
+  "djt2026":    { label: "TECNICA/DJ",    area: "TECNICA/DJ" },
+  "gastro2026": { label: "GASTRONOMIA",   area: "GASTRONOMIA" },
+  "com2026":    { label: "COMERCIAL",     area: "COMERCIAL" },
+  "foto2026":   { label: "FOTOGRAFIA",    area: "FOTOGRAFIA" },
+  "port2026":   { label: "PORTERIA",      area: "PORTERIA" },
+  "seg2026":    { label: "SEGURIDAD",     area: "SEGURIDAD" }
+};
+const SESSION_AREA_KEY = 'hor_area';
 const DIAS = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
 const SESSION_KEY = "janos_horarios_auth";
 
@@ -580,6 +592,7 @@ areas: [], // ["Area1", ...]
 horarios: {}, // { "Area": { "Lunes": { entrada, salida }, ... } }
 conteo: {}, // { "Area": N }
 selectedArea: null,
+userArea: null,
 };
 
 /* ══════════════════════════════════════════════════════
@@ -620,6 +633,8 @@ sessionStorage.setItem(SESSION_KEY, "1");
 
 function clearSession() {
 sessionStorage.removeItem(SESSION_KEY);
+sessionStorage.removeItem(SESSION_AREA_KEY);
+state.userArea = null;
 }
 
 function showLogin() {
@@ -644,8 +659,11 @@ function attempt() {
 errDiv.textContent = "";
 const val = input.value.trim();
 if (!val) return;
-if (val === CODIGO_RRHH) {
+const acc = ACCESOS[val];
+if (acc) {
 saveSession();
+  state.userArea = acc.area;
+  sessionStorage.setItem(SESSION_AREA_KEY, acc.area === null ? '' : acc.area);
 input.value = "";
 showMain();
 loadHorarios();
@@ -699,7 +717,8 @@ return;
 }
 
 const frag = document.createDocumentFragment();
-state.areas.forEach(area => {
+const areasToShow = state.userArea ? state.areas.filter(a => a === state.userArea) : state.areas;
+areasToShow.forEach(area => {
 const item = document.createElement("div");
 item.className = "area-item" + (state.selectedArea === area ? " active" : "");
 item.dataset.area = area;
@@ -720,6 +739,7 @@ frag.appendChild(item);
 
 $("areas-list").innerHTML = "";
 $("areas-list").appendChild(frag);
+  if (state.userArea && areasToShow.length === 1) { selectArea(state.userArea); }
 }
 
 /* ══════════════════════════════════════════════════════
@@ -926,6 +946,8 @@ BOOT
 initLogin();
 initBulkBar();
 if (checkSession()) {
+  const _sa = sessionStorage.getItem(SESSION_AREA_KEY);
+  state.userArea = (_sa !== null && _sa !== '') ? _sa : null;
 showMain();
 loadHorarios();
 } else {
