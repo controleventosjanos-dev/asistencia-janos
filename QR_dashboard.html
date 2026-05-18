@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JANOS &middot; Asistencia</title>
+<title>FaceCheck by Kama</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -762,6 +762,11 @@ border-color: #38bdf8;
   align-items: center;
 }
 .btn-horarios:hover { opacity: .85; }
+
+/* FaceCheck branding */
+.brand { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-name { font-size: 18px; font-weight: 700; color: #e2e8f0; }
+.brand-by { font-size: 10px; color: #94a3b8; letter-spacing: 1px; text-transform: uppercase; }
 </style>
 </head>
 <body>
@@ -770,8 +775,7 @@ border-color: #38bdf8;
 <div id="screen-login">
 <div class="login-card">
 <div class="login-logo">
-<div class="brand">JANOS <em>&middot;</em> Asistencia</div>
-<div class="brand-sub">Panel de control de asistencia</div>
+<div class="brand"><span class="brand-name">FaceCheck</span><span class="brand-by">by Kama</span></div>
 </div>
 <div class="fgroup">
 <label for="inp-codigo">C&oacute;digo de acceso</label>
@@ -786,7 +790,7 @@ border-color: #38bdf8;
 <div id="screen-dashboard">
 
 <header class="hdr">
-<div class="hdr-brand">JANOS <em>&middot;</em> Asistencia</div>
+<div class="brand"><span class="brand-name">FaceCheck</span><span class="brand-by">by Kama</span></div>
 <div class="hdr-area" id="hdr-area">&mdash;</div>
 <a href="QR_horarios.html" id="link-horarios" class="btn-horarios">Configurar horarios</a>
 <button class="btn-logout" id="btn-logout">Cerrar sesi&oacute;n</button>
