@@ -119,6 +119,7 @@ min-height: 1.2em;
 
 /* Header */
 .app-header {
+  position: relative;
 background: var(--surface);
 border-bottom: 1px solid var(--border);
 padding: 0.85rem 1.5rem;
@@ -483,6 +484,36 @@ max-height: 40vh;
 .brand { display: flex; flex-direction: column; line-height: 1.1; }
 .brand-name { font-size: 18px; font-weight: 700; color: #e2e8f0; }
 .brand-by { font-size: 10px; color: #94a3b8; letter-spacing: 1px; text-transform: uppercase; }
+
+.product-brand {
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  text-align: right;
+  pointer-events: none;
+  z-index: 5;
+}
+.product-brand-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+  letter-spacing: 0.3px;
+}
+.product-brand-by {
+  font-size: 9px;
+  color: #94a3b8;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+@media (max-width: 600px) {
+  .product-brand-name { font-size: 12px; }
+  .product-brand-by   { font-size: 8px; }
+  .product-brand      { right: 12px; top: 10px; }
+}
 </style>
 </head>
 <body>
@@ -511,7 +542,12 @@ max-height: 40vh;
 <span class="header-title">Configuración de horarios</span>
 <a href="QR_dashboard.html" class="btn-volver">Volver al dashboard</a>
 <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
-</header>
+
+    <div class="product-brand">
+      <span class="product-brand-name">FaceCheck</span>
+      <span class="product-brand-by">by Kama</span>
+    </div>
+  </header>
 
 <div class="main-content">
 
