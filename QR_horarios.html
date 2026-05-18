@@ -592,7 +592,7 @@ areas: [], // ["Area1", ...]
 horarios: {}, // { "Area": { "Lunes": { entrada, salida }, ... } }
 conteo: {}, // { "Area": N }
 selectedArea: null,
-userArea: null,
+session: null,
 };
 
 /* ══════════════════════════════════════════════════════
@@ -634,7 +634,7 @@ sessionStorage.setItem(SESSION_KEY, "1");
 function clearSession() {
 sessionStorage.removeItem(SESSION_KEY);
 sessionStorage.removeItem(SESSION_AREA_KEY);
-state.userArea = null;
+state.session = null;
 }
 
 function showLogin() {
@@ -662,7 +662,7 @@ if (!val) return;
 const acc = ACCESOS[val];
 if (acc) {
 saveSession();
-  state.userArea = acc.area;
+  state.session = { area: acc.area };
   sessionStorage.setItem(SESSION_AREA_KEY, acc.area === null ? '' : acc.area);
 input.value = "";
 showMain();
@@ -717,7 +717,7 @@ return;
 }
 
 const frag = document.createDocumentFragment();
-const areasToShow = state.userArea ? state.areas.filter(a => a === state.userArea) : state.areas;
+const areasToShow = (state.session && state.session.area) ? state.areas.filter(a => a === state.session.area) : state.areas;
 areasToShow.forEach(area => {
 const item = document.createElement("div");
 item.className = "area-item" + (state.selectedArea === area ? " active" : "");
@@ -739,7 +739,7 @@ frag.appendChild(item);
 
 $("areas-list").innerHTML = "";
 $("areas-list").appendChild(frag);
-  if (state.userArea && areasToShow.length === 1) { selectArea(state.userArea); }
+  if (state.session && state.session.area !== null && state.areas.includes(state.session.area)) { selectArea(state.session.area); }
 }
 
 /* ══════════════════════════════════════════════════════
@@ -947,7 +947,7 @@ initLogin();
 initBulkBar();
 if (checkSession()) {
   const _sa = sessionStorage.getItem(SESSION_AREA_KEY);
-  state.userArea = (_sa !== null && _sa !== '') ? _sa : null;
+  state.session = { area: (_sa !== null && _sa !== '') ? _sa : null };
 showMain();
 loadHorarios();
 } else {
