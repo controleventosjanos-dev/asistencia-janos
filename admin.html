@@ -42,48 +42,17 @@
 .brand-name { font-size: 18px; font-weight: 700; color: #e2e8f0; }
 .brand-by { font-size: 10px; color: #94a3b8; letter-spacing: 1px; text-transform: uppercase; }
 
-.product-brand {
-  position: fixed;
-  right: 16px;
-  top: 12px;
-  display: flex;
-  flex-direction: column;
-  line-height: 1.05;
-  text-align: right;
-  pointer-events: none;
-  z-index: 99;
-}
-.product-brand-name {
-  font-size: 14px;
-  font-weight: 700;
-  color: #e2e8f0;
-  letter-spacing: 0.3px;
-}
-.product-brand-by {
-  font-size: 9px;
-  color: #94a3b8;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-@media (max-width: 600px) {
-  .product-brand-name { font-size: 12px; }
-  .product-brand-by   { font-size: 8px; }
-  .product-brand      { right: 12px; top: 10px; }
-}
-    .admin-title{text-align:center;font-size:1.1rem;font-weight:700;color:#e2e8f0;margin-bottom:16px;letter-spacing:0.3px}
+
+    .admin-title{text-align:center;font-size:2rem;font-weight:700;color:#e2e8f0;margin-bottom:16px;letter-spacing:0.3px}
     .admin-title em{color:#38bdf8;font-style:normal}
 </style>
 </head>
 <body>
-<div class="product-brand"><span class="product-brand-name">FaceCheck</span><span class="product-brand-by">by Kama</span></div>
-
 <div class="logo">🪩</div>
+<div class="admin-title"><em>JANO'S</em></div>
 <div class="brand"><span class="brand-name">FaceCheck</span><span class="brand-by">by Kama</span></div>
 
-<div class="admin-title"><em>JANO'S</em> – Asistencia</div>
-
-<div class="card">
+iv class="card">
   <div class="field">
     <label>DNI del empleado *</label>
     <input type="text" id="dni" placeholder="Ej: 38521744" inputmode="numeric" maxlength="10">
