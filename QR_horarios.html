@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JANOS · Horarios</title>
+<title>FaceCheck by Kama</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -478,6 +478,11 @@ max-height: 40vh;
   align-items: center;
 }
 .btn-volver:hover { opacity: .85; }
+
+/* FaceCheck branding */
+.brand { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-name { font-size: 18px; font-weight: 700; color: #e2e8f0; }
+.brand-by { font-size: 10px; color: #94a3b8; letter-spacing: 1px; text-transform: uppercase; }
 </style>
 </head>
 <body>
@@ -485,7 +490,7 @@ max-height: 40vh;
 <!-- ═══════════════════════════════════ SCREEN 1 — LOGIN ═══════════════════════════════════ -->
 <div id="screen-login">
 <div class="login-card">
-<div class="login-logo">JANOS</div>
+<div class="brand"><span class="brand-name">FaceCheck</span><span class="brand-by">by Kama</span></div>
 <div class="login-subtitle">Horarios</div>
 
 <div class="form-group">
@@ -502,7 +507,7 @@ max-height: 40vh;
 <div id="screen-main">
 
 <header class="app-header">
-<span class="header-brand">JANOS</span>
+<div class="brand"><span class="brand-name">FaceCheck</span><span class="brand-by">by Kama</span></div>
 <span class="header-title">Configuración de horarios</span>
 <a href="QR_dashboard.html" class="btn-volver">Volver al dashboard</a>
 <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
