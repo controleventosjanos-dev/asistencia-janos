@@ -35,7 +35,6 @@
   .gps-wait{background:#1e3a5f;color:#93c5fd}
   .spinner{display:inline-block;width:18px;height:18px;border:3px solid #334155;border-top-color:#38bdf8;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .cam-locked{opacity:.4;pointer-events:none;user-select:none}
   .zone-tag{font-size:.75rem;color:#64748b;margin-left:4px}
 
 /* FaceCheck branding */
@@ -47,6 +46,8 @@
     .admin-title{text-align:center;font-size:2rem;font-weight:700;color:#e2e8f0;margin-bottom:16px;letter-spacing:0.3px}
     .admin-title em{color:#38bdf8;font-style:normal}
 .admin-subtitle{text-align:center;font-size:1rem;color:#94a3b8;margin-bottom:10px;font-weight:500;letter-spacing:0.5px}
+
+  .cam-locked{opacity:.4;pointer-events:none;user-select:none}
 </style>
 </head>
 <body>
@@ -57,17 +58,17 @@
 <div class="card">
   <div class="field">
     <label>DNI del empleado *</label>
-    <input type="text" id="dni" placeholder="Ej: 38521744" inputmode="numeric" maxlength="10">
-    <div id="dniStatus" style="display:none;margin-top:8px;padding:10px 14px;border-radius:8px;font-size:.85rem;font-weight:600"></div>
+    <input type="text" id="dni" placeholder="Ej: 38521744" inputmode="numeric" maxlength="10" onblur="checkDni()">
+  <div id="dniStatus" style="display:none;margin-top:8px;padding:10px 14px;border-radius:8px;font-size:.85rem;font-weight:600"></div>
   </div>
   <div class="field">
     <label>Nombre completo *</label>
-    <input type="text" id="nombre" placeholder="Ej: MarÃÂ­a LÃÂ³pez" autocomplete="off">
+    <input type="text" id="nombre" placeholder="Ej: María López" autocomplete="off">
   </div>
   <div class="field">
-    <label>SalÃÂ³n *</label>
+    <label>Salón *</label>
     <select id="salon">
-      <option value="">Ã¢ÂÂ SeleccionÃÂ¡ un salÃÂ³n Ã¢ÂÂ</option>
+      <option value="">— Seleccioná un salón —</option>
       <optgroup label="CABA">
         <option value="CABA Boutique" data-lat="-34.60696947952881" data-lng="-58.38446560235706">CABA Boutique</option>
         <option value="Caballito 1" data-lat="-34.60976055210654" data-lng="-58.4400598">Caballito 1</option>
@@ -78,7 +79,7 @@
         <option value="Darwin 1" data-lat="-34.5886717288581" data-lng="-58.43687601534143">Darwin 1</option>
         <option value="Darwin 2" data-lat="-34.5886717288581" data-lng="-58.43687601534143">Darwin 2</option>
         <option value="DOT" data-lat="-34.54635161803416" data-lng="-58.48787506064081">DOT</option>
-        <option value="NuÃÂ±ez" data-lat="-34.54218327080488" data-lng="-58.45969217301391">NuÃÂ±ez</option>
+        <option value="Nuñez" data-lat="-34.54218327080488" data-lng="-58.45969217301391">Nuñez</option>
         <option value="Palermo Hollywood" data-lat="-34.57802364353802" data-lng="-58.43768630184958">Palermo Hollywood</option>
         <option value="Palermo Soho" data-lat="-34.5920897560759" data-lng="-58.43083028650607">Palermo Soho</option>
         <option value="Paseo Colon" data-lat="-34.61123555454792" data-lng="-58.36965475270821">Paseo Colon</option>
@@ -170,16 +171,16 @@
   </div>
 </div>
 
-<div class="card" id="camCard">
+<div class="card">
   <label>Foto del empleado *</label>
   <video id="video" autoplay playsinline muted></video>
   <canvas id="canvas"></canvas>
   <img id="preview" alt="Foto capturada">
-  <button class="btn btn-cam" onclick="tomarFoto()">Ã°ÂÂÂ· Tomar foto</button>
-  <button class="btn btn-flip" onclick="flipCam()">Ã°ÂÂÂ Cambiar cÃÂ¡mara</button>
+  <button class="btn btn-cam" onclick="tomarFoto()">📷 Tomar foto</button>
+  <button class="btn btn-flip" onclick="flipCam()">🔄 Cambiar cámara</button>
 </div>
 
-<button class="btn btn-reg" id="btnReg" onclick="registrar()" disabled>Ã¢ÂÂ Registrar empleado</button>
+<button class="btn btn-reg" id="btnReg" onclick="registrar()" disabled>✅ Registrar empleado</button>
 <div id="msg"></div>
 
 <script>
@@ -191,64 +192,61 @@ var stream = null, facing = 'user', fotoB64 = null, dniValidado = false;
 async function checkDni() {
   var dni = document.getElementById('dni').value.trim();
   var st  = document.getElementById('dniStatus');
-  if (!dni || dni.length < 6) {
-    st.style.display = 'none';
-    dniValidado = false;
-    bloquearCam(true);
-    actualizarBoton();
-    return;
-  }
-  st.innerHTML = '<span class="spinner"></span> Verificando DNI...';
-  st.className = 'warn';
+  if (!dni || dni.length < 6) { dniValidado = false; actualizarBoton(); return; }
   st.style.display = 'block';
+  st.style.background = '#1e293b';
+  st.style.color = '#94908a';
+  st.textContent = '🔍 Verificando DNI...';
   dniValidado = false;
-  bloquearCam(true);
+  actualizarBoton();
   try {
     var r = await fetch(SHEETS_URL + '?action=validarDni&dni=' + encodeURIComponent(dni));
     var d = await r.json();
-    if (!d.ok) {
-      st.textContent = '✗ Error al verificar: ' + (d.error || 'inténtelo de nuevo');
-      st.className = 'err';
-    } else if (!d.encontrado) {
-      st.textContent = '✗ DNI no encontrado en el sistema';
-      st.className = 'err';
+    if (!d.ok) throw new Error(d.error || 'Error en servidor');
+    if (!d.encontrado) {
+      st.style.background = '#450a0a';
+      st.style.color = '#fca5a5';
+      st.textContent = '✗ DNI no encontrado en el sistema. Solicitá a RRHH que lo registre.';
+      dniValidado = false;
     } else if (d.yaRegistrado) {
-      st.textContent = '⚠ ' + (d.datos.nombre || '') + ' ya tiene rostro registrado. Para actualizar contacte al administrador.';
-      st.className = 'warn';
-      autocompletar(d.datos);
+      st.style.background = '#422006';
+      st.style.color = '#fdba74';
+      st.innerHTML = '⚠ Este empleado ya tiene rostro registrado. ¿Querés actualizarlo?<br><button onclick="confirmarUpdate()" style="margin-top:6px;padding:4px 12px;border-radius:6px;background:#f97316;color:white;border:none;cursor:pointer;font-size:.8rem">Sí, actualizar</button>';
+      if (d.datos) { document.getElementById('nombre').value = d.datos.nombre || ''; }
+      dniValidado = false;
     } else {
-      st.textContent = '✓ ' + (d.datos.nombre || '') + (d.datos.area ? '  ·  ' + d.datos.area : '') + (d.datos.sector ? '  ·  ' + d.datos.sector : '');
-      st.className = 'ok';
+      st.style.background = '#052e16';
+      st.style.color = '#86efac';
+      st.textContent = '✓ Empleado encontrado. Podés continuar con el registro.';
+      if (d.datos) { document.getElementById('nombre').value = d.datos.nombre || ''; }
       dniValidado = true;
-      autocompletar(d.datos);
-      bloquearCam(false);
     }
   } catch(e) {
-    st.textContent = '⚠ Sin conexión – verifique manualmente';
-    st.className = 'warn';
-    dniValidado = true;
-    bloquearCam(false);
+    st.style.background = '#1e293b';
+    st.style.color = '#f87171';
+    st.textContent = '⚠ Error al verificar el DNI. Revisá la conexión.';
+    dniValidado = false;
   }
   actualizarBoton();
 }
 
-function autocompletar(datos) {
-  if (!datos) return;
-  if (datos.nombre) document.getElementById('nombre').value = datos.nombre;
-  if (datos.sector) {
-    var sel = document.getElementById('salon');
-    for (var i = 0; i < sel.options.length; i++) {
-      if (sel.options[i].value === datos.sector) { sel.selectedIndex = i; break; }
-    }
-  }
+function confirmarUpdate() {
+  dniValidado = true;
+  var st = document.getElementById('dniStatus');
+  st.style.background = '#052e16';
+  st.style.color = '#86efac';
+  st.textContent = '✓ Actualización confirmada. Tomá la nueva foto.';
   actualizarBoton();
 }
 
-function bloquearCam(lock) {
-  var card = document.getElementById('camCard');
-  if (card) card.classList.toggle('cam-locked', lock);
+function actualizarBoton() {
+  var nombre = document.getElementById('nombre').value.trim();
+  var salon  = document.getElementById('salon').value;
+  document.getElementById('btnReg').disabled = !(dniValidado && nombre && salon && fotoB64);
+  var card = document.querySelector('.cam-section');
+  if (card) card.classList.toggle('cam-locked', !dniValidado);
 }
-// === FIN MÓDULO B ===
+
 
 async function iniciarCam(f) {
   if (stream) stream.getTracks().forEach(t => t.stop());
@@ -263,7 +261,7 @@ async function iniciarCam(f) {
     fotoB64 = null;
     actualizarBoton();
   } catch(e) {
-    mostrar('No se pudo acceder a la cÃÂ¡mara: ' + e.message, 'err');
+    mostrar('No se pudo acceder a la cámara: ' + e.message, 'err');
   }
 }
 
@@ -289,64 +287,67 @@ function tomarFoto() {
 }
 
 function actualizarBoton() {
+  var dni    = document.getElementById('dni').value.trim();
   var nombre = document.getElementById('nombre').value.trim();
   var salon  = document.getElementById('salon').value;
-  document.getElementById('btnReg').disabled = !(dniValidado && nombre && salon && fotoB64);
+  document.getElementById('btnReg').disabled = !(dni && nombre && salon && fotoB64);
 }
 
-['nombre','salon'].forEach(id => {
+['dni','nombre','salon'].forEach(id => {
   document.getElementById(id).addEventListener('input', actualizarBoton);
 });
-document.getElementById('dni').addEventListener('input', function() {
-  dniValidado = false;
-  bloquearCam(true);
-  document.getElementById('dniStatus').style.display = 'none';
-  actualizarBoton();
-});
-document.getElementById('dni').addEventListener('blur', checkDni);
-
-iniciarCam(facing);
-bloquearCam(true);
 
 async function registrar() {
   var dni    = document.getElementById('dni').value.trim();
   var nombre = document.getElementById('nombre').value.trim();
   var salon  = document.getElementById('salon').value;
-  if (!dni || !nombre || !salon || !fotoB64 || !dniValidado) return;
-  document.getElementById('btnReg').disabled = true;
-  mostrar('️￼ Enviando...', 'warn');
+  var btn    = document.getElementById('btnReg');
+
+  if (!dni || !nombre || !salon || !fotoB64) {
+    mostrar('Completá todos los campos y tomá una foto', 'warn');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Registrando...';
+  mostrar('', '');
+
   try {
-    var res = await fetch(API_URL, {
+    var res = await fetch(API_URL + '/registrar', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ action: 'enrollFace', dni, nombre, salon, fotoB64 })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ employeeId: dni, nombre: nombre, salon: salon, imageBase64: fotoB64 })
     });
-    var j = await res.json();
-    if (j.ok || j.status === 'ok') {
-      mostrar('☓ Registrado correctamente', 'ok');
-      document.getElementById('dni').value = '';
+    var data = await res.json();
+    if (!res.ok) { mostrar('❌ ' + (data.Message || data.error || 'Error ' + res.status), 'err'); } else if (data.ok) {
+      mostrar('✅ ' + nombre + ' registrado correctamente en ' + salon + '\nDNI: ' + dni + '\nFaceId: ' + data.employeeId, 'ok'); fetch(SHEETS_URL+'?action=nuevo_empleado&employeeId='+encodeURIComponent(dni)+'&nombre='+encodeURIComponent(nombre)+'&salon='+encodeURIComponent(salon),{mode:'no-cors'}).catch(function(){});
+      document.getElementById('dni').value   = '';
       document.getElementById('nombre').value = '';
-      document.getElementById('salon').selectedIndex = 0;
-      document.getElementById('dniStatus').style.display = 'none';
-      dniValidado = false;
+      document.getElementById('salon').value  = '';
+      fotoB64 = null;
+      document.getElementById('preview').style.display = 'none';
       iniciarCam(facing);
-      bloquearCam(true);
     } else {
-      mostrar('✗ ' + (j.error || 'Error al registrar'), 'err');
-      document.getElementById('btnReg').disabled = false;
+      mostrar('❌ ' + (data.error || 'Error desconocido'), 'err');
     }
   } catch(e) {
-    mostrar('⚠ Error de red: ' + e.message, 'err');
-    document.getElementById('btnReg').disabled = false;
+    mostrar('❌ Error de conexión: ' + e.message, 'err');
   }
+
+  btn.disabled = false;
+  btn.innerHTML = '✅ Registrar empleado';
+  actualizarBoton();
 }
 
-function mostrar(text, type) {
-  var m = document.getElementById('msg');
-  m.textContent = text;
-  m.className = type;
-  m.style.display = 'block';
+function mostrar(txt, tipo) {
+  var el = document.getElementById('msg');
+  if (!txt) { el.style.display = 'none'; return; }
+  el.textContent = txt;
+  el.className = tipo;
+  el.style.display = 'block';
 }
+
+iniciarCam(facing);
 </script>
 </body>
 </html>
