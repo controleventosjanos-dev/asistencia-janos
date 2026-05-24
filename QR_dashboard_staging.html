@@ -1093,8 +1093,9 @@ const $placeholder = document.getElementById('grid-placeholder');
 const $fBusqueda = document.getElementById('fBusqueda');
 
 $logout.addEventListener('click', function() {
-s  document.getElementById('link-horarios').style.display = 'none';
-essionStorage.removeItem('janos_s');
+
+document.getElementById('link-horarios').style.display = 'none';
+sessionStorage.removeItem('janos_s');
 session = null; allEmps = []; isRangeMode = false;
 $codigo.value = '';
 $dash.classList.remove('on');
