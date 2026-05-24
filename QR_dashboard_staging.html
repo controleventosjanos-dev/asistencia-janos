@@ -745,6 +745,22 @@ border-color: #38bdf8;
 .row-extra td { color: #38bdf8; }
     .rchip-flexible { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
     .badge-flexible  { background: rgba(168, 85, 247, 0.2);  color: #a855f7; }
+/* ── Horario personalizado (override individual) ── */
+.modal-ovr-dias { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.modal-ovr-dia-label { display:flex; align-items:center; gap:4px; font-size:13px; color:var(--text); cursor:pointer; user-select:none; }
+.modal-ovr-dia-label input[type=checkbox] { accent-color:var(--accent); width:14px; height:14px; cursor:pointer; }
+.modal-ovr-tiempo { display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+.modal-ovr-tiempo label { font-size:12px; color:var(--muted); }
+.modal-ovr-tiempo input[type=time] { background:rgba(255,255,255,.07); border:1px solid var(--border); border-radius:var(--r-xs); color:var(--text); padding:4px 8px; font-size:13px; }
+.modal-ovr-tiempo input[type=time]:focus { outline:none; border-color:var(--accent); }
+.modal-ovr-btns { display:flex; gap:8px; }
+.modal-ovr-save { background:var(--accent); color:#0f172a; border:none; border-radius:var(--r-xs); padding:6px 18px; font-size:13px; font-weight:600; cursor:pointer; }
+.modal-ovr-save:hover { opacity:.85; }
+.modal-ovr-remove { background:transparent; color:var(--red); border:1px solid var(--red); border-radius:var(--r-xs); padding:6px 18px; font-size:13px; cursor:pointer; }
+.modal-ovr-remove:hover { background:rgba(239,68,68,.1); }
+.modal-ovr-msg { font-size:12px; margin-top:8px; min-height:16px; }
+.modal-ovr-msg.ok  { color:#4ade80; }
+.modal-ovr-msg.err { color:var(--red); }
   </style>
 </head>
 <body>
@@ -1369,14 +1385,14 @@ fetch(url, { redirect:'follow', credentials:'omit' })
 .then(function(data) {
 if (!data.ok) throw new Error(data.error || 'Error del servidor');
 $modalSub.textContent = (data.empleado.salon || '') + (data.empleado.area ? ' · ' + data.empleado.area : '');
-renderModalContent(data);
+renderModalContent(data, emp.id);
 })
 .catch(function(err) {
 $modalBody.innerHTML = '<div class="modal-empty">⚠ ' + esc(err.message) + '</div>';
 });
 }
 
-function renderModalContent(data) {
+function renderModalContent(data, empId) {
 var html = '';
 
 html += '<div class="modal-section-title">Horario base</div>';
@@ -1396,6 +1412,25 @@ html += '<div class="modal-horario-row">'
 });
 html += '</div>';
 }
+
+html += '<div class="modal-section-title">Horario personalizado</div>';
+html += '<div id="ovr-block">';
+html += '<div class="modal-ovr-dias">';
+['Lunes','Martes','Mi\u00e9rcoles','Jueves','Viernes','S\u00e1bado','Domingo'].forEach(function(d) {
+var sid = 'ovr-' + d.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+html += '<label class="modal-ovr-dia-label"><input type="checkbox" id="' + sid + '" value="' + esc(d) + '"> ' + esc(d) + '</label>';
+});
+html += '</div>';
+html += '<div class="modal-ovr-tiempo">';
+html += '<label>Entrada</label><input type="time" id="ovr-entrada">';
+html += '<label>Salida</label><input type="time" id="ovr-salida">';
+html += '</div>';
+html += '<div class="modal-ovr-btns">';
+html += '<button class="modal-ovr-save" id="ovr-save">Guardar</button>';
+html += '<button class="modal-ovr-remove" id="ovr-remove">Borrar override</button>';
+html += '</div>';
+html += '<div class="modal-ovr-msg" id="ovr-msg"></div>';
+html += '</div>';
 
 html += '<div class="modal-section-title">Historial</div>';
 var regs = (data.registros || []).slice().sort(function(a, b) {
@@ -1449,6 +1484,48 @@ html += '</tbody></table></div>';
 }
 
 $modalBody.innerHTML = html;
+
+// ── Override handlers ────────────────────────────
+var DIAS_OVR = ['Lunes','Martes','Mi\u00e9rcoles','Jueves','Viernes','S\u00e1bado','Domingo'];
+function ovrDiaId(d) { return 'ovr-' + d.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase(); }
+function ovrFetch(jornada, horario, cb) {
+var url = SHEETS_URL + '?action=setHorarioEmpleado'
++ '&id='      + encodeURIComponent(empId || '')
++ '&jornada=' + encodeURIComponent(jornada)
++ '&horario=' + encodeURIComponent(horario);
+var msg = document.getElementById('ovr-msg');
+if (msg) { msg.textContent = 'Guardando\u2026'; msg.className = 'modal-ovr-msg'; }
+fetch(url, { redirect:'follow', credentials:'omit' })
+.then(function(r) { return r.json(); })
+.then(function(res) {
+if (msg) { msg.textContent = res.ok ? '\u2713 Listo' : '\u26a0 ' + (res.error || 'Error'); msg.className = 'modal-ovr-msg ' + (res.ok ? 'ok' : 'err'); }
+if (cb) cb(res.ok);
+})
+.catch(function() { if (msg) { msg.textContent = '\u26a0 Error de red'; msg.className = 'modal-ovr-msg err'; } });
+}
+var $ovrSave   = document.getElementById('ovr-save');
+var $ovrRemove = document.getElementById('ovr-remove');
+if ($ovrSave) {
+$ovrSave.addEventListener('click', function() {
+var dias = DIAS_OVR.filter(function(d) { var el = document.getElementById(ovrDiaId(d)); return el && el.checked; });
+var entrada = (document.getElementById('ovr-entrada').value || '').trim();
+var salida  = (document.getElementById('ovr-salida').value  || '').trim();
+var msg = document.getElementById('ovr-msg');
+if (!dias.length || !entrada || !salida) { if (msg) { msg.textContent = 'Seleccion\u00e1 al menos un d\u00eda, entrada y salida.'; msg.className = 'modal-ovr-msg err'; } return; }
+ovrFetch(dias.join(','), entrada + '-' + salida, null);
+});
+}
+if ($ovrRemove) {
+$ovrRemove.addEventListener('click', function() {
+ovrFetch('', '', function(ok) {
+if (!ok) return;
+DIAS_OVR.forEach(function(d) { var el = document.getElementById(ovrDiaId(d)); if (el) el.checked = false; });
+var ei = document.getElementById('ovr-entrada'); if (ei) ei.value = '';
+var si = document.getElementById('ovr-salida');  if (si) si.value = '';
+});
+});
+}
+// ────────────────────────────────────────────────
 
 $modalBody.querySelectorAll('.modal-filter-btn').forEach(function(btn) {
 btn.addEventListener('click', function() {
