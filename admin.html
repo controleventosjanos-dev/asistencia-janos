@@ -46,6 +46,8 @@
     .admin-title{text-align:center;font-size:2rem;font-weight:700;color:#e2e8f0;margin-bottom:16px;letter-spacing:0.3px}
     .admin-title em{color:#38bdf8;font-style:normal}
 .admin-subtitle{text-align:center;font-size:1rem;color:#94a3b8;margin-bottom:10px;font-weight:500;letter-spacing:0.5px}
+
+  .cam-locked{opacity:.4;pointer-events:none;user-select:none}
 </style>
 </head>
 <body>
@@ -56,7 +58,8 @@
 <div class="card">
   <div class="field">
     <label>DNI del empleado *</label>
-    <input type="text" id="dni" placeholder="Ej: 38521744" inputmode="numeric" maxlength="10">
+    <input type="text" id="dni" placeholder="Ej: 38521744" inputmode="numeric" maxlength="10" onblur="checkDni()">
+  <div id="dniStatus" style="display:none;margin-top:8px;padding:10px 14px;border-radius:8px;font-size:.85rem;font-weight:600"></div>
   </div>
   <div class="field">
     <label>Nombre completo *</label>
@@ -183,7 +186,67 @@
 <script>
 const API_URL = 'https://nha46wbuoo7ajwqqrsgzycavfi0rbcqh.lambda-url.us-east-2.on.aws'; const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxtEFH0vi1lE0Wbife6OelmX3tWLKVb6PVEhy4TlfvWdJnNre1bL4MVl3Gb8FvduDD3ng/exec';
 
-var stream = null, facing = 'user', fotoB64 = null;
+var stream = null, facing = 'user', fotoB64 = null, dniValidado = false;
+
+// === MÓDULO B — Validación de DNI ===
+async function checkDni() {
+  var dni = document.getElementById('dni').value.trim();
+  var st  = document.getElementById('dniStatus');
+  if (!dni || dni.length < 6) { dniValidado = false; actualizarBoton(); return; }
+  st.style.display = 'block';
+  st.style.background = '#1e293b';
+  st.style.color = '#94908a';
+  st.textContent = '🔍 Verificando DNI...';
+  dniValidado = false;
+  actualizarBoton();
+  try {
+    var r = await fetch(SHEETS_URL + '?action=validarDni&dni=' + encodeURIComponent(dni));
+    var d = await r.json();
+    if (!d.ok) throw new Error(d.error || 'Error en servidor');
+    if (!d.encontrado) {
+      st.style.background = '#450a0a';
+      st.style.color = '#fca5a5';
+      st.textContent = '✗ DNI no encontrado en el sistema. Solicitá a RRHH que lo registre.';
+      dniValidado = false;
+    } else if (d.yaRegistrado) {
+      st.style.background = '#422006';
+      st.style.color = '#fdba74';
+      st.innerHTML = '⚠ Este empleado ya tiene rostro registrado. ¿Querés actualizarlo?<br><button onclick="confirmarUpdate()" style="margin-top:6px;padding:4px 12px;border-radius:6px;background:#f97316;color:white;border:none;cursor:pointer;font-size:.8rem">Sí, actualizar</button>';
+      if (d.datos) { document.getElementById('nombre').value = d.datos.nombre || ''; }
+      dniValidado = false;
+    } else {
+      st.style.background = '#052e16';
+      st.style.color = '#86efac';
+      st.textContent = '✓ Empleado encontrado. Podés continuar con el registro.';
+      if (d.datos) { document.getElementById('nombre').value = d.datos.nombre || ''; }
+      dniValidado = true;
+    }
+  } catch(e) {
+    st.style.background = '#1e293b';
+    st.style.color = '#f87171';
+    st.textContent = '⚠ Error al verificar el DNI. Revisá la conexión.';
+    dniValidado = false;
+  }
+  actualizarBoton();
+}
+
+function confirmarUpdate() {
+  dniValidado = true;
+  var st = document.getElementById('dniStatus');
+  st.style.background = '#052e16';
+  st.style.color = '#86efac';
+  st.textContent = '✓ Actualización confirmada. Tomá la nueva foto.';
+  actualizarBoton();
+}
+
+function actualizarBoton() {
+  var nombre = document.getElementById('nombre').value.trim();
+  var salon  = document.getElementById('salon').value;
+  document.getElementById('btnReg').disabled = !(dniValidado && nombre && salon && fotoB64);
+  var card = document.querySelector('.cam-section');
+  if (card) card.classList.toggle('cam-locked', !dniValidado);
+}
+
 
 async function iniciarCam(f) {
   if (stream) stream.getTracks().forEach(t => t.stop());
