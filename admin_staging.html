@@ -239,14 +239,6 @@ function confirmarUpdate() {
   actualizarBoton();
 }
 
-function actualizarBoton() {
-  var nombre = document.getElementById('nombre').value.trim();
-  var salon  = document.getElementById('salon').value;
-  document.getElementById('btnReg').disabled = !(dniValidado && nombre && salon && fotoB64);
-  var card = document.querySelector('.cam-section');
-  if (card) card.classList.toggle('cam-locked', !dniValidado);
-}
-
 
 async function iniciarCam(f) {
   if (stream) stream.getTracks().forEach(t => t.stop());
@@ -290,7 +282,7 @@ function actualizarBoton() {
   var dni    = document.getElementById('dni').value.trim();
   var nombre = document.getElementById('nombre').value.trim();
   var salon  = document.getElementById('salon').value;
-  document.getElementById('btnReg').disabled = !(dni && nombre && salon && fotoB64);
+  document.getElementById('btnReg').disabled = !(dniValidado && dni && nombre && salon && fotoB64);
 }
 
 ['dni','nombre','salon'].forEach(id => {
@@ -303,7 +295,7 @@ async function registrar() {
   var salon  = document.getElementById('salon').value;
   var btn    = document.getElementById('btnReg');
 
-  if (!dni || !nombre || !salon || !fotoB64) {
+  if (!dniValidado || !dni || !nombre || !salon || !fotoB64) {
     mostrar('Completá todos los campos y tomá una foto', 'warn');
     return;
   }
