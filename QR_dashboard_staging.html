@@ -152,6 +152,7 @@ min-height: 100vh;
 #screen-dashboard.on { display: flex; }
 
 .hdr {
+position: relative;
 background: var(--surface);
 border-bottom: 1px solid var(--border);
 height: 58px;
@@ -194,6 +195,36 @@ white-space: nowrap;
   align-items: center;
 }
 .btn-horarios:hover { opacity: .85; }
+/* FaceCheck branding */
+.product-brand {
+  position: absolute;
+  right: 16px;
+  top: 12px;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  text-align: right;
+  pointer-events: none;
+  z-index: 5;
+}
+.product-brand-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e2e8f0;
+  letter-spacing: 0.3px;
+}
+.product-brand-by {
+  font-size: 9px;
+  color: #94a3b8;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+@media (max-width: 600px) {
+  .product-brand-name { font-size: 12px; }
+  .product-brand-by   { font-size: 8px; }
+  .product-brand      { right: 12px; top: 10px; }
+}
 
 .btn-logout {
 background: transparent;
@@ -802,12 +833,15 @@ border-color: #38bdf8;
 <div id="screen-dashboard">
 
 <header class="hdr">
-<div class="hdr-brand">JANOS <em>&middot;</em> Asistencia</div>
+<div class="hdr-brand"><em>JANO'S</em> – Asistencia</div>
 <div class="hdr-area" id="hdr-area">&mdash;</div>
-<a href="QR_horarios_staging.html"
-   id="link-horarios"
+<a href="QR_horarios_staging.html" id="link-horarios"
    class="btn-horarios">Configurar horarios</a>
-<button class="btn-logout" id="btn-logout">Cerrar sesi&oacute;n</button>
+<button class="btn-logout" id="btn-logout">Cerrar sesión</button>
+<div class="product-brand">
+  <span class="product-brand-name">FaceCheck</span>
+  <span class="product-brand-by">by Kama</span>
+</div>
 </header>
 
 <!-- FILTROS -->
