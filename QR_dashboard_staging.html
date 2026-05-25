@@ -1547,10 +1547,19 @@ var jornadaRaw = (data.empleado && data.empleado.jornada)
 var esOverride = jornadaRaw && jornadaRaw.charAt(0) === '{';
 var horarioEfectivo = {};
 if (esOverride) {
-  try { horarioEfectivo = JSON.parse(jornadaRaw); }
-  catch(e) { esOverride = false; }
-}
-if (!esOverride) {
+  try {
+    var ovrJson = JSON.parse(jornadaRaw);
+    // Merge: base del área primero, override encima
+    // Los días no cubiertos por el override usan el horario del área
+    horarioEfectivo = Object.assign({}, data.horario_base || {});
+    Object.keys(ovrJson).forEach(function(dia) {
+      horarioEfectivo[dia] = ovrJson[dia];
+    });
+  } catch(e) {
+    esOverride = false;
+    horarioEfectivo = data.horario_base || {};
+  }
+} else {
   horarioEfectivo = data.horario_base || {};
 }
 // Header de sección con botón Editar
