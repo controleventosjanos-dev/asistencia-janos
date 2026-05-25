@@ -1247,6 +1247,7 @@ $login.style.display = 'flex';
 
 $buscar.addEventListener('click', doFetch);
 $fSalon.addEventListener('change', renderFiltered);
+$fArea.addEventListener('change', renderFiltered);
 /* CAMBIO 3: búsqueda en tiempo real con debounce 200ms */
 var _searchTimer = null;
 $fBusqueda.addEventListener('input', function() {
@@ -1341,6 +1342,11 @@ lista = lista.filter(function(e) { return salonesZ.indexOf(e.salon || '') !== -1
 lista = lista.filter(function(e) { return (e.salon || '') === salon; });
 }
 
+if (area) {
+lista = lista.filter(function(e) {
+return (e.area || '').toUpperCase() === area.toUpperCase();
+});
+}
 if (busqueda.length >= 1) {
 lista = lista.filter(function(e) {
 var nombre = (e.nombre || '').toLowerCase();
