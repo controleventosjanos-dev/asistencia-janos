@@ -1835,7 +1835,7 @@ function descargarExcel() {
     return row.map(function(cel) {
       var s = String(cel == null ? '' : cel);
       if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
-        s = '"' + s.replace(/"/g, '\"\")' + '"';
+        s = '"' + s.replace(/"/g, '""') + '"';
       }
       return s;
     }).join(',');
