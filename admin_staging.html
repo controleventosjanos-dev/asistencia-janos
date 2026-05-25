@@ -313,7 +313,16 @@ async function registrar() {
     });
     var data = await res.json();
     if (!res.ok) { mostrar('❌ ' + (data.Message || data.error || 'Error ' + res.status), 'err'); } else if (data.ok) {
-      mostrar('✅ ' + nombre + ' registrado correctamente en ' + salon + '\nDNI: ' + dni + '\nFaceId: ' + data.employeeId, 'ok'); fetch(SHEETS_URL+'?action=nuevo_empleado&employeeId='+encodeURIComponent(dni)+'&nombre='+encodeURIComponent(nombre)+'&salon='+encodeURIComponent(salon),{mode:'no-cors'}).catch(function(){});
+      mostrar('✅ ' + nombre + ' registrado correctamente en ' + salon + '\nDNI: ' + dni + '\nFaceId: ' + data.employeeId, 'ok'); var faceId  = data.faceId  || data.employeeId || '';
+        var fotoUrl = data.foto_url || '';
+        fetch(SHEETS_URL
+          + '?action=nuevo_empleado'
+          + '&employeeId=' + encodeURIComponent(dni)
+          + '&nombre='     + encodeURIComponent(nombre)
+          + '&salon='      + encodeURIComponent(salon)
+          + '&faceId='     + encodeURIComponent(faceId)
+          + '&fotoUrl='    + encodeURIComponent(fotoUrl),
+          {mode:'no-cors'}).catch(function(){});
       document.getElementById('dni').value   = '';
       document.getElementById('nombre').value = '';
       document.getElementById('salon').value  = '';
