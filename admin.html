@@ -7,7 +7,7 @@
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f172a;color:#f1f5f9;min-height:100vh;padding:16px}
-  h1{text-align:center;font-size:1.4rem;font-weight:700;margin-bottom:18px;color:#38bdf8}
+  h1{text-align:center;font-size:1.4rem;font-weight:700;margin-bottom:18hpx;color:#38bdf8}
   .logo{text-align:center;font-size:2.5rem;margin-bottom:6px}
   .card{background:#1e293b;border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #334155}
   label{display:block;font-size:.85rem;color:#94a3b8;margin-bottom:6px;font-weight:500}
@@ -171,7 +171,7 @@
     </select>
   </div>
 </div>
-
+h
 <div class="card">
   <label>Foto del empleado *</label>
   <video id="video" autoplay playsinline muted></video>
@@ -313,7 +313,7 @@ async function registrar() {
     });
     var data = await res.json();
     if (!res.ok) { mostrar('❌ ' + (data.Message || data.error || 'Error ' + res.status), 'err'); } else if (data.ok) {
-      mostrar('✅ ' + nombre + ' registrado correctamente en ' + salon + '\nDNI: ' + dni + '\nFaceId: ' + data.employeeId, 'ok'); fetch(SHEETS_URL+'?action=nuevo_empleado&employeeId='+encodeURIComponent(dni)+'&nombre='+encodeURIComponent(nombre)+'&salon='+encodeURIComponent(salon),{mode:'no-cors'}).catch(function(){});
+      mostrar('✅ ' + nombre + ' registrado correctamente en ' + salon + '\nDNI: ' + dni + '\nFaceId: ' + data.employeeId, 'ok'); var faceId  = data.faceId  || data.employeeId || '';
       document.getElementById('dni').value   = '';
       document.getElementById('nombre').value = '';
       document.getElementById('salon').value  = '';
