@@ -1838,7 +1838,7 @@ function descargarExcel() {
         s = '"' + s.replace(/"/g, '""') + '"';
       }
       return s;
-    }).join(',');
+    }).join(';');
   }).join('\r\n');
   var blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'});
   var a = document.createElement('a');
