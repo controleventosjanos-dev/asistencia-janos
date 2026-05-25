@@ -872,7 +872,31 @@ border-color: #38bdf8;
   padding: 2px 6px;
   margin-left: 8px;
   font-weight: 500;
-
+}
+.badge-flex {
+  font-size: 11px;
+  background: rgba(139,92,246,.2);
+  color: #a78bfa;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-weight: 500;
+}
+.btn-flex-toggle {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .15s;
+  margin-left: 6px;
+}
+.btn-flex-toggle.activo {
+  background: rgba(139,92,246,.2);
+  border-color: #a78bfa;
+  color: #a78bfa;
+}
   </style>
 </head>
 <body>
@@ -1548,7 +1572,9 @@ if (!horarioEfectivo || Object.keys(horarioEfectivo).length === 0) {
     html += '<div class="modal-horario-row" data-dia="' + esc(dia) + '">'
       + '<div class="modal-horario-dia">' + esc(dia) + '</div>'
       + '<div class="modal-horario-horas">'
-      + esc(h.entrada || '—') + ' – ' + esc(h.salida || '—')
+      + (h.entrada === 'FLEXIBLE'
+          ? '<span class="badge-flex">Flex</span>'
+          : esc(h.entrada || '—') + ' – ' + esc(h.salida || '—'))
       + '</div></div>';
   });
   html += '</div>';
@@ -1558,16 +1584,25 @@ html += '<div id="hor-grid-edit" style="display:none">';
 html += '<div class="modal-horario-grid">';
 dias.forEach(function(dia) {
   var h = horarioEfectivo[dia] || {};
+  var esF = (h.entrada === 'FLEXIBLE');
+  var slug = dia.normalize('NFD')
+    .replace(/[̀-ͯ]/g,'').toLowerCase();
   html += '<div class="modal-horario-row">'
     + '<div class="modal-horario-dia">' + esc(dia) + '</div>'
     + '<div class="modal-horario-horas">'
+    + '<span id="hrs-' + slug + '"'
+    + (esF ? ' style="display:none"' : '') + '>'
     + '<input type="time" class="modal-horario-input"'
     + ' data-dia="' + esc(dia) + '" data-tipo="entrada"'
-    + ' value="' + esc(h.entrada || '') + '">'
+    + ' value="' + esc(esF ? '' : (h.entrada || '')) + '">'
     + ' – '
     + '<input type="time" class="modal-horario-input"'
     + ' data-dia="' + esc(dia) + '" data-tipo="salida"'
-    + ' value="' + esc(h.salida || '') + '">'
+    + ' value="' + esc(esF ? '' : (h.salida || '')) + '">'
+    + '</span>'
+    + '<button class="btn-flex-toggle' + (esF ? ' activo' : '') + '"'
+    + ' data-slug="' + slug + '" data-dia="' + esc(dia) + '"'
+    + ' type="button">Flex</button>'
     + '</div></div>';
 });
 html += '</div>';
@@ -1606,7 +1641,7 @@ if (!regs.length) {
     var horDia = (horarioEfectivo && horarioEfectivo[diaSp])
       ? horarioEfectivo[diaSp] : null;
     var rowClass = '';
-    if (horDia && r.hora) {
+    if (horDia && r.hora && horDia.entrada !== 'FLEXIBLE') {
       if (r.tipo === 'ENTRADA' && horDia.entrada) {
         var pE = horDia.entrada.split(':').map(Number);
         var pR = r.hora.split(':').map(Number);
@@ -1647,6 +1682,16 @@ if ($btnEdit) {
     $btnEdit.disabled = true;
   });
 }
+if ($gridEdit) {
+  $gridEdit.querySelectorAll('.btn-flex-toggle')
+  .forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var activo = btn.classList.toggle('activo');
+      var el = document.getElementById('hrs-' + btn.dataset.slug);
+      if (el) el.style.display = activo ? 'none' : '';
+    });
+  });
+}
 function guardarHorario(jornadaJson) {
   $horMsg.textContent = 'Guardando…';
   $horMsg.className = 'modal-horario-msg';
@@ -1669,15 +1714,23 @@ function guardarHorario(jornadaJson) {
 }
 if ($btnGuardar) {
   $btnGuardar.addEventListener('click', function() {
-    var inputs = $gridEdit.querySelectorAll('.modal-horario-input');
     var obj = {};
-    inputs.forEach(function(inp) {
-      var dia  = inp.dataset.dia;
-      var tipo = inp.dataset.tipo;
-      var val  = inp.value.trim();
+    // Días Flex: se capturan primero
+    $gridEdit.querySelectorAll('.btn-flex-toggle.activo')
+    .forEach(function(btn) {
+      obj[btn.dataset.dia] = {
+        entrada: 'FLEXIBLE', salida: 'FLEXIBLE'
+      };
+    });
+    // Días con horas: solo si no son Flex
+    $gridEdit.querySelectorAll('.modal-horario-input')
+    .forEach(function(inp) {
+      var dia = inp.dataset.dia;
+      if (obj[dia]) return; // es Flex, ignorar
+      var val = inp.value.trim();
       if (val) {
         if (!obj[dia]) obj[dia] = {};
-        obj[dia][tipo] = val;
+        obj[dia][inp.dataset.tipo] = val;
       }
     });
     if (Object.keys(obj).length === 0) {
