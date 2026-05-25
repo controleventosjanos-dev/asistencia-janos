@@ -195,6 +195,24 @@ white-space: nowrap;
   align-items: center;
 }
 .btn-horarios:hover { opacity: .85; }
+.btn-excel {
+  background: #22c55e;
+  color: #0f172a;
+  border: 1px solid #22c55e;
+  border-radius: var(--r-xs);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  text-decoration: none;
+  transition: opacity .2s;
+  white-space: nowrap;
+  display: none;
+  align-items: center;
+  cursor: pointer;
+  border: none;
+}
+.btn-excel:hover { opacity: .85; }
 /* FaceCheck branding */
 .product-brand {
   position: absolute;
@@ -925,6 +943,8 @@ border-color: #38bdf8;
 <div class="hdr-area" id="hdr-area">&mdash;</div>
 <a href="QR_horarios_staging.html" id="link-horarios"
    class="btn-horarios">Configurar horarios</a>
+<button class="btn-excel" id="btn-excel"
+  onclick="descargarExcel()">⬇ Excel</button>
 <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
 <div class="product-brand">
   <span class="product-brand-name">FaceCheck</span>
@@ -1217,6 +1237,7 @@ const $fBusqueda = document.getElementById('fBusqueda');
 $logout.addEventListener('click', function() {
 
 document.getElementById('link-horarios').style.display = 'none';
+document.getElementById('btn-excel').style.display = 'none';
 sessionStorage.removeItem('janos_s');
 session = null; allEmps = []; isRangeMode = false;
 $codigo.value = '';
@@ -1243,6 +1264,7 @@ if (!$fDesde.value) $fDesde.value = hoy;
 if (!$fHasta.value) $fHasta.value = hoy;
 doFetch();
 document.getElementById('link-horarios').style.display = 'inline-flex';
+document.getElementById('btn-excel').style.display = 'inline-flex';
 }
 
 async function doFetch() {
@@ -1786,6 +1808,44 @@ $filterBtns.forEach(function(btn) {
 });
 }
 
+
+function descargarExcel() {
+  if (!allEmps || !allEmps.length) {
+    alert('No hay datos cargados. Aplicá un filtro primero.');
+    return;
+  }
+  var desde = $fDesde ? $fDesde.value : '';
+  var hasta = $fHasta ? $fHasta.value : '';
+  var filas = [];
+  var esRango = allEmps[0] && allEmps[0].puntual !== undefined;
+  if (esRango) {
+    filas.push(['ID','Nombre','Área','Salón','Puntual','Tardío','Ausente','Feriado','Sin horario','Flexible','Horas extra (días)','Horas extra (min)']);
+    allEmps.forEach(function(e) {
+      filas.push([e.id, e.nombre, e.area, e.salon, e.puntual||0, e.tardio||0, e.ausente||0, e.feriado||0, e.sin_horario||0, e.flexible||0, e.hora_extra||0, e.hora_extra_minutos||0]);
+    });
+  } else {
+    filas.push(['ID','Nombre','Área','Salón','Estado','Entrada esperada','Salida esperada','Entrada real','Salida real','Hora extra (min)']);
+    allEmps.forEach(function(e) {
+      var he = e.horario_esperado || {};
+      var rr = e.registro_real || {};
+      filas.push([e.id, e.nombre, e.area, e.salon, e.estado, he.entrada||''  , he.salida||'', rr.entrada||'', rr.salida||'', e.hora_extra_minutos||0]);
+    });
+  }
+  var csv = filas.map(function(row) {
+    return row.map(function(cel) {
+      var s = String(cel == null ? '' : cel);
+      if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
+        s = '"' + s.replace(/"/g, '\"\")' + '"';
+      }
+      return s;
+    }).join(',');
+  }).join('\r\n');
+  var blob = new Blob(['\uFEFF' + csv], {type:'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Asistencia_' + desde + '_' + hasta + '.csv';
+  a.click();
+}
 </script>
 
 <!-- MODAL DETALLE EMPLEADO -->
