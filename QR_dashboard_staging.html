@@ -1740,7 +1740,7 @@ if ($btnGuardar) {
     $gridEdit.querySelectorAll('.modal-horario-input')
     .forEach(function(inp) {
       var dia = inp.dataset.dia;
-      if (obj[dia]) return; // es Flex, ignorar
+      if (obj[dia] && obj[dia].entrada === 'FLEXIBLE') return;
       var val = inp.value.trim();
       if (val) {
         if (!obj[dia]) obj[dia] = {};
