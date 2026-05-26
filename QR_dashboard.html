@@ -1570,7 +1570,8 @@ var dias = ['Lunes','Martes','Miércoles','Jueves',
 var jornadaRaw = (data.empleado && data.empleado.jornada)
   ? String(data.empleado.jornada).trim() : '';
 var esOverride = jornadaRaw && jornadaRaw.charAt(0) === '{';
-var horarioEfevar fotoUrl = (data.empleado && data.empleado.fotoUrl) ? data.empleado.fotoUrl : '';
+var horarioEfectivo = {};
+var fotoUrl = (data.empleado && data.empleado.fotoUrl) ? data.empleado.fotoUrl : '';
 var $hdr = document.getElementById('modal-hdr');
 var $oldFoto = $hdr ? $hdr.querySelector('.modal-foto-wrap') : null;
 if ($oldFoto) $oldFoto.remove();
