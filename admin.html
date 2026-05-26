@@ -314,6 +314,7 @@ async function registrar() {
     var data = await res.json();
     if (!res.ok) { mostrar('❌ ' + (data.Message || data.error || 'Error ' + res.status), 'err'); } else if (data.ok) {
       mostrar('✅ ' + nombre + ' registrado correctamente en ' + salon + '\nDNI: ' + dni + '\nFaceId: ' + data.employeeId, 'ok');
+      console.log('Lambda response:', JSON.stringify(data));
       var faceId  = data.faceId  || data.employeeId || '';
       var fotoUrl = data.foto_url || '';
       fetch(SHEETS_URL
