@@ -155,8 +155,6 @@ async function escanear() {
   try {
     var res=await fetch(API_URL+'/verificar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:b64})});
     var data=await res.json();
-        if (!data.dni && data.employeeId) data.dni = data.employeeId;
-        if (!data.nombre && data.name)    data.nombre = data.name;
     if (data.ok) {
       var sim=Math.round(data.similarity||0);
       var sectorOk=true;
