@@ -1581,7 +1581,8 @@ if (fotoUrl && $hdr) {
   $fw.innerHTML = '<img src="' + esc(fotoUrl) + '" alt="foto">';
   $hdr.insertBefore($fw, $hdr.firstChild);
 }
-var html = ''; (esOverride) {
+var html = '';
+if (esOverride) {
   try {
     var ovrJson = JSON.parse(jornadaRaw);
     // Merge: base del área primero, override encima
