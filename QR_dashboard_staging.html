@@ -1854,7 +1854,8 @@ function descargarExcel() {
   var filas = [];
   var esRango = allEmps[0] && allEmps[0].puntual !== undefined;
   if (esRango) {
-    filas.push(['ID','Nombre','Área','Salón','Puntual','Tardío','Ausente','Feriado','Sin horario','Flexible','Horas extra (días)','Horas extra (min)']);
+    filas.push(['ID','Nombre','Área','Salón','Puntual','Tardío','Ausente','Feriado','Sin horario','Flexible','Horas extra (días)','Horas extra (min)',
+      'Horas trabajadas (h)','Horas trabajadas (min)']);
     allEmps.forEach(function(e) {
       filas.push([e.id, e.nombre, e.area, e.salon, e.puntual||0, e.tardio||0, e.ausente||0, e.feriado||0, e.sin_horario||0, e.flexible||0, e.hora_extra||0, e.hora_extra_minutos||0]);
     });
@@ -1863,7 +1864,9 @@ function descargarExcel() {
     allEmps.forEach(function(e) {
       var he = e.horario_esperado || {};
       var rr = e.registro_real || {};
-      filas.push([e.id, e.nombre, e.area, e.salon, e.estado, he.entrada||''  , he.salida||'', rr.entrada||'', rr.salida||'', e.hora_extra_minutos||0]);
+      filas.push([e.id, e.nombre, e.area, e.salon, e.estado, he.entrada||''  , he.salida||'', rr.entrada||'', rr.salida||'', e.hora_extra_minutos||0,
+        Math.floor((e.horas_trabajadas_min || 0) / 60),
+        (e.horas_trabajadas_min || 0) % 60]);
     });
   }
   var csv = filas.map(function(row) {
