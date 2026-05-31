@@ -152,7 +152,6 @@ min-height: 100vh;
 #screen-dashboard.on { display: flex; }
 
 .hdr {
-position: relative;
 background: var(--surface);
 border-bottom: 1px solid var(--border);
 height: 58px;
@@ -195,54 +194,6 @@ white-space: nowrap;
   align-items: center;
 }
 .btn-horarios:hover { opacity: .85; }
-.btn-excel {
-  background: #22c55e;
-  color: #0f172a;
-  border: 1px solid #22c55e;
-  border-radius: var(--r-xs);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 7px 14px;
-  text-decoration: none;
-  transition: opacity .2s;
-  white-space: nowrap;
-  display: none;
-  align-items: center;
-  cursor: pointer;
-  border: none;
-}
-.btn-excel:hover { opacity: .85; }
-/* FaceCheck branding */
-.product-brand {
-  position: absolute;
-  right: 16px;
-  top: 12px;
-  display: flex;
-  flex-direction: column;
-  line-height: 1.05;
-  text-align: right;
-  pointer-events: none;
-  z-index: 5;
-}
-.product-brand-name {
-  font-size: 14px;
-  font-weight: 700;
-  color: #e2e8f0;
-  letter-spacing: 0.3px;
-}
-.product-brand-by {
-  font-size: 9px;
-  color: #94a3b8;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-@media (max-width: 600px) {
-  .product-brand-name { font-size: 12px; }
-  .product-brand-by   { font-size: 8px; }
-  .product-brand      { right: 12px; top: 10px; }
-}
 
 .btn-logout {
 background: transparent;
@@ -256,7 +207,6 @@ padding: 7px 14px;
 cursor: pointer;
 transition: all .2s;
 white-space: nowrap;
-margin-right: 110px;
 }
 
 .btn-logout:hover { border-color: var(--red); color: var(--red); }
@@ -624,26 +574,6 @@ font-size: 17px;
 font-weight: 700;
 line-height: 1.3;
 }
-.modal-foto-wrap {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: var(--surface2);
-  border: 2px solid var(--border);
-}
-.modal-foto-wrap img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-#modal-hdr {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 12px;
-}
 
 #modal-sub {
 font-size: 13px;
@@ -832,7 +762,6 @@ border-color: #38bdf8;
 .row-extra td { color: #38bdf8; }
     .rchip-flexible { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
     .badge-flexible  { background: rgba(168, 85, 247, 0.2);  color: #a855f7; }
-    .badge-flexible  { background: rgba(168, 85, 247, 0.2);  color: #a855f7; }
 /* ── Horario editable ── */
 .modal-horario-hdr {
   display: flex;
@@ -959,17 +888,12 @@ border-color: #38bdf8;
 <div id="screen-dashboard">
 
 <header class="hdr">
-<div class="hdr-brand"><em>JANO'S</em> – Asistencia</div>
+<div class="hdr-brand">JANOS <em>&middot;</em> Asistencia</div>
 <div class="hdr-area" id="hdr-area">&mdash;</div>
-<a href="QR_horarios_staging.html" id="link-horarios"
+<a href="QR_horarios_staging.html"
+   id="link-horarios"
    class="btn-horarios">Configurar horarios</a>
-<button class="btn-excel" id="btn-excel"
-  onclick="descargarExcel()">⬇ Excel</button>
-<button class="btn-logout" id="btn-logout">Cerrar sesión</button>
-<div class="product-brand">
-  <span class="product-brand-name">FaceCheck</span>
-  <span class="product-brand-by">by Kama</span>
-</div>
+<button class="btn-logout" id="btn-logout">Cerrar sesi&oacute;n</button>
 </header>
 
 <!-- FILTROS -->
@@ -1255,9 +1179,7 @@ const $placeholder = document.getElementById('grid-placeholder');
 const $fBusqueda = document.getElementById('fBusqueda');
 
 $logout.addEventListener('click', function() {
-
 document.getElementById('link-horarios').style.display = 'none';
-document.getElementById('btn-excel').style.display = 'none';
 sessionStorage.removeItem('janos_s');
 session = null; allEmps = []; isRangeMode = false;
 $codigo.value = '';
@@ -1267,7 +1189,6 @@ $login.style.display = 'flex';
 
 $buscar.addEventListener('click', doFetch);
 $fSalon.addEventListener('change', renderFiltered);
-$fArea.addEventListener('change', renderFiltered);
 /* CAMBIO 3: búsqueda en tiempo real con debounce 200ms */
 var _searchTimer = null;
 $fBusqueda.addEventListener('input', function() {
@@ -1285,7 +1206,6 @@ if (!$fDesde.value) $fDesde.value = hoy;
 if (!$fHasta.value) $fHasta.value = hoy;
 doFetch();
 document.getElementById('link-horarios').style.display = 'inline-flex';
-document.getElementById('btn-excel').style.display = 'inline-flex';
 }
 
 async function doFetch() {
@@ -1304,6 +1224,7 @@ url += '&fecha_desde=' + encodeURIComponent(toBackend(desde));
 url += '&fecha_hasta=' + encodeURIComponent(toBackend(hasta));
 }
 
+if (area) url += '&area=' + encodeURIComponent(area);
 
 setLoading(true);
 hideErr();
@@ -1361,11 +1282,6 @@ lista = lista.filter(function(e) { return salonesZ.indexOf(e.salon || '') !== -1
 lista = lista.filter(function(e) { return (e.salon || '') === salon; });
 }
 
-if (area) {
-lista = lista.filter(function(e) {
-return (e.area || '').toUpperCase() === area.toUpperCase();
-});
-}
 if (busqueda.length >= 1) {
 lista = lista.filter(function(e) {
 var nombre = (e.nombre || '').toLowerCase();
@@ -1585,16 +1501,6 @@ $modalBody.innerHTML = '<div class="modal-empty">⚠ ' + esc(err.message) + '</d
 }
 
 function renderModalContent(data, empId) {
-var fotoUrl = (data.empleado && data.empleado.fotoUrl) ? data.empleado.fotoUrl : '';
-var $hdr = document.getElementById('modal-hdr');
-var $oldFoto = $hdr ? $hdr.querySelector('.modal-foto-wrap') : null;
-if ($oldFoto) $oldFoto.remove();
-if (fotoUrl && $hdr) {
-  var $fw = document.createElement('div');
-  $fw.className = 'modal-foto-wrap';
-  $fw.innerHTML = '<img src="' + esc(fotoUrl) + '" alt="foto">';
-  $hdr.insertBefore($fw, $hdr.firstChild);
-}
 var html = '';
 var dias = ['Lunes','Martes','Miércoles','Jueves',
             'Viernes','Sábado','Domingo'];
@@ -1717,13 +1623,30 @@ if (!regs.length) {
         var pS = horDia.salida.split(':').map(Number);
         var pRS = r.hora.split(':').map(Number);
         if ((pRS[0]*60+pRS[1]) > (pS[0]*60+pS[1])) rowClass = 'row-extra';
+        if ((pRS[0]*60+pRS[1]) - (pS[0]*60+pS[1]) > 480) rowClass = 'row-anomalia';
+      }
+    }
+    if (r.tipo === 'SALIDA' && rowClass !== 'row-anomalia') {
+      var esFlex = !horDia || horDia.entrada === 'FLEXIBLE';
+      if (esFlex) {
+        var entradaMismoDia = null;
+        data.registros.forEach(function(reg) {
+          if (reg.fecha === r.fecha && reg.tipo === 'ENTRADA') entradaMismoDia = reg.hora;
+        });
+        if (entradaMismoDia) {
+          var pEnt = entradaMismoDia.split(':').map(Number);
+          var pSal = r.hora.split(':').map(Number);
+          var minTrab = (pSal[0]*60+pSal[1]) - (pEnt[0]*60+pEnt[1]);
+          if (minTrab > 840) rowClass = 'row-anomalia';
+        }
       }
     }
     html += '<tr class="' + rowClass + '">'
       + '<td>' + esc(r.fecha) + '</td>'
       + '<td>' + esc(DIAS_ES[r.dia] || r.dia) + '</td>'
       + '<td>' + esc(r.hora || '—') + '</td>'
-      + '<td><span class="badge ' + bc + '">' + esc(r.tipo) + '</span></td>'
+      + '<td><span class="badge ' + bc + '">' + esc(r.tipo) + '</span>'
+      + (rowClass === 'row-anomalia' ? ' ⚠️' : '') + '</td>'
       + '<td>' + (r.confianza != null && r.confianza !== ''
           ? (function() {
               var c = parseFloat(r.confianza);
@@ -1797,7 +1720,7 @@ if ($btnGuardar) {
     $gridEdit.querySelectorAll('.modal-horario-input')
     .forEach(function(inp) {
       var dia = inp.dataset.dia;
-      if (obj[dia] && obj[dia].entrada === 'FLEXIBLE') return;
+      if (obj[dia]) return; // es Flex, ignorar
       var val = inp.value.trim();
       if (val) {
         if (!obj[dia]) obj[dia] = {};
@@ -1843,65 +1766,7 @@ $filterBtns.forEach(function(btn) {
 });
 }
 
-
-function descargarExcel() {
-  if (!allEmps || !allEmps.length) {
-    alert('No hay datos cargados. Aplicá un filtro primero.');
-    return;
-  }
-  var desde = $fDesde ? $fDesde.value : '';
-  var hasta = $fHasta ? $fHasta.value : '';
-  var filas = [];
-  var esRango = allEmps[0] && allEmps[0].puntual !== undefined;
-  if (esRango) {
-    filas.push(['ID','Nombre','Área','Salón','Puntual','Tardío','Ausente','Feriado','Sin horario','Flexible','Horas extra (días)','Horas extra (min)',
-      'Horas trabajadas']);
-    allEmps.forEach(function(e) {
-      filas.push([e.id, e.nombre, e.area, e.salon, e.puntual||0, e.tardio||0, e.ausente||0, e.feriado||0, e.sin_horario||0, e.flexible||0, e.hora_extra||0, e.hora_extra_minutos||0, (function(){var tot=e.horas_trabajadas_min||0;var h=Math.floor(tot/60),m=tot%60;return h+'h '+(m<10?'0':'')+m+'min';})()]);
-    });
-  } else {
-    filas.push(['ID','Nombre','Área','Salón','Estado','Entrada esperada','Salida esperada','Entrada real','Salida real','Hora extra (min)']);
-    allEmps.forEach(function(e) {
-      var he = e.horario_esperado || {};
-      var rr = e.registro_real || {};
-      filas.push([e.id, e.nombre, e.area, e.salon, e.estado, he.entrada||''  , he.salida||'', rr.entrada||'', rr.salida||'', e.hora_extra_minutos||0,
-        Math.floor((e.horas_trabajadas_min || 0) / 60),
-        (e.horas_trabajadas_min || 0) % 60]);
-    });
-  }
-  var csv = filas.map(function(row) {
-    return row.map(function(cel) {
-      var s = String(cel == null ? '' : cel);
-      if (s.indexOf(',') !== -1 || s.indexOf('"') !== -1 || s.indexOf('\n') !== -1) {
-        s = '"' + s.replace(/"/g, '""') + '"';
-      }
-      return s;
-    }).join(';');
-  }).join('\r\n');
-  var blob = new Blob(['\uFEFF' + 'sep=;\r\n' + csv], {type:'text/csv;charset=utf-8'});
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'Asistencia_' + desde + '_' + hasta + '.csv';
-  a.click();
-}
 </script>
-
-<!-- MODAL DETALLE EMPLEADO -->
-<div id="modal-overlay" style="display:none" role="dialog" aria-modal="true">
-<div id="modal-box">
-<div id="modal-hdr">
-<div>
-<div id="modal-nombre"></div>
-<div id="modal-sub"></div>
-</div>
-<button id="modal-close" aria-label="Cerrar">&#x2715;</button>
-</div>
-<div id="modal-body"></div>
-</div>
-</div>
-
-</body>
-</html>
 
 <!-- MODAL DETALLE EMPLEADO -->
 <div id="modal-overlay" style="display:none" role="dialog" aria-modal="true">
