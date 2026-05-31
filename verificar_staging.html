@@ -144,7 +144,7 @@ function mostrarCamError(msg) {
 }
 function flipCam() { facing=facing==='user'?'environment':'user'; iniciarCam(facing); }
 async function escanear() {
-  if (!gpsOk) { mostrarResult('warn','Fuera de rango','Debes estar a menos de '+MAX_DIST+'m de un salon para marcar asistencia.'); return; }
+  if (userLat === null) { mostrarResult('warn','Sin GPS','Activa el GPS para poder marcar asistencia.'); return; }
   var btn=document.getElementById('btnScan');
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Verificando...';
   if (!camActive) { activarCam(); await new Promise(function(r){ setTimeout(r,2000); }); }
@@ -187,9 +187,26 @@ async function escanear() {
       try {
         var secRes=await fetch(SHEETS_URL+'?action=getSector&dni='+encodeURIComponent(data.dni));
         var secData=await secRes.json();
-        if (secData.ok && secData.sector && secData.sector!==salonNom) {
-          mostrarResult('warn',data.nombre,'No estas asignado a este salon. Tu salon es: '+secData.sector);
-          sectorOk=false;
+        var esAmbulante=secData.ok && secData.sector &&
+          secData.sector.toUpperCase().indexOf('AMBULANTE')>=0;
+        if (esAmbulante) {
+          var minD=Infinity, closestSalon=salonNom;
+          Object.keys(SALONES).forEach(function(s) {
+            var d=haversine(userLat,userLng,SALONES[s].lat,SALONES[s].lng);
+            if (d<minD) { minD=d; closestSalon=s; }
+          });
+          salonNom=closestSalon;
+          distanciaMetros=Math.round(minD);
+        } else {
+          if (!gpsOk) {
+            mostrarResult('warn','Fuera de rango','Debes estar a menos de '+MAX_DIST+'m de un salon para marcar asistencia.');
+            btn.disabled=false; btn.innerHTML='Verificar identidad';
+            return;
+          }
+          if (secData.ok && secData.sector && secData.sector!==salonNom) {
+            mostrarResult('warn',data.nombre,'No estas asignado a este salon. Tu salon es: '+secData.sector);
+            sectorOk=false;
+          }
         }
       } catch(e2) { /* si falla consulta sector, se permite el registro */ }
       if (sectorOk) {
