@@ -158,6 +158,32 @@ async function escanear() {
     if (data.ok) {
       var sim=Math.round(data.similarity||0);
       var sectorOk=true;
+              var estadoRes = await fetch(SHEETS_URL
+                                                    + '?action=getEstadoHoy&dni='
+                                                    + encodeURIComponent(data.dni));
+              var estadoData = await estadoRes.json();
+              var ultimoTipo = estadoData.ok
+                ? estadoData.ultimoTipo : null;
+              if (ultimoTipo === 'SALIDA') {
+                          mostrarResult('warn', data.nombre,
+                                                    'Ya registraste tu salida hoy.');
+                          btn.disabled = false;
+                          btn.innerHTML = 'Verificar identidad';
+                          return;
+              }
+              if (ultimoTipo === 'ENTRADA') {
+                          setTipo('salida');
+                          document.getElementById('btnE').disabled = true;
+                          document.getElementById('btnE').style.opacity = '0.4';
+                          document.getElementById('btnS').disabled = false;
+                          document.getElementById('btnS').style.opacity = '1';
+              } else {
+                          setTipo('entrada');
+                          document.getElementById('btnE').disabled = false;
+                          document.getElementById('btnE').style.opacity = '1';
+                          document.getElementById('btnS').disabled = true;
+                          document.getElementById('btnS').style.opacity = '0.4';
+              }
       try {
         var secRes=await fetch(SHEETS_URL+'?action=getSector&dni='+encodeURIComponent(data.dni));
         var secData=await secRes.json();
