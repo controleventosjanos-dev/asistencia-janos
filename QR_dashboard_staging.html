@@ -1717,13 +1717,29 @@ if (!regs.length) {
         var pS = horDia.salida.split(':').map(Number);
         var pRS = r.hora.split(':').map(Number);
         if ((pRS[0]*60+pRS[1]) > (pS[0]*60+pS[1])) rowClass = 'row-extra';
+        if ((pRS[0]*60+pRS[1]) < (pS[0]*60+pS[1])) rowClass = 'row-anomalia';
+      }
+    }
+    if (r.tipo === 'SALIDA') {
+      var ultimaFechaEnt = null;
+      data.registros.forEach(function(reg) {
+        if (reg.tipo === 'ENTRADA') {
+          var d = new Date(reg.fecha.split('/').reverse().join('-')+'T'+reg.hora);
+          var dSal = new Date(r.fecha.split('/').reverse().join('-')+'T'+r.hora);
+          if (d <= dSal && (!ultimaFechaEnt || d > ultimaFechaEnt)) ultimaFechaEnt = d;
+        }
+      });
+      if (ultimaFechaEnt) {
+        var dSal2 = new Date(r.fecha.split('/').reverse().join('-')+'T'+r.hora);
+        if ((dSal2 - ultimaFechaEnt)/60000 > 840) rowClass = 'row-anomalia';
       }
     }
     html += '<tr class="' + rowClass + '">'
       + '<td>' + esc(r.fecha) + '</td>'
       + '<td>' + esc(DIAS_ES[r.dia] || r.dia) + '</td>'
       + '<td>' + esc(r.hora || '—') + '</td>'
-      + '<td><span class="badge ' + bc + '">' + esc(r.tipo) + '</span></td>'
+      + '<td><span class="badge ' + bc + '">' + esc(r.tipo) + '</span>'
+      + (rowClass === 'row-anomalia' ? ' ⚠️' : '') + '</td>'
       + '<td>' + (r.confianza != null && r.confianza !== ''
           ? (function() {
               var c = parseFloat(r.confianza);
