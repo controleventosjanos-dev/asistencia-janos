@@ -1623,22 +1623,23 @@ if (!regs.length) {
         var pS = horDia.salida.split(':').map(Number);
         var pRS = r.hora.split(':').map(Number);
         if ((pRS[0]*60+pRS[1]) > (pS[0]*60+pS[1])) rowClass = 'row-extra';
-        if ((pRS[0]*60+pRS[1]) - (pS[0]*60+pS[1]) > 480) rowClass = 'row-anomalia';
+        // Salida anticipada (horario fijo)
+        if ((pRS[0]*60+pRS[1]) < (pS[0]*60+pS[1])) rowClass = 'row-anomalia';
       }
     }
-    if (r.tipo === 'SALIDA' && rowClass !== 'row-anomalia') {
-      var esFlex = !horDia || horDia.entrada === 'FLEXIBLE';
-      if (esFlex) {
-        var entradaMismoDia = null;
-        data.registros.forEach(function(reg) {
-          if (reg.fecha === r.fecha && reg.tipo === 'ENTRADA') entradaMismoDia = reg.hora;
-        });
-        if (entradaMismoDia) {
-          var pEnt = entradaMismoDia.split(':').map(Number);
-          var pSal = r.hora.split(':').map(Number);
-          var minTrab = (pSal[0]*60+pSal[1]) - (pEnt[0]*60+pEnt[1]);
-          if (minTrab > 840) rowClass = 'row-anomalia';
+    // Anomalía universal: más de 14 horas desde la última entrada (cualquier día)
+    if (r.tipo === 'SALIDA') {
+      var ultimaFechaEnt = null;
+      data.registros.forEach(function(reg) {
+        if (reg.tipo === 'ENTRADA') {
+          var d = new Date(reg.fecha.split('/').reverse().join('-')+'T'+reg.hora);
+          var dSal = new Date(r.fecha.split('/').reverse().join('-')+'T'+r.hora);
+          if (d <= dSal && (!ultimaFechaEnt || d > ultimaFechaEnt)) ultimaFechaEnt = d;
         }
+      });
+      if (ultimaFechaEnt) {
+        var dSal2 = new Date(r.fecha.split('/').reverse().join('-')+'T'+r.hora);
+        if ((dSal2 - ultimaFechaEnt)/60000 > 840) rowClass = 'row-anomalia';
       }
     }
     html += '<tr class="' + rowClass + '">'
