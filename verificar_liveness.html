@@ -231,7 +231,7 @@ function mostrarLiveness(sessionId, creds) {
       console.log('ReactDOM OK');
       return import('@aws-amplify/ui-react-liveness').then(function(Liveness){
         console.log('Liveness OK:', Object.keys(Liveness));
-        var FaceLivenessDetector = Liveness.FaceLivenessDetector;
+        var FaceLivenessDetector = Liveness.FaceLivenessDetectorCore;
         var root = document.getElementById('livenessRoot');
         if (!_livenessRoot) _livenessRoot = ReactDOM.createRoot(root);
         var credProvider = function() {
@@ -247,7 +247,7 @@ function mostrarLiveness(sessionId, creds) {
             region:              'us-east-1',
             onAnalysisComplete:  function() { verificarLiveness(sessionId); },
             onError:             function(err) { cerrarLiveness(); mostrarResult('err','Error de verificacion', err.message||'Intenta de nuevo'); },
-            credentialsProvider: credProvider,
+            config: { credentialProvider: credProvider },
             displayText: {
               hintMoveFaceIntoOvalMessage: 'Mueve tu cara al ovalo',
               hintTooFarMessage:           'Acercate mas',
