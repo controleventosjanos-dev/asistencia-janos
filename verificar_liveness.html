@@ -223,9 +223,14 @@ var _livenessRoot = null;
 function mostrarLiveness(sessionId, creds) {
   document.getElementById('livenessOverlay').classList.add('active');
   // Renderizar con React
+  document.getElementById('livenessRoot').innerHTML = '<div class="liveness-loading"><span class="spinner"></span><br><br>Cargando componente...</div>';
+  console.log('Iniciando imports...');
   import('react').then(function(React){
+    console.log('React OK');
     return import('react-dom/client').then(function(ReactDOM){
+      console.log('ReactDOM OK');
       return import('@aws-amplify/ui-react-liveness').then(function(Liveness){
+        console.log('Liveness OK:', Object.keys(Liveness));
         var FaceLivenessDetector = Liveness.FaceLivenessDetector;
         var root = document.getElementById('livenessRoot');
         if (!_livenessRoot) _livenessRoot = ReactDOM.createRoot(root);
@@ -256,7 +261,10 @@ function mostrarLiveness(sessionId, creds) {
         );
       });
     });
-  }).catch(function(e){ cerrarLiveness(); mostrarResult('err','Error','No se pudo cargar el componente de verificacion: '+e.message); });
+  }).catch(function(e){
+    console.error('Import error:', e);
+    document.getElementById('livenessRoot').innerHTML = '<div class="liveness-loading" style="color:#f87171">Error al cargar componente:<br>'+e.message+'<br><br><small>Revisa la consola</small></div>';
+  });
 }
 
 async function verificarLiveness(sessionId) {
@@ -283,7 +291,7 @@ function cancelarLiveness() {
 }
 function cerrarLiveness() {
   document.getElementById('livenessOverlay').classList.remove('active');
-  if (_livenessRoot) { _livenessRoot.render(React.createElement('div',null)); }
+  try { if (_livenessRoot) { _livenessRoot.unmount(); _livenessRoot = null; } } catch(e) {}
 }
 
 // ── RECONOCER: igual que verificar_staging pero recibe b64 como parámetro ──
