@@ -104,20 +104,7 @@ h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-botto
   <button class="liveness-cancel" onclick="cancelarLiveness()">Cancelar</button>
 </div>
 
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@18.3.1",
-    "react-dom": "https://esm.sh/react-dom@18.3.1",
-    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
-    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
-    "@aws-amplify/ui-react-liveness": "https://esm.sh/@aws-amplify/ui-react-liveness@3?external=react,react-dom",
-    "@aws-amplify/ui-react": "https://esm.sh/@aws-amplify/ui-react@6?external=react,react-dom"
-  }
-}
-</script>
-
-<link rel="stylesheet" href="https://esm.sh/@aws-amplify/ui-react@6/styles.css">
+<!-- liveness: widget compilado en iframe (sin esm.sh / sin build en runtime) -->
 
 <script>
 // ── CONFIG ──
@@ -201,73 +188,39 @@ async function escanear() {
   canvas.getContext('2d').drawImage(video,0,0);
   _pendingB64 = canvas.toDataURL('image/jpeg',0.85).split(',')[1];
   btn.innerHTML = '<span class="spinner"></span> Iniciando verificacion de vida...';
-  try {
-    // 1. Crear sesión de liveness
-    var crearRes = await fetch(API_URL+'/liveness/crear', {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
-    var crearData = await crearRes.json();
-    if (!crearData.ok || !crearData.sessionId) throw new Error('No se pudo crear sesion de liveness');
-    var sessionId = crearData.sessionId;
-    // 2. Obtener credenciales temporales
-    var credRes = await fetch(API_URL+'/liveness/credentials', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({sessionId:sessionId})});
-    var credData = await credRes.json();
-    if (!credData.ok) throw new Error('No se pudieron obtener credenciales');
-    // 3. Mostrar overlay de liveness con React
-    btn.disabled = false; btn.innerHTML = 'Verificar identidad';
-    mostrarLiveness(sessionId, credData);
-  } catch(e) {
-    mostrarResult('err','Error',e.message);
-    btn.disabled=false; btn.innerHTML='Verificar identidad';
-  }
+  // Liberar la camara para que la use el widget de liveness
+  if (stream) { stream.getTracks().forEach(function(t){ t.stop(); }); stream=null; camActive=false; }
+  document.getElementById('video').style.display='none';
+  document.getElementById('camPlaceholder').style.display='flex';
+  btn.disabled = false; btn.innerHTML = 'Verificar identidad';
+  // Abrir widget de liveness (bundleado, en iframe). El widget crea su propia sesion.
+  abrirWidget();
 }
 
-// ── LIVENESS: mostrar componente Amplify ──
-var _livenessRoot = null;
-function mostrarLiveness(sessionId, creds) {
+// ── LIVENESS: widget compilado (bundle) embebido en iframe ──
+var _livenessFrame = null;
+function abrirWidget() {
+  var root = document.getElementById('livenessRoot');
+  root.innerHTML = '';
+  var ifr = document.createElement('iframe');
+  ifr.src = 'liveness_widget.html?ts=' + Date.now();
+  ifr.allow = 'camera; microphone; fullscreen';
+  ifr.setAttribute('allowfullscreen', '');
+  ifr.style.cssText = 'width:100%;height:100%;min-height:480px;border:none;display:block;background:#0f172a';
+  root.appendChild(ifr);
+  _livenessFrame = ifr;
   document.getElementById('livenessOverlay').classList.add('active');
-  // Renderizar con React
-  document.getElementById('livenessRoot').innerHTML = '<div class="liveness-loading"><span class="spinner"></span><br><br>Cargando componente...</div>';
-  console.log('Iniciando imports...');
-  import('react').then(function(React){
-    console.log('React OK');
-    return import('react-dom/client').then(function(ReactDOM){
-      console.log('ReactDOM OK');
-      return import('@aws-amplify/ui-react-liveness').then(function(Liveness){
-        console.log('Liveness OK:', Object.keys(Liveness));
-        var FaceLivenessDetector = Liveness.FaceLivenessDetectorCore;
-        var root = document.getElementById('livenessRoot');
-        if (!_livenessRoot) _livenessRoot = ReactDOM.createRoot(root);
-        var credProvider = function() {
-          return Promise.resolve({
-            accessKeyId:     creds.accessKeyId,
-            secretAccessKey: creds.secretAccessKey,
-            sessionToken:    creds.sessionToken
-          });
-        };
-        _livenessRoot.render(
-          React.createElement(FaceLivenessDetector, {
-            sessionId:           sessionId,
-            region:              'us-east-1',
-            onAnalysisComplete:  function() { verificarLiveness(sessionId); },
-            onError:             function(err) { cerrarLiveness(); mostrarResult('err','Error de verificacion', err.message||'Intenta de nuevo'); },
-            config: { credentialProvider: credProvider },
-            displayText: {
-              hintMoveFaceIntoOvalMessage: 'Mueve tu cara al ovalo',
-              hintTooFarMessage:           'Acercate mas',
-              hintTooCloseMessage:         'Alejate un poco',
-              hintHoldFaceMessage:         'Mantente quieto',
-              hintConnectingMessage:       'Conectando...',
-              hintVerifyingMessage:        'Verificando...',
-              startScreenBeginCheckingText:'Comenzar verificacion',
-            }
-          })
-        );
-      });
-    });
-  }).catch(function(e){
-    console.error('Import error:', e);
-    document.getElementById('livenessRoot').innerHTML = '<div class="liveness-loading" style="color:#f87171">Error al cargar componente:<br>'+e.message+'<br><br><small>Revisa la consola</small></div>';
-  });
 }
+
+// Mensajes del widget de liveness (corre en el iframe)
+window.addEventListener('message', function(ev){
+  var d = ev.data || {};
+  if (d.type === 'LIVENESS_OK') {
+    verificarLiveness(d.sessionId);
+  } else if (d.type === 'LIVENESS_CANCEL') {
+    cancelarLiveness();
+  }
+});
 
 async function verificarLiveness(sessionId) {
   try {
@@ -293,7 +246,9 @@ function cancelarLiveness() {
 }
 function cerrarLiveness() {
   document.getElementById('livenessOverlay').classList.remove('active');
-  try { if (_livenessRoot) { _livenessRoot.unmount(); _livenessRoot = null; } } catch(e) {}
+  var root = document.getElementById('livenessRoot');
+  if (root) root.innerHTML = '';
+  _livenessFrame = null;
 }
 
 // ── RECONOCER: igual que verificar_staging pero recibe b64 como parámetro ──
