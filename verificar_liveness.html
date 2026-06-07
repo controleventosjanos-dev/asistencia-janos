@@ -150,6 +150,21 @@ function mostrarCamError(msg) {
 function flipCam() { facing=facing==='user'?'environment':'user'; iniciarCam(facing); }
 async function escanear() {
   if (userLat === null) { mostrarResult('warn','Sin GPS','Activa el GPS para poder marcar asistencia.'); return; }
+  // Chequeo de rango universal — aplica para todos antes de activar cualquier cosa
+  var distCheck = Infinity, salonCheck = salonNom;
+  if (salonForzado && SALONES[salonForzado]) {
+    distCheck = haversine(userLat,userLng,SALONES[salonForzado].lat,SALONES[salonForzado].lng);
+    salonCheck = salonForzado;
+  } else {
+    Object.keys(SALONES).forEach(function(s){
+      var d=haversine(userLat,userLng,SALONES[s].lat,SALONES[s].lng);
+      if(d<distCheck){distCheck=d;salonCheck=s;}
+    });
+  }
+  if (distCheck > MAX_DIST) {
+    mostrarResult('warn','Fuera de rango','Debes estar a menos de '+MAX_DIST+'m de un salon (mas cercano: '+salonCheck+', '+Math.round(distCheck)+'m).');
+    return;
+  }
   var btn = document.getElementById('btnScan');
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Identificando...';
   // 1. Activar cámara si no está activa
