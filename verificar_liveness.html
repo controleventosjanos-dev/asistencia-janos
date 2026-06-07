@@ -180,20 +180,8 @@ function mostrarCamError(msg){
 // ── ESCANEAR: captura foto → liveness → reconocimiento ──
 async function escanear() {
   if (userLat === null) { mostrarResult('warn','Sin GPS','Activa el GPS para poder marcar asistencia.'); return; }
-  var btn = document.getElementById('btnScan');
-  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Verificando...';
-  if (!camActive) { activarCam(); await new Promise(function(r){ setTimeout(r,2000); }); }
-  var video=document.getElementById('video'), canvas=document.getElementById('canvas');
-  canvas.width=video.videoWidth||640; canvas.height=video.videoHeight||480;
-  canvas.getContext('2d').drawImage(video,0,0);
-  _pendingB64 = canvas.toDataURL('image/jpeg',0.85).split(',')[1];
-  btn.innerHTML = '<span class="spinner"></span> Iniciando verificacion de vida...';
-  // Liberar la camara para que la use el widget de liveness
-  if (stream) { stream.getTracks().forEach(function(t){ t.stop(); }); stream=null; camActive=false; }
-  document.getElementById('video').style.display='none';
-  document.getElementById('camPlaceholder').style.display='flex';
-  btn.disabled = false; btn.innerHTML = 'Verificar identidad';
-  // Abrir widget de liveness (bundleado, en iframe). El widget crea su propia sesion.
+  // 1) Liveness PRIMERO: el widget usa su propia camara a pantalla completa.
+  //    La interfaz de FaceCheck (reconocimiento) corre despues, al pasar el liveness.
   abrirWidget();
 }
 
@@ -232,7 +220,7 @@ async function verificarLiveness(sessionId) {
       return;
     }
     // Liveness OK → continuar con reconocimiento facial
-    await reconocer(_pendingB64);
+    await capturarYReconocer();
   } catch(e) {
     cerrarLiveness();
     mostrarResult('err','Error de conexion', e.message);
@@ -249,6 +237,20 @@ function cerrarLiveness() {
   var root = document.getElementById('livenessRoot');
   if (root) root.innerHTML = '';
   _livenessFrame = null;
+}
+
+// ── FACECHECK: tras liveness, abrir camara, capturar y reconocer ──
+async function capturarYReconocer() {
+  var btn = document.getElementById('btnScan');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Abriendo camara...';
+  activarCam();
+  await new Promise(function(r){ setTimeout(r, 1800); });
+  btn.innerHTML = '<span class="spinner"></span> Reconociendo rostro...';
+  var video=document.getElementById('video'), canvas=document.getElementById('canvas');
+  canvas.width=video.videoWidth||640; canvas.height=video.videoHeight||480;
+  canvas.getContext('2d').drawImage(video,0,0);
+  var b64 = canvas.toDataURL('image/jpeg',0.85).split(',')[1];
+  await reconocer(b64);
 }
 
 // ── RECONOCER: igual que verificar_staging pero recibe b64 como parámetro ──
