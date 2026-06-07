@@ -1699,7 +1699,7 @@ if (!regs.length) {
   html += '<div class="modal-table-wrap"><table class="modal-table">'
     + '<thead><tr>'
     + '<th>Fecha</th><th>Día</th><th>Hora</th>'
-    + '<th>Tipo</th><th>Confianza</th><th>Distancia</th>'
+    + '<th>Tipo</th><th>Salón</th><th>Confianza</th><th>Distancia</th>'
     + '</tr></thead><tbody>';
   regs.forEach(function(r) {
     var bc = r.tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-salida';
@@ -1740,6 +1740,7 @@ if (!regs.length) {
       + '<td>' + esc(r.hora || '—') + '</td>'
       + '<td><span class="badge ' + bc + '">' + esc(r.tipo) + '</span>'
       + (rowClass === 'row-anomalia' ? ' ⚠️' : '') + '</td>'
+      + '<td>' + esc(r.salon || '—') + '</td>'
       + '<td>' + (r.confianza != null && r.confianza !== ''
           ? (function() {
               var c = parseFloat(r.confianza);
