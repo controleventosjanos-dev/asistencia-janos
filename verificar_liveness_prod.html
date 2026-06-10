@@ -199,12 +199,15 @@ async function escanear() {
     // 5. Guardar datos para usar después
     window._pendingData = data;
     window._pendingB64 = b64;
+    // 6. Validar salon asignado ANTES de abrir liveness (no gastar verificacion de AWS si el salon no corresponde)
+    var salonOk = await validarSalon(data);
+    if (!salonOk) { return; }
     btn.disabled=false; btn.innerHTML='Verificar identidad';
     if (tipo === 'salida') {
       // Salida: sin liveness, registrar directamente
       await completarRegistro(data, b64);
     } else {
-      // Entrada: abrir liveness
+      // Entrada: salon validado, abrir liveness
       document.getElementById('livenessOverlay').classList.add('active');
     }
   } catch(e) {
@@ -230,6 +233,44 @@ window.addEventListener('message', function(ev) {
     mostrarResult('err','Verificacion fallida', ev.data.message || 'Intenta de nuevo');
   }
 });
+async function validarSalon(data) {
+  // Valida que el empleado pueda fichar en el salon detectado ANTES del liveness.
+  // Devuelve true si pasa; si falla, muestra el bloqueo y reactiva el boton.
+  var btn=document.getElementById('btnScan');
+  try {
+    var secRes=await fetch(SHEETS_URL+'?action=getSector&dni='+encodeURIComponent(data.dni));
+    var secData=await secRes.json();
+    var esAmbulante=secData.ok && secData.sector &&
+      secData.sector.toUpperCase().indexOf('AMBULANTE')>=0;
+    if (esAmbulante) {
+      var minD=Infinity, closestSalon=salonNom;
+      Object.keys(SALONES).forEach(function(s) {
+        var d=haversine(userLat,userLng,SALONES[s].lat,SALONES[s].lng);
+        if (d<minD) { minD=d; closestSalon=s; }
+      });
+      if (minD > MAX_DIST) {
+        mostrarResult('warn','Fuera de rango','No estas cerca de ningun salon (mas de '+Math.round(minD)+'m del mas cercano: '+closestSalon+').');
+        btn.disabled=false; btn.innerHTML='Verificar identidad';
+        return false;
+      }
+      salonNom=closestSalon;
+      distanciaMetros=Math.round(minD);
+    } else {
+      if (!gpsOk) {
+        mostrarResult('warn','Fuera de rango','Debes estar a menos de '+MAX_DIST+'m de un salon para marcar asistencia.');
+        btn.disabled=false; btn.innerHTML='Verificar identidad';
+        return false;
+      }
+      if (secData.ok && secData.sector && secData.sector!==salonNom) {
+        mostrarResult('warn',data.nombre,'No estas asignado a este salon. Tu salon es: '+secData.sector);
+        btn.disabled=false; btn.innerHTML='Verificar identidad';
+        return false;
+      }
+    }
+  } catch(e2) { /* fail-open: si getSector falla por red, se permite continuar */ }
+  return true;
+}
+
 async function completarRegistro(data, b64) {
   var btn=document.getElementById('btnScan');
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Registrando...';
