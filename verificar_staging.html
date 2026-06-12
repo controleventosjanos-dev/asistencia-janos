@@ -76,7 +76,7 @@ h1{font-size:1.3rem;font-weight:700;color:#38bdf8;text-align:center;margin-botto
 <button class="btn btn-scan" onclick="reiniciar()" style="margin-top:20px">Siguiente</button>
 </div>
 <script>
-var API_URL = 'https://tsrzke37pqhqw47fiufrm4shmq0qhzpd.lambda-url.us-east-2.on.aws';
+var API_URL = 'https://nha46wbuoo7ajwqqrsgzycavfi0rbcqh.lambda-url.us-east-2.on.aws';
 var SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxPXeeMIpxMi1bXuR47Ki5ISz7z9muSy2Gs3GmyiS8J-B2wTfFlZpOuElvwPSCTNcwm/exec';
 var MAX_DIST = 100;
 var SALONES = {"Acceso Oeste":{"lat":-34.630051,"lng":-58.736273},"Acceso Oeste 2":{"lat":-34.6343665,"lng":-58.7541304},"Adrogue":{"lat":-34.79580714896355,"lng":-58.39840871349146},"Avellaneda 1":{"lat":-34.67700663596199,"lng":-58.36926045956796},"Avellaneda 2":{"lat":-34.67700663596199,"lng":-58.36926045956796},"Avellaneda 3":{"lat":-34.67700663596199,"lng":-58.36926045956796},"Avellaneda 4":{"lat":-34.67700663596199,"lng":-58.36926045956796},"Bayres Eventos":{"lat":-34.49386844950456,"lng":-58.59392713305712},"Bella Vista":{"lat":-34.556763,"lng":-58.695852},"Bella Vista 2":{"lat":-34.56558024975642,"lng":-58.70115624468752},"Benavidez 1":{"lat":-34.41328690586904,"lng":-58.70441725767073},"Benavidez 2":{"lat":-34.41283070430927,"lng":-58.71634057565793},"Berazategui":{"lat":-34.78078603561312,"lng":-58.24587579999999},"Berazategui 2":{"lat":-34.77625697288345,"lng":-58.23644127686214},"Berisso":{"lat":-34.88420883790188,"lng":-57.90217764534688},"CABA Boutique":{"lat":-34.60696947952881,"lng":-58.38446560235706},"Caballito 1":{"lat":-34.60976055210654,"lng":-58.4400598},"Caballito 2":{"lat":-34.60976055210654,"lng":-58.4400598},"Campana":{"lat":-34.1570387,"lng":-59.0185956},"Canning":{"lat":-34.85605521068076,"lng":-58.5175497},"Champagnat Boutique":{"lat":-34.451768,"lng":-58.916404},"Costanera 1":{"lat":-34.54545894333134,"lng":-58.43118643173255},"Costanera 2":{"lat":-34.54545894333134,"lng":-58.43118643173255},"Dardo Rocha":{"lat":-34.4907407206998,"lng":-58.52651305767236},"Darwin 1":{"lat":-34.5886717288581,"lng":-58.43687601534143},"Darwin 2":{"lat":-34.5886717288581,"lng":-58.43687601534143},"Del Viso":{"lat":-34.44740216850433,"lng":-58.79489273317542},"DOT":{"lat":-34.54635161803416,"lng":-58.48787506064081},"Escobar":{"lat":-34.376101,"lng":-58.81715},"General Rodriguez":{"lat":-34.59602602954801,"lng":-58.93372882123573},"Haedo":{"lat":-34.6356497,"lng":-58.5896032},"Haedo 2":{"lat":-34.6356497,"lng":-58.5896032},"Hipodromo La Plata":{"lat":-34.90392222834488,"lng":-57.94801235582321},"Holiday Inn":{"lat":-34.73327940981686,"lng":-58.52004444603416},"Holiday Inn 2":{"lat":-34.73327940981686,"lng":-58.52004444603416},"House":{"lat":-34.519991,"lng":-58.742783},"Hudson":{"lat":-34.80735519557907,"lng":-58.17153655397216},"Hudson 2":{"lat":-34.90252141857428,"lng":-58.17218342883579},"Hurlingham":{"lat":-34.601542,"lng":-58.652154},"Ituzaingo":{"lat":-34.638843,"lng":-58.677128},"Ituzaingo 2":{"lat":-34.66464198571634,"lng":-58.67389078886168},"La Plata":{"lat":-34.94450602665787,"lng":-57.96753527384086},"La Plata 2":{"lat":-34.93372659788916,"lng":-57.92991437116449},"La Plata Boutique":{"lat":-34.93372659788916,"lng":-57.92991437116449},"Liniers":{"lat":-34.64489496032444,"lng":-58.51045795302172},"Lomas":{"lat":-34.75689134308413,"lng":-58.39613517301476},"Lomas Boutique":{"lat":-34.7603301378896,"lng":-58.41099933068637},"Los Naranjos":{"lat":-38.00898592439063,"lng":-57.6333206181579},"Martinez":{"lat":-34.492246,"lng":-58.511093},"Maschwitz":{"lat":-34.378192,"lng":-58.752286},"Merlo":{"lat":-34.66875764104189,"lng":-58.7378104106764},"Merlo 2":{"lat":-34.66091039235508,"lng":-58.7535604711642},"Moreno":{"lat":-34.646143,"lng":-58.8033},"Moron":{"lat":-34.63326397571632,"lng":-58.63119241534143},"Nunnez":{"lat":-34.54218327080488,"lng":-58.45969217301391},"Oficina":{"lat":-34.556763,"lng":-58.695852},"Olivos":{"lat":-34.502327,"lng":-58.479292},"Olivos 2":{"lat":-34.502327,"lng":-58.479292},"Palacio Sans Souci":{"lat":-34.44566535800791,"lng":-58.54268630429397},"Palermo Hollywood":{"lat":-34.57802364353802,"lng":-58.43768630184958},"Palermo Soho":{"lat":-34.5920897560759,"lng":-58.43083028650607},"Paseo Colon":{"lat":-34.61123555454792,"lng":-58.36965475270821},"Pilar":{"lat":-34.44639611355176,"lng":-58.89163322778487},"Pilar boutique":{"lat":-34.4074743905739,"lng":-58.85580878895455},"Pilar Hotel":{"lat":-34.4569304,"lng":-58.8888985},"Playa Grande":{"lat":-38.02523486067417,"lng":-57.53059157670718},"Puerto Madero":{"lat":-34.60964874165761,"lng":-58.36383646002772},"Puerto Madero Boutique":{"lat":-34.61439986030064,"lng":-58.3579035},"Quilmes Boutique":{"lat":-34.76490647775054,"lng":-58.27535245767235},"Quinta":{"lat":-34.468832,"lng":-58.797458},"Ramos Boutique":{"lat":-34.64604401098804,"lng":-58.56895834496699},"Ramos Boutique 2":{"lat":-34.64838835018546,"lng":-58.5695002888542},"Ramos Mejia":{"lat":-34.65964903594481,"lng":-58.56208005466929},"Ramos Mejia 2":{"lat":-34.65964903594481,"lng":-58.56208005466929},"Recoleta":{"lat":-34.58606615760529,"lng":-58.39348064232763},"San Isidro":{"lat":-34.48035092232818,"lng":-58.52074157116463},"San Justo":{"lat":-34.67591894028484,"lng":-58.5875203558232},"San Justo 2":{"lat":-34.67875610644857,"lng":-58.59102243181726},"San Martin 1":{"lat":-34.56777583638708,"lng":-58.59138328650755},"San Martin 2":{"lat":-34.56816739887635,"lng":-58.59061621404123},"San Martin 3":{"lat":-34.56784016632005,"lng":-58.59070850702175},"San Miguel":{"lat":-34.55440169283807,"lng":-58.71736887116464},"San Telmo":{"lat":-34.61183,"lng":-58.37469},"San Telmo 2":{"lat":-34.61135331347032,"lng":-58.37388707116464},"San Telmo Boutique":{"lat":-34.61492395543934,"lng":-58.37116922883535},"Temperley":{"lat":-34.78514977472399,"lng":-58.40608038465528},"Vicente Lopez":{"lat":-34.51771,"lng":-58.47866},"Villa de Mayo":{"lat":-34.5141151,"lng":-58.6815573},"Villa de Mayo Boutique":{"lat":-34.5141151,"lng":-58.6815573}};
@@ -144,7 +144,7 @@ function mostrarCamError(msg) {
 }
 function flipCam() { facing=facing==='user'?'environment':'user'; iniciarCam(facing); }
 async function escanear() {
-  if (userLat === null) { mostrarResult('warn','Sin GPS','Activa el GPS para poder marcar asistencia.'); return; }
+  if (!gpsOk) { mostrarResult('warn','Fuera de rango','Debes estar a menos de '+MAX_DIST+'m de un salon para marcar asistencia.'); return; }
   var btn=document.getElementById('btnScan');
   btn.disabled=true; btn.innerHTML='<span class="spinner"></span> Verificando...';
   if (!camActive) { activarCam(); await new Promise(function(r){ setTimeout(r,2000); }); }
@@ -156,57 +156,23 @@ async function escanear() {
     var res=await fetch(API_URL+'/verificar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:b64})});
     var data=await res.json();
     if (data.ok) {
+      // BLOQUEO NOMINA: empleado dado de baja (Activo=NO) ANTES de salon/registro
+      try {
+        var actRes=await fetch(SHEETS_URL+'?action=getActivo&dni='+encodeURIComponent(data.dni));
+        var actData=await actRes.json();
+        if (actData && actData.activo==='NO') {
+          mostrarResult('err','DNI Inactivo',(data.nombre||'')+' esta dado de baja. No podes fichar.');
+          btn.disabled=false; btn.innerHTML='Verificar identidad'; return;
+        }
+      } catch(eAct) { /* fail-open: si getActivo falla por red, sigue (el backend bloquea igual) */ }
       var sim=Math.round(data.similarity||0);
       var sectorOk=true;
-              var estadoRes = await fetch(SHEETS_URL
-                                                    + '?action=getEstadoHoy&dni='
-                                                    + encodeURIComponent(data.dni));
-              var estadoData = await estadoRes.json();
-              var ultimoTipo = estadoData.ok
-                ? estadoData.ultimoTipo : null;
-              if (ultimoTipo === 'SALIDA') {
-                          mostrarResult('warn', data.nombre,
-                                                    'Ya registraste tu salida hoy.');
-                          btn.disabled = false;
-                          btn.innerHTML = 'Verificar identidad';
-                          return;
-              }
-              if (ultimoTipo === 'ENTRADA') {
-                          setTipo('salida');
-                          document.getElementById('btnE').disabled = true;
-                          document.getElementById('btnE').style.opacity = '0.4';
-                          document.getElementById('btnS').disabled = false;
-                          document.getElementById('btnS').style.opacity = '1';
-              } else {
-                          setTipo('entrada');
-                          document.getElementById('btnE').disabled = false;
-                          document.getElementById('btnE').style.opacity = '1';
-                          document.getElementById('btnS').disabled = true;
-                          document.getElementById('btnS').style.opacity = '0.4';
-              }
       try {
         var secRes=await fetch(SHEETS_URL+'?action=getSector&dni='+encodeURIComponent(data.dni));
         var secData=await secRes.json();
-        var esAmbulante=secData.ok && secData.sector &&
-          secData.sector.toUpperCase().indexOf('AMBULANTE')>=0;
-        if (esAmbulante) {
-          var minD=Infinity, closestSalon=salonNom;
-          Object.keys(SALONES).forEach(function(s) {
-            var d=haversine(userLat,userLng,SALONES[s].lat,SALONES[s].lng);
-            if (d<minD) { minD=d; closestSalon=s; }
-          });
-          salonNom=closestSalon;
-          distanciaMetros=Math.round(minD);
-        } else {
-          if (!gpsOk) {
-            mostrarResult('warn','Fuera de rango','Debes estar a menos de '+MAX_DIST+'m de un salon para marcar asistencia.');
-            btn.disabled=false; btn.innerHTML='Verificar identidad';
-            return;
-          }
-          if (secData.ok && secData.sector && secData.sector!==salonNom) {
-            mostrarResult('warn',data.nombre,'No estas asignado a este salon. Tu salon es: '+secData.sector);
-            sectorOk=false;
-          }
+        if (secData.ok && secData.sector && secData.sector!==salonNom) {
+          mostrarResult('warn',data.nombre,'No estas asignado a este salon. Tu salon es: '+secData.sector);
+          sectorOk=false;
         }
       } catch(e2) { /* si falla consulta sector, se permite el registro */ }
       if (sectorOk) {
