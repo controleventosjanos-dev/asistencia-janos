@@ -213,6 +213,73 @@ white-space: nowrap;
   border: none;
 }
 .btn-excel:hover { opacity: .85; }
+.btn-nomina {
+  background: var(--btn);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-xs);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  transition: opacity .2s;
+  white-space: nowrap;
+  display: none;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+.btn-nomina:hover { opacity: .85; }
+.btn-nomina:disabled { opacity: .55; cursor: default; }
+/* MODAL NOMINA */
+#nomina-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,.72);
+  z-index: 60;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.nomina-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  width: 100%;
+  max-width: 380px;
+  padding: 22px 22px 20px;
+  box-shadow: 0 12px 48px rgba(0,0,0,.45);
+}
+.nomina-box h3 { font-size: 16px; font-weight: 600; color: var(--text); }
+.nomina-sub { font-size: 12px; color: var(--muted); margin: 4px 0 14px; }
+.nomina-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 2px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.nomina-row span { color: var(--muted); }
+.nomina-row b { color: var(--text); font-weight: 600; }
+.nomina-err { margin-top: 12px; color: var(--red); font-size: 13px; }
+.nomina-err ul { margin: 6px 0 0 18px; }
+.nomina-close {
+  margin-top: 18px;
+  width: 100%;
+  background: var(--btn);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-xs);
+  padding: 10px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s;
+}
+.nomina-close:hover { background: var(--btn-hover); }
 /* FaceCheck branding */
 .product-brand {
   position: absolute;
@@ -965,6 +1032,8 @@ border-color: #38bdf8;
    class="btn-horarios">Configurar horarios</a>
 <button class="btn-excel" id="btn-excel"
   onclick="descargarExcel()">⬇ Excel</button>
+<button class="btn-nomina" id="btn-nomina"
+  onclick="procesarNomina()">👥 Procesar nómina</button>
 <button class="btn-logout" id="btn-logout">Cerrar sesión</button>
 <div class="product-brand">
   <span class="product-brand-name">FaceCheck</span>
@@ -1286,6 +1355,7 @@ if (!$fHasta.value) $fHasta.value = hoy;
 doFetch();
 document.getElementById('link-horarios').style.display = 'inline-flex';
 document.getElementById('btn-excel').style.display = 'inline-flex';
+document.getElementById('btn-nomina').style.display = (session.codigo === 'rrhh2026') ? 'inline-flex' : 'none';
 }
 
 async function doFetch() {
@@ -1699,7 +1769,7 @@ if (!regs.length) {
   html += '<div class="modal-table-wrap"><table class="modal-table">'
     + '<thead><tr>'
     + '<th>Fecha</th><th>Día</th><th>Hora</th>'
-    + '<th>Tipo</th><th>Confianza</th><th>Distancia</th>'
+    + '<th>Tipo</th><th>Salón</th><th>Confianza</th><th>Distancia</th>'
     + '</tr></thead><tbody>';
   regs.forEach(function(r) {
     var bc = r.tipo === 'ENTRADA' ? 'badge-entrada' : 'badge-salida';
@@ -1740,6 +1810,7 @@ if (!regs.length) {
       + '<td>' + esc(r.hora || '—') + '</td>'
       + '<td><span class="badge ' + bc + '">' + esc(r.tipo) + '</span>'
       + (rowClass === 'row-anomalia' ? ' ⚠️' : '') + '</td>'
+      + '<td>' + esc(r.salon || '—') + '</td>'
       + '<td>' + (r.confianza != null && r.confianza !== ''
           ? (function() {
               var c = parseFloat(r.confianza);
@@ -1860,6 +1931,41 @@ $filterBtns.forEach(function(btn) {
 }
 
 
+var PROFORMA_ID = '1tU48cFtw35D4I2Kcwt0C5KHF0ql8aJL5bzFPyCyDsa4'; // PROD: proforma oficial RRHH
+
+function procesarNomina() {
+  if (!confirm('¿Procesar la nómina cargada por RRHH? Esto dará de alta a los empleados nuevos y de baja a los marcados.')) return;
+  var btn = document.getElementById('btn-nomina');
+  var prev = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Procesando…';
+  fetch(SHEETS_URL + '?action=procesarMovimientos&proformaId=' + encodeURIComponent(PROFORMA_ID))
+    .then(function(r){ return r.json(); })
+    .then(function(res){ btn.disabled = false; btn.innerHTML = prev; mostrarResultadoNomina(res); })
+    .catch(function(e){ btn.disabled = false; btn.innerHTML = prev; mostrarResultadoNomina({ ok:false, error:'Error de conexión: ' + e }); });
+}
+
+function mostrarResultadoNomina(res) {
+  var body = document.getElementById('nomina-body');
+  if (res && res.ok) {
+    var h = '<div class="nomina-row"><span>Altas</span><b>' + (res.altas||0) + '</b></div>'
+          + '<div class="nomina-row"><span>Bajas</span><b>' + (res.bajas||0) + '</b></div>'
+          + '<div class="nomina-row"><span>Reactivaciones</span><b>' + (res.reactivaciones||0) + '</b></div>'
+          + '<div class="nomina-row"><span>Sin cambios</span><b>' + (res.sinCambios||0) + '</b></div>';
+    if (res.errores && res.errores.length) {
+      h += '<div class="nomina-err"><b>Errores (' + res.errores.length + '):</b><ul>';
+      res.errores.forEach(function(x){ h += '<li>' + esc(x) + '</li>'; });
+      h += '</ul></div>';
+    }
+    body.innerHTML = h;
+  } else {
+    body.innerHTML = '<div class="nomina-err">' + esc((res && res.error) || 'Error desconocido') + '</div>';
+  }
+  document.getElementById('nomina-overlay').style.display = 'flex';
+}
+
+function cerrarNomina() { document.getElementById('nomina-overlay').style.display = 'none'; }
+
 function descargarExcel() {
   if (!allEmps || !allEmps.length) {
     alert('No hay datos cargados. Aplicá un filtro primero.');
@@ -1916,20 +2022,13 @@ function descargarExcel() {
 </div>
 </div>
 
-</body>
-</html>
-
-<!-- MODAL DETALLE EMPLEADO -->
-<div id="modal-overlay" style="display:none" role="dialog" aria-modal="true">
-<div id="modal-box">
-<div id="modal-hdr">
-<div>
-<div id="modal-nombre"></div>
-<div id="modal-sub"></div>
-</div>
-<button id="modal-close" aria-label="Cerrar">&#x2715;</button>
-</div>
-<div id="modal-body"></div>
+<!-- MODAL NOMINA -->
+<div id="nomina-overlay">
+<div class="nomina-box">
+<h3>Procesar nómina</h3>
+<div class="nomina-sub">Resultado de los movimientos aplicados</div>
+<div id="nomina-body"></div>
+<button class="nomina-close" onclick="cerrarNomina()">Cerrar</button>
 </div>
 </div>
 
