@@ -182,6 +182,15 @@ async function escanear() {
       mostrarResult('err','No reconocido', data.error||'Rostro no encontrado. Pedi al administrador que te registre primero.');
       btn.disabled=false; btn.innerHTML='Verificar identidad'; return;
     }
+    // 3b. BLOQUEO NOMINA: empleado dado de baja (Activo=NO) ANTES de salon/liveness
+    try {
+      var actRes = await fetch(SHEETS_URL+'?action=getActivo&dni='+encodeURIComponent(data.dni));
+      var actData = await actRes.json();
+      if (actData && actData.activo === 'NO') {
+        mostrarResult('err','DNI Inactivo',(data.nombre||'')+' esta dado de baja. No podes fichar.');
+        btn.disabled=false; btn.innerHTML='Verificar identidad'; return;
+      }
+    } catch(eAct) { /* fail-open: si getActivo falla por red, sigue (el backend bloquea igual) */ }
     // 4. Consultar último fichaje del día en el Sheet
     var estadoRes = await fetch(SHEETS_URL+'?action=getEstadoHoy&dni='+encodeURIComponent(data.dni));
     var estadoData = await estadoRes.json();

@@ -156,6 +156,15 @@ async function escanear() {
     var res=await fetch(API_URL+'/verificar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({imageBase64:b64})});
     var data=await res.json();
     if (data.ok) {
+      // BLOQUEO NOMINA: empleado dado de baja (Activo=NO) ANTES de salon/registro
+      try {
+        var actRes=await fetch(SHEETS_URL+'?action=getActivo&dni='+encodeURIComponent(data.dni));
+        var actData=await actRes.json();
+        if (actData && actData.activo==='NO') {
+          mostrarResult('err','DNI Inactivo',(data.nombre||'')+' esta dado de baja. No podes fichar.');
+          btn.disabled=false; btn.innerHTML='Verificar identidad'; return;
+        }
+      } catch(eAct) { /* fail-open: si getActivo falla por red, sigue (el backend bloquea igual) */ }
       var sim=Math.round(data.similarity||0);
       var sectorOk=true;
               var estadoRes = await fetch(SHEETS_URL
