@@ -1406,6 +1406,10 @@ url += '&fecha_desde=' + encodeURIComponent(toBackend(desde));
 url += '&fecha_hasta=' + encodeURIComponent(toBackend(hasta));
 }
 
+  if (session.area !== null) {
+    url += '&area=' + encodeURIComponent(session.area);
+  }
+
 
 setLoading(true);
 hideErr();
@@ -1437,51 +1441,49 @@ setLoading(false);
 }
 
 /* CAMBIO 2: renderizado condicional — solo muestra tarjetas si hay filtro activo */
+function getListaFiltrada() {
+  var base = allEmps;
+  if (session.area !== null) {
+    base = base.filter(function(e){
+      return (e.area||'').toUpperCase() === String(session.area).toUpperCase();
+    });
+  }
+  var salon = $fSalon.value;
+  var busqueda = $fBusqueda.value.trim().toLowerCase();
+  var area = $fArea.value;
+  var lista = base;
+  if (salon && salon.indexOf('zona:') === 0) {
+    var zona = salon.slice(5); var salonesZ = ZONAS[zona] || [];
+    lista = lista.filter(function(e){ return salonesZ.indexOf(e.salon||'') !== -1; });
+  } else if (salon) {
+    lista = lista.filter(function(e){ return (e.salon||'') === salon; });
+  }
+  if (area) {
+    lista = lista.filter(function(e){ return (e.area||'').toUpperCase() === area.toUpperCase(); });
+  }
+  if (busqueda.length >= 1) {
+    lista = lista.filter(function(e){
+      var nombre=(e.nombre||'').toLowerCase(); var id=String(e.id||'').toLowerCase();
+      return nombre.indexOf(busqueda)!==-1 || id.indexOf(busqueda)!==-1;
+    });
+  }
+  return lista;
+}
+
 function renderFiltered() {
-var salon = $fSalon.value;
-var busqueda = $fBusqueda.value.trim().toLowerCase();
-var area = $fArea.value;
-var hayFiltro = salon !== '' || area !== '' || busqueda.length >= 1 || activeChip !== null;
-
-$grid.innerHTML = '';
-$empty.classList.remove('on');
-$placeholder.classList.remove('on');
-
-if (!hayFiltro) {
-updateChips(allEmps);
-$placeholder.classList.add('on');
-return;
-}
-
-var lista = allEmps;
-
-if (salon && salon.indexOf('zona:') === 0) {
-var zona = salon.slice(5);
-var salonesZ = ZONAS[zona] || [];
-lista = lista.filter(function(e) { return salonesZ.indexOf(e.salon || '') !== -1; });
-} else if (salon) {
-lista = lista.filter(function(e) { return (e.salon || '') === salon; });
-}
-
-if (area) {
-lista = lista.filter(function(e) {
-return (e.area || '').toUpperCase() === area.toUpperCase();
-});
-}
-if (busqueda.length >= 1) {
-lista = lista.filter(function(e) {
-var nombre = (e.nombre || '').toLowerCase();
-var id = String(e.id || '').toLowerCase();
-return nombre.indexOf(busqueda) !== -1 || id.indexOf(busqueda) !== -1;
-});
-}
-
-updateChips(lista);
-
-if (!lista.length) { $empty.classList.add('on'); return; }
-lista.forEach(function(e) { $grid.appendChild(buildCard(e)); });
-
-if (activeChip) applyChipFilter();
+  var hayFiltro = $fSalon.value !== '' || $fArea.value !== '' || $fBusqueda.value.trim().length >= 1 || activeChip !== null;
+  $grid.innerHTML = '';
+  $empty.classList.remove('on');
+  $placeholder.classList.remove('on');
+  var lista = getListaFiltrada();
+  updateChips(lista);
+  if (!hayFiltro) {
+    $placeholder.classList.add('on');
+    return;
+  }
+  if (!lista.length) { $empty.classList.add('on'); return; }
+  lista.forEach(function(e) { $grid.appendChild(buildCard(e)); });
+  if (activeChip) applyChipFilter();
 }
 
 function formatExtra(min) {
@@ -2006,16 +2008,17 @@ function descargarExcel() {
   var desde = $fDesde ? $fDesde.value : '';
   var hasta = $fHasta ? $fHasta.value : '';
   var filas = [];
+  var lista = getListaFiltrada();
   var esRango = allEmps[0] && allEmps[0].puntual !== undefined;
   if (esRango) {
     filas.push(['ID','Nombre','Área','Salón','Puntual','Tardío','Ausente','Feriado','Sin horario','Flexible','Horas extra (días)','Horas extra (min)',
       'Horas trabajadas']);
-    allEmps.forEach(function(e) {
+    lista.forEach(function(e) {
       filas.push([e.id, e.nombre, e.area, e.salon, e.puntual||0, e.tardio||0, e.ausente||0, e.feriado||0, e.sin_horario||0, e.flexible||0, e.hora_extra||0, e.hora_extra_minutos||0, (function(){var tot=e.horas_trabajadas_min||0;var h=Math.floor(tot/60),m=tot%60;return h+'h '+(m<10?'0':'')+m+'min';})()]);
     });
   } else {
     filas.push(['ID','Nombre','Área','Salón','Estado','Entrada esperada','Salida esperada','Entrada real','Salida real','Hora extra (min)']);
-    allEmps.forEach(function(e) {
+    lista.forEach(function(e) {
       var he = e.horario_esperado || {};
       var rr = e.registro_real || {};
       filas.push([e.id, e.nombre, e.area, e.salon, e.estado, he.entrada||''  , he.salida||'', rr.entrada||'', rr.salida||'', e.hora_extra_minutos||0,
